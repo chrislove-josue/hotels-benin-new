@@ -1,0 +1,176 @@
+@extends('layouts.app')
+
+@section('title', $establishment->name . ' — Hôtels Bénin')
+@section('meta_description', \Illuminate\Support\Str::limit($establishment->short_description, 155))
+
+@section('content')
+@php
+    $galleryImages = collect([$establishment->cover_image])->merge($establishment->images->pluck('path'))->values();
+@endphp
+<div x-data="{ lightbox: null, images: {{ $galleryImages->toJson() }} }">
+
+{{-- GALERIE --}}
+<section class="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8" data-reveal>
+    <nav class="mb-4 flex items-center gap-1 text-sm text-gray-500">
+        <a href="{{ route('home') }}" class="hover:text-hb-blue">Accueil</a> <span>/</span>
+        <a href="{{ route('establishments.index') }}" class="hover:text-hb-blue">Établissements</a> <span>/</span>
+        <span class="font-semibold text-hb-blue">{{ $establishment->name }}</span>
+    </nav>
+
+{{-- Grille de galerie --}}
+    <div class="grid grid-cols-1 gap-3 md:grid-cols-4 md:grid-rows-2">
+        <button type="button" class="group relative overflow-hidden rounded-2xl md:col-span-2 md:row-span-2" @click="lightbox = 0">
+            <img src="{{ $galleryImages[0] }}" alt="{{ $establishment->name }}" class="h-64 w-full object-cover transition duration-700 group-hover:scale-105 md:h-full">
+            <span class="absolute inset-0 bg-hb-blue-deeper/0 transition group-hover:bg-hb-blue-deeper/20"></span>
+        </button>
+        @foreach($galleryImages->slice(1, 4) as $i => $image)
+            <button type="button" class="group relative overflow-hidden rounded-2xl" @click="lightbox = {{ $loop->iteration }}">
+                <img src="{{ $image }}" alt="" class="h-32 w-full object-cover transition duration-700 group-hover:scale-105 md:h-full">
+                <span class="absolute inset-0 bg-hb-blue-deeper/0 transition group-hover:bg-hb-blue-deeper/20"></span>
+            </button>
+        @endforeach
+    </div>
+</section>
+
+<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+
+        {{-- Colonne principale --}}
+        <div class="lg:col-span-2">
+            <div class="mb-4 flex flex-wrap items-center gap-3">
+                <span class="badge-gold-solid">{{ $establishment->type->name }}</span>
+                <span class="flex items-center gap-1 rounded-full bg-hb-gold/10 px-3 py-1 text-sm font-semibold text-hb-gold">
+                    ★ {{ number_format($establishment->rating, 1) }} · {{ $establishment->reviews_count }} avis
+                </span>
+            </div>
+
+            <h1 class="font-display text-3xl font-bold text-hb-blue-deeper md:text-4xl">{{ $establishment->name }}</h1>
+<p class="mt-2 flex items-center gap-1 text-gray-500">
+                <i class="bi bi-geo-alt text-hb-orange"></i> {{ $establishment->address }}, {{ $establishment->locality->name }}
+            </p>
+
+            <div class="my-8 h-px bg-gradient-to-r from-transparent via-hb-gold/40 to-transparent"></div>
+
+            <h2 class="mb-3 font-display text-xl font-bold text-hb-blue-deeper">Description</h2>
+            <p class="leading-relaxed text-gray-600">{{ $establishment->description }}</p>
+
+            <div class="my-8 h-px bg-gradient-to-r from-transparent via-hb-gold/40 to-transparent"></div>
+
+            <h2 class="mb-4 font-display text-xl font-bold text-hb-blue-deeper">Équipements</h2>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                @foreach($establishment->amenities as $amenity)
+                    <div class="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm text-gray-700 shadow-sm">
+<span class="flex h-5 w-5 items-center justify-center rounded-full bg-hb-gold/20 text-xs text-hb-orange"><i class="bi bi-check-lg"></i></span> {{ $amenity->name }}
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="my-8 h-px bg-gradient-to-r from-transparent via-hb-gold/40 to-transparent"></div>
+
+            <h2 class="mb-4 font-display text-xl font-bold text-hb-blue-deeper">Chambres / espaces disponibles</h2>
+            <div class="space-y-3">
+                @foreach($establishment->rooms as $room)
+                    <div class="flex flex-col justify-between gap-2 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition hover:border-hb-gold/50 hover:shadow-md sm:flex-row sm:items-center">
+                        <div class="flex items-start gap-3">
+<span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-hb-blue/10 text-hb-blue"><i class="bi bi-door-open"></i></span>
+                            <div>
+                                <p class="font-semibold text-hb-blue">{{ $room->name }}</p>
+                                <p class="text-sm text-gray-500">{{ $room->description }}</p>
+                                <p class="mt-1 text-xs text-gray-400">Capacité : {{ $room->capacity }} pers.</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-display text-lg font-bold text-hb-blue">{{ number_format($room->price_per_night, 0, ',', ' ') }} FCFA</p>
+                            <p class="text-xs text-gray-400">/ nuit</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="my-8 h-px bg-gradient-to-r from-transparent via-hb-gold/40 to-transparent"></div>
+
+            <h2 class="mb-4 font-display text-xl font-bold text-hb-blue-deeper">Avis des voyageurs ({{ $establishment->reviews_count }})</h2>
+            <div class="space-y-4">
+                @forelse($establishment->reviews->take(6) as $review)
+                    <div class="rounded-xl bg-white p-4 shadow-sm">
+                        <div class="mb-1 flex items-center justify-between">
+                            <p class="font-semibold text-hb-blue">{{ $review->user->name }}</p>
+                            <span class="text-sm font-semibold text-hb-gold">{{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}</span>
+                        </div>
+                        @if($review->title)
+                            <p class="text-sm font-semibold text-gray-700">{{ $review->title }}</p>
+                        @endif
+                        <p class="mt-1 text-sm text-gray-600">{{ $review->comment }}</p>
+                    </div>
+                @empty
+                    <p class="text-sm text-gray-500">Aucun avis pour le moment.</p>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Colonne réservation (simulée) --}}
+        <div class="lg:col-span-1">
+            <div class="card sticky top-24 p-6">
+                <p class="mb-1 text-xs text-gray-400">à partir de</p>
+                <p class="mb-4 font-display text-3xl font-bold text-hb-blue">
+                    {{ number_format($establishment->price_from, 0, ',', ' ') }} <span class="text-sm font-medium">FCFA / nuit</span>
+                </p>
+
+                <form class="space-y-4" x-data="{ confirmed: false }" @submit.prevent="confirmed = true">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="mb-1 block text-xs font-semibold text-gray-500">Arrivée</label>
+                            <input type="date" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-semibold text-gray-500">Départ</label>
+                            <input type="date" class="input-field" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-gray-500">Voyageurs</label>
+                        <input type="number" min="1" value="2" class="input-field" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full">Vérifier la disponibilité</button>
+                    <p x-show="confirmed" x-cloak x-transition class="rounded-lg bg-hb-gold/15 p-3 text-center text-xs text-hb-blue">
+                        Simulation uniquement — le traitement réel des réservations sera géré par le back-office.
+                    </p>
+                </form>
+
+                <div class="mt-6 border-t border-gray-100 pt-6 text-center text-sm text-gray-500">
+                    Une question ? <a href="{{ route('contact.create') }}" class="font-semibold text-hb-orange">Contactez-nous</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Établissements similaires --}}
+    @if($similar->isNotEmpty())
+        <div class="mt-16" data-reveal>
+            <span class="section-eyebrow">Dans la même ville</span>
+            <h2 class="section-title mb-8">Établissements similaires à {{ $establishment->locality->name }}</h2>
+            <div class="divider-gold"></div>
+            <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                @foreach($similar as $item)
+                    @include('partials.establishment-card', ['establishment' => $item])
+                @endforeach
+            </div>
+        </div>
+    @endif
+</section>
+
+{{-- Lightbox --}}
+<div x-cloak x-show="lightbox !== null" @keydown.escape.window="lightbox = null"
+     class="fixed inset-0 z-[60] flex items-center justify-center bg-hb-blue-deeper/90 p-4 backdrop-blur-sm"
+     x-transition.opacity @click.self="lightbox = null">
+<button @click="lightbox = null" class="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"><i class="bi bi-x-lg text-xl"></i></button>
+
+    <button @click="lightbox = (lightbox + images.length - 1) % images.length" class="absolute left-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"><i class="bi bi-chevron-left text-2xl"></i></button>
+
+    <img :src="images[lightbox]" class="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl">
+
+    <button @click="lightbox = (lightbox + 1) % images.length" class="absolute right-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"><i class="bi bi-chevron-right text-2xl"></i></button>
+</div>
+
+</div>
+@endsection

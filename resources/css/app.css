@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+    body {
+        @apply bg-hb-cream text-gray-800 antialiased;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-full bg-hb-orange px-6 py-3 font-semibold text-white transition hover:bg-hb-orange-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-hb-gold focus-visible:ring-offset-2;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-hb-blue px-6 py-3 font-semibold text-hb-blue transition hover:bg-hb-blue hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-hb-gold focus-visible:ring-offset-2;
+    }
+    .badge-gold {
+        @apply inline-flex items-center gap-1 rounded-full bg-hb-gold/15 px-3 py-1 text-xs font-semibold text-hb-blue;
+    }
+    .card {
+        @apply overflow-hidden rounded-2xl bg-white shadow-card transition hover:-translate-y-1 hover:shadow-lg;
+    }
+    .input-field {
+        @apply w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-hb-blue focus:outline-none focus:ring-2 focus:ring-hb-blue/20;
+    }
+    .section-title {
+        @apply font-sans text-3xl font-bold text-hb-blue md:text-4xl;
+    }
+    .section-eyebrow {
+        @apply mb-2 inline-block text-sm font-semibold uppercase tracking-widest text-hb-orange;
+    }
+}
