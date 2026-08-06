@@ -1,4 +1,4 @@
-<header x-data="{ mobileOpen: false, dropdownOpen: false, searchOpen: false }"
+<header x-data="{ mobileOpen: false, searchOpen: false }"
         class="sticky top-0 z-50 border-b border-white/60 bg-white/85 backdrop-blur-md">
     <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
 
@@ -16,29 +16,10 @@
         <nav class="hidden items-center gap-1 lg:flex">
             <a href="{{ route('home') }}" class="rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('home') ? 'bg-hb-cream text-hb-blue' : '' }}">Accueil</a>
 
-            {{-- Dropdown Établissements --}}
-            <div class="relative" @mouseenter="dropdownOpen = true" @mouseleave="dropdownOpen = false">
-                <a href="{{ route('establishments.index') }}"
-                   class="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('establishments.*') ? 'bg-hb-cream text-hb-blue' : '' }}">
-                    Établissements
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition" :class="dropdownOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                </a>
-
-                <div x-cloak x-show="dropdownOpen" x-transition.opacity x-transition.scale.origin.top
-                     class="absolute left-0 z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-gray-100 bg-white p-2 shadow-card-lg">
-                    <a href="{{ route('establishments.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue">
-                        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-hb-blue/10 text-hb-blue"><i class="bi bi-grid"></i></span>
-                        Tous les établissements
-                    </a>
-                    <div class="my-1 h-px bg-gray-100"></div>
-                    @foreach($headerTypes as $type)
-                        <a href="{{ route('establishments.index', ['type' => $type->slug]) }}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue">
-                            <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-hb-orange/10 text-hb-orange"><i class="bi bi-{{ $type->icon }}"></i></span>
-                            {{ $type->name }}
-                        </a>
-                    @endforeach
-                </div>
-            </div>
+<a href="{{ route('establishments.index') }}"
+               class="rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('establishments.*') ? 'bg-hb-cream text-hb-blue' : '' }}">
+                Établissements
+            </a>
 
             <a href="{{ route('about') }}" class="rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('about') ? 'bg-hb-cream text-hb-blue' : '' }}">À propos</a>
             <a href="{{ route('contact.create') }}" class="rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('contact.*') ? 'bg-hb-cream text-hb-blue' : '' }}">Contact</a>
@@ -96,17 +77,8 @@
     <div x-cloak x-show="mobileOpen" x-transition.opacity
          class="border-t border-gray-100 bg-white lg:hidden">
         <nav class="flex flex-col gap-1 px-4 py-4">
-            <a href="{{ route('home') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('home') ? 'bg-hb-cream text-hb-blue' : '' }}">Accueil</a>
-
-            <p class="px-4 pt-2 text-xs font-bold uppercase tracking-wider text-gray-400">Établissements</p>
-            <a href="{{ route('establishments.index') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue">Tous les établissements</a>
-            @foreach($headerTypes as $type)
-                <a href="{{ route('establishments.index', ['type' => $type->slug]) }}" @click="mobileOpen = false" class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue">
-                    <i class="bi bi-{{ $type->icon }} text-hb-orange"></i> {{ $type->name }}
-                </a>
-            @endforeach
-
-            <div class="my-2 h-px bg-gray-100"></div>
+<a href="{{ route('home') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('home') ? 'bg-hb-cream text-hb-blue' : '' }}">Accueil</a>
+            <a href="{{ route('establishments.index') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('establishments.*') ? 'bg-hb-cream text-hb-blue' : '' }}">Établissements</a>
             <a href="{{ route('about') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue">À propos</a>
             <a href="{{ route('contact.create') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue">Contact</a>
             <div class="my-2 h-px bg-gray-100"></div>
