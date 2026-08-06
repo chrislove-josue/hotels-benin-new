@@ -123,13 +123,15 @@ public function updateReservation(Request $request, int $id)
         return back()->with('status', 'Réservation mise à jour.');
     }
 
-    public function transactions()
+public function transactions()
     {
         $transactions = Transaction::with('reservation.establishment')
             ->latest()
             ->paginate(15);
 
-        return view('backoffice.admin.transactions', compact('transactions'));
+        $total = Transaction::where('status', 'reussie')->sum('amount');
+
+        return view('backoffice.admin.transactions', compact('transactions', 'total'));
     }
 
     public function messages()
