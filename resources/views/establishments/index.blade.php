@@ -17,8 +17,8 @@
          x-data="{ filtersOpen: true }">
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
 
-        {{-- Filtres --}}
-        <aside class="lg:col-span-1">
+{{-- Filtres --}}
+        <aside class="lg:col-span-1 lg:sticky lg:top-24 lg:h-fit lg:self-start">
             {{-- Bouton accordéon (mobile) --}}
 <button @click="filtersOpen = !filtersOpen"
                     class="mb-4 flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-hb-blue lg:hidden">
