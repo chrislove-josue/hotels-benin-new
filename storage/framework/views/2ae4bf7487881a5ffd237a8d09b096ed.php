@@ -108,7 +108,7 @@
             </div>
         </div>
 
-        
+
         <div class="lg:col-span-1">
             <div class="card sticky top-24 p-6">
                 <p class="mb-1 text-xs text-gray-400">à partir de</p>
@@ -116,26 +116,77 @@
                     <?php echo e(number_format($establishment->price_from, 0, ',', ' ')); ?> <span class="text-sm font-medium">FCFA / nuit</span>
                 </p>
 
-                <form class="space-y-4" x-data="{ confirmed: false }" @submit.prevent="confirmed = true">
+                <?php if(auth()->guard()->guest()): ?>
+                    <div class="rounded-xl bg-hb-sand p-5 text-center">
+                        <p class="text-sm text-gray-600">Connectez-vous pour réserver cet établissement.</p>
+                        <a href="<?php echo e(route('login.show')); ?>" class="btn-primary mt-4 w-full">Se connecter</a>
+                        <a href="<?php echo e(route('register.show')); ?>" class="btn-outline mt-2 w-full">Créer un compte</a>
+                    </div>
+                <?php else: ?>
+
+<form action="<?php echo e(route('reservations.store', $establishment->slug)); ?>" method="POST" class="space-y-4"
+                      x-data="{ selectedRoom: '', updateNights() { return; } }">
+                    <?php echo csrf_field(); ?>
+
+                    <?php if($errors->any()): ?>
+                        <div class="rounded-xl bg-red-50 p-3 text-xs text-red-600">
+                            <ul class="space-y-1">
+                                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <li>• <?php echo e($error); ?></li>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-gray-500">Chambre / espace</label>
+                        <select name="room_id" x-model="selectedRoom" class="input-field" required>
+                            <option value="">Choisir une chambre</option>
+                            <?php $__currentLoopData = $establishment->rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($room->id); ?>" data-price="<?php echo e($room->price_per_night); ?>">
+                                    <?php echo e($room->name); ?> — <?php echo e(number_format($room->price_per_night, 0, ',', ' ')); ?> FCFA/nuit
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="mb-1 block text-xs font-semibold text-gray-500">Arrivée</label>
-                            <input type="date" class="input-field" required>
+                            <input type="date" name="check_in" class="input-field" required
+                                   x-on:change="updateNights()">
                         </div>
                         <div>
                             <label class="mb-1 block text-xs font-semibold text-gray-500">Départ</label>
-                            <input type="date" class="input-field" required>
+                            <input type="date" name="check_out" class="input-field" required
+                                   x-on:change="updateNights()">
                         </div>
                     </div>
+
                     <div>
                         <label class="mb-1 block text-xs font-semibold text-gray-500">Voyageurs</label>
-                        <input type="number" min="1" value="2" class="input-field" required>
+                        <input type="number" name="guests" min="1" max="20" value="2" class="input-field" required>
                     </div>
-                    <button type="submit" class="btn-primary w-full">Vérifier la disponibilité</button>
-                    <p x-show="confirmed" x-cloak x-transition class="rounded-lg bg-hb-gold/15 p-3 text-center text-xs text-hb-blue">
-                        Simulation uniquement — le traitement réel des réservations sera géré par le back-office.
+
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-gray-500">Moyen de paiement</label>
+                        <select name="payment_method" class="input-field" required>
+                            <option value="mtn_momo">MTN Mobile Money</option>
+                            <option value="moov_money">Moov Money</option>
+                            <option value="card">Carte bancaire</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full" :disabled="!selectedRoom">
+                        <i class="bi bi-calendar-check"></i> Réserver
+                    </button>
+
+                    <p class="text-center text-xs text-gray-400">
+                        Paiement sécurisé simulé · inclut 10% de commission de service
                     </p>
                 </form>
+
+                <?php endif; ?>
 
                 <div class="mt-6 border-t border-gray-100 pt-6 text-center text-sm text-gray-500">
                     Une question ? <a href="<?php echo e(route('contact.create')); ?>" class="font-semibold text-hb-orange">Contactez-nous</a>

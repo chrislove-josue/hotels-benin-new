@@ -7,6 +7,8 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EstablishmentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HoteController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,6 +40,26 @@ Route::prefix('inscription')->name('register.')->group(function () {
 });
 
 Route::post('/deconnexion', [AuthPageController::class, 'logout'])->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Réservations & espace voyageur
+|--------------------------------------------------------------------------
+| Création d'une réservation, paiement simulé et espace personnel du voyageur.
+*/
+Route::post('/etablissements/{establishment:slug}/reserver', [ReservationController::class, 'store'])
+    ->middleware('auth')
+    ->name('reservations.store');
+
+Route::prefix('espace-voyageur')->name('reservations.')->middleware('auth')->group(function () {
+    Route::get('/', [ReservationController::class, 'myReservations'])->name('index');
+    Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
+    Route::get('/{reservation}/confirmation', [ReservationController::class, 'confirm'])->name('confirm');
+
+    // Paiement simulé
+    Route::get('/{reservation}/paiement', [TransactionController::class, 'checkout'])->name('checkout');
+    Route::post('/{reservation}/paiement', [TransactionController::class, 'process'])->name('process');
+});
 
 /*
 |--------------------------------------------------------------------------

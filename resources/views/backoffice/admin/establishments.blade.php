@@ -46,6 +46,7 @@
                     </td>
                     <td class="px-5 py-3">
 <div class="flex justify-end gap-2">
+                            <a href="{{ route('admin.establishments.edit', $establishment->id) }}" class="btn-outline !px-3 !py-1.5 text-xs"><i class="bi bi-pencil-square"></i> Modifier</a>
                             <a href="{{ route('admin.establishments.rooms', $establishment->id) }}" class="btn-outline !px-3 !py-1.5 text-xs"><i class="bi bi-door-open"></i> Chambres</a>
                             <form action="{{ route('admin.establishments.toggle', $establishment->id) }}" method="POST">
                                 @csrf
