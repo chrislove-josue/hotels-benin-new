@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
-        <h1 class="font-display text-3xl font-bold text-hb-blue">Bonjour, {{ auth()->user()->name }} 👋</h1>
+<h1 class="font-display text-3xl font-bold text-hb-blue">Bonjour, {{ auth()->user()->name }} <i class="bi bi-emoji-smile text-hb-gold"></i></h1>
         <p class="mt-1 text-sm text-gray-500">Gérez vos établissements et vos réservations.</p>
     </div>
 <a href="{{ route('hote.establishments.create') }}" class="btn-gold"><i class="bi bi-plus-lg"></i> Nouvel établissement</a>
@@ -55,9 +55,10 @@
                     <p class="mt-1 text-sm text-gray-500">{{ $establishment->type->name }} · {{ $establishment->locality->name }}</p>
                     <p class="mt-1 text-xs text-gray-400">{{ $establishment->rooms_count ?? $establishment->rooms->count() }} chambre(s) · {{ $establishment->reservations->count() }} réservation(s)</p>
                 </div>
-                <div class="flex shrink-0 gap-2">
-                    <a href="{{ route('establishments.show', $establishment->slug) }}" class="btn-outline !px-3 !py-1.5 text-xs" target="_blank">Voir</a>
-                    <a href="{{ route('hote.establishments.edit', $establishment->id) }}" class="btn-primary !px-3 !py-1.5 text-xs">Gérer</a>
+<div class="flex shrink-0 gap-2">
+                    <a href="{{ route('establishments.show', $establishment->slug) }}" class="btn-outline !px-3 !py-1.5 text-xs" target="_blank"><i class="bi bi-eye"></i> Voir</a>
+                    <a href="{{ route('hote.rooms.index', $establishment->id) }}" class="btn-outline !px-3 !py-1.5 text-xs"><i class="bi bi-door-open"></i> Chambres</a>
+                    <a href="{{ route('hote.establishments.edit', $establishment->id) }}" class="btn-primary !px-3 !py-1.5 text-xs"><i class="bi bi-gear"></i> Gérer</a>
                 </div>
             </div>
         </div>

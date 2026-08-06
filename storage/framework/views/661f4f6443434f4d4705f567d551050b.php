@@ -47,6 +47,7 @@
                     </td>
                     <td class="px-5 py-3">
 <div class="flex justify-end gap-2">
+                            <a href="<?php echo e(route('admin.establishments.rooms', $establishment->id)); ?>" class="btn-outline !px-3 !py-1.5 text-xs"><i class="bi bi-door-open"></i> Chambres</a>
                             <form action="<?php echo e(route('admin.establishments.toggle', $establishment->id)); ?>" method="POST">
                                 <?php echo csrf_field(); ?>
                                 <button type="submit" class="btn-outline !px-3 !py-1.5 text-xs">

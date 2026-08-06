@@ -9,7 +9,7 @@
 </div>
 
 
-<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
     <div class="stat-card">
         <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-hb-blue/10 text-xl text-hb-blue"><i class="bi bi-building"></i></div>
         <div>
@@ -38,6 +38,14 @@
             <p class="text-2xl font-bold text-hb-blue"><?php echo e(number_format($stats['revenue'], 0, ',', ' ')); ?> FCFA</p>
             <p class="text-xs text-gray-500">Revenus (paiements réussis)</p>
             <p class="text-[11px] text-green-600">Commission : <?php echo e(number_format($stats['commission'], 0, ',', ' ')); ?> FCFA</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-hb-gold/10 text-xl text-hb-gold"><i class="bi bi-clipboard-check"></i></div>
+        <div>
+            <p class="text-2xl font-bold text-hb-blue"><?php echo e($stats['pending_changes']); ?></p>
+            <p class="text-xs text-gray-500">Modifications en attente</p>
+            <a href="<?php echo e(route('admin.pending')); ?>" class="text-[11px] font-semibold text-hb-orange hover:underline">Examiner</a>
         </div>
     </div>
 </div>

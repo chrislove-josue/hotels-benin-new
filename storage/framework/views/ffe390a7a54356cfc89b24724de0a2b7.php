@@ -114,8 +114,11 @@
                     <a href="<?php echo e(route('admin.transactions')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.transactions') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
                         <i class="bi bi-credit-card text-lg"></i> Transactions
                     </a>
-                    <a href="<?php echo e(route('admin.messages')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.messages') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
+<a href="<?php echo e(route('admin.messages')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.messages') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
                         <i class="bi bi-envelope text-lg"></i> Messages
+                    </a>
+                    <a href="<?php echo e(route('admin.pending')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.pending') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
+                        <i class="bi bi-clipboard-check text-lg"></i> Modifications
                     </a>
                 <?php else: ?>
                     <a href="<?php echo e(route('hote.dashboard')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('hote.dashboard') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">

@@ -91,62 +91,20 @@
 <button type="submit" class="btn-primary w-full"><i class="bi bi-check-lg"></i> Enregistrer les modifications</button>
     </form>
 
-    {{-- Gestion des chambres --}}
+{{-- Gestion des chambres (page dédiée) --}}
     <div class="space-y-6">
         <div class="card p-6">
-            <h2 class="mb-4 font-display text-lg font-bold text-hb-blue">Ajouter une chambre / un espace</h2>
-            <form action="{{ route('hote.rooms.store', $establishment->id) }}" method="POST" class="space-y-3">
-                @csrf
-                <div>
-                    <label class="label">Nom *</label>
-                    <input type="text" name="name" class="input-field" placeholder="Ex : Chambre double" required>
-                </div>
-                <div>
-                    <label class="label">Description</label>
-                    <input type="text" name="description" class="input-field">
-                </div>
-                <div class="grid grid-cols-3 gap-3">
-                    <div>
-                        <label class="label">Capacité *</label>
-                        <input type="number" name="capacity" class="input-field" min="1" value="2" required>
-                    </div>
-                    <div>
-                        <label class="label">Prix / nuit *</label>
-                        <input type="number" name="price_per_night" class="input-field" min="0" required>
-                    </div>
-                    <div>
-                        <label class="label">Quantité *</label>
-                        <input type="number" name="quantity" class="input-field" min="1" value="1" required>
-                    </div>
-                </div>
-<button type="submit" class="btn-gold w-full"><i class="bi bi-plus-lg"></i> Ajouter la chambre</button>
-            </form>
+            <h2 class="mb-2 flex items-center gap-2 font-display text-lg font-bold text-hb-blue"><i class="bi bi-door-open"></i> Chambres & espaces</h2>
+            <p class="text-sm text-gray-500">Gérez les chambres de cet établissement : ajout, modification et suppression. Chaque changement doit être approuvé par un administrateur.</p>
+            <div class="mt-4 flex items-center gap-3">
+                <span class="badge-pill bg-hb-blue/10 text-hb-blue">{{ $establishment->rooms->count() }} chambre(s)</span>
+                <a href="{{ route('hote.rooms.index', $establishment->id) }}" class="btn-gold !px-4 !py-2 text-xs"><i class="bi bi-gear"></i> Gérer les chambres</a>
+            </div>
         </div>
 
-        <div class="card">
-            <div class="border-b border-gray-100 px-5 py-4">
-                <h2 class="font-display text-lg font-bold text-hb-blue">Chambres existantes ({{ $establishment->rooms->count() }})</h2>
-            </div>
-            <div class="divide-y divide-gray-50">
-                @forelse($establishment->rooms as $room)
-                    <div class="p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-semibold text-hb-blue">{{ $room->name }}</p>
-                                <p class="text-xs text-gray-500">{{ $room->description }}</p>
-                                <p class="mt-1 text-xs text-gray-400">Capacité {{ $room->capacity }} pers. · <span class="font-semibold text-hb-blue">{{ number_format($room->price_per_night, 0, ',', ' ') }} FCFA</span> / nuit</p>
-                            </div>
-                            <form action="{{ route('hote.rooms.destroy', [$establishment->id, $room->id]) }}" method="POST" onsubmit="return confirm('Supprimer cette chambre ?');">
-                                @csrf
-                                @method('DELETE')
-<button type="submit" class="btn-danger !px-3 !py-1.5 text-xs"><i class="bi bi-trash"></i> Supprimer</button>
-                            </form>
-                        </div>
-                    </div>
-                @empty
-                    <p class="px-5 py-6 text-center text-sm text-gray-400">Aucune chambre pour le moment.</p>
-                @endforelse
-            </div>
+        <div class="card p-6">
+            <h2 class="mb-2 flex items-center gap-2 font-display text-lg font-bold text-hb-blue"><i class="bi bi-info-circle"></i> Modération</h2>
+            <p class="text-sm text-gray-500">Les modifications des informations de cet établissement sont mises en file d'attente et seront appliquées publiquement uniquement après approbation par un administrateur.</p>
         </div>
     </div>
 </div>

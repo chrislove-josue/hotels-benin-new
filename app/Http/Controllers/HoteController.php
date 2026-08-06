@@ -6,6 +6,8 @@ use App\Models\Amenity;
 use App\Models\Establishment;
 use App\Models\EstablishmentType;
 use App\Models\Locality;
+use App\Models\PendingEstablishmentChange;
+use App\Models\PendingRoomChange;
 use App\Models\Reservation;
 use App\Models\Room;
 use Illuminate\Http\Request;
@@ -109,10 +111,38 @@ class HoteController extends Controller
             'amenities.*' => ['exists:amenities,id'],
         ]);
 
-        $establishment->update($data);
-        $establishment->amenities()->sync($data['amenities'] ?? []);
+// Emettre une modification en attente d'approbation admin au lieu d'appliquer directement
+        PendingEstablishmentChange::create([
+            'establishment_id' => $establishment->id,
+            'user_id' => Auth::id(),
+            'data' => array_merge($data, ['amenities' => $data['amenities'] ?? []]),
+            'status' => 'en_attente',
+        ]);
 
-        return back()->with('status', 'Établissement mis à jour.');
+        return back()->with('status', 'Vos modifications sont enregistrées et seront appliquées après approbation par un administrateur.');
+    }
+
+    /**
+     * Page dédiée de gestion des chambres d'un établissement.
+     */
+    public function rooms(int $establishmentId)
+    {
+        $establishment = Establishment::where('user_id', Auth::id())
+            ->with('rooms')
+            ->findOrFail($establishmentId);
+
+        return view('backoffice.hote.rooms', compact('establishment'));
+    }
+
+    /**
+     * Formulaire de modification d'une chambre.
+     */
+    public function editRoom(int $establishmentId, int $roomId)
+    {
+        $establishment = Establishment::where('user_id', Auth::id())->findOrFail($establishmentId);
+        $room = $establishment->rooms()->findOrFail($roomId);
+
+        return view('backoffice.hote.edit-room', compact('establishment', 'room'));
     }
 
     public function reservations()
@@ -145,7 +175,7 @@ class HoteController extends Controller
         return back()->with('status', 'Réservation mise à jour.');
     }
 
-    public function storeRoom(Request $request, int $establishmentId)
+public function storeRoom(Request $request, int $establishmentId)
     {
         $establishment = Establishment::where('user_id', Auth::id())->findOrFail($establishmentId);
 
@@ -157,9 +187,16 @@ class HoteController extends Controller
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $establishment->rooms()->create($data);
+        // Création en attente d'approbation admin
+        PendingRoomChange::create([
+            'establishment_id' => $establishment->id,
+            'user_id' => Auth::id(),
+            'action' => 'create',
+            'data' => $data,
+            'status' => 'en_attente',
+        ]);
 
-        return back()->with('status', 'Chambre / espace ajouté.');
+        return back()->with('status', 'Chambre / espace ajouté. Il sera visible après approbation par un administrateur.');
     }
 
     public function updateRoom(Request $request, int $establishmentId, int $roomId)
@@ -167,22 +204,42 @@ class HoteController extends Controller
         $establishment = Establishment::where('user_id', Auth::id())->findOrFail($establishmentId);
         $room = $establishment->rooms()->findOrFail($roomId);
 
-        $room->update($request->validate([
+        $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'description' => ['nullable', 'string'],
             'capacity' => ['required', 'integer', 'min:1'],
             'price_per_night' => ['required', 'numeric', 'min:0'],
             'quantity' => ['required', 'integer', 'min:1'],
-        ]));
+        ]);
 
-        return back()->with('status', 'Chambre / espace mis à jour.');
+        // Modification en attente d'approbation admin
+        PendingRoomChange::create([
+            'room_id' => $room->id,
+            'establishment_id' => $establishment->id,
+            'user_id' => Auth::id(),
+            'action' => 'update',
+            'data' => $data,
+            'status' => 'en_attente',
+        ]);
+
+        return back()->with('status', 'Vos modifications seront appliquées après approbation par un administrateur.');
     }
 
     public function deleteRoom(int $establishmentId, int $roomId)
     {
         $establishment = Establishment::where('user_id', Auth::id())->findOrFail($establishmentId);
-        $establishment->rooms()->findOrFail($roomId)->delete();
+        $room = $establishment->rooms()->findOrFail($roomId);
 
-        return back()->with('status', 'Chambre / espace supprimé.');
+        // Suppression en attente d'approbation admin
+        PendingRoomChange::create([
+            'room_id' => $room->id,
+            'establishment_id' => $establishment->id,
+            'user_id' => Auth::id(),
+            'action' => 'delete',
+            'data' => null,
+            'status' => 'en_attente',
+        ]);
+
+        return back()->with('status', 'La suppression sera appliquée après approbation par un administrateur.');
     }
 }

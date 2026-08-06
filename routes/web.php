@@ -52,12 +52,15 @@ Route::prefix('espace-hote')->name('hote.')->middleware(['auth', 'hote'])->group
     Route::get('/etablissements/{id}/modifier', [HoteController::class, 'editEstablishment'])->name('establishments.edit');
     Route::put('/etablissements/{id}', [HoteController::class, 'updateEstablishment'])->name('establishments.update');
 
-    Route::get('/reservations', [HoteController::class, 'reservations'])->name('reservations');
-    Route::patch('/reservations/{id}', [HoteController::class, 'updateReservation'])->name('reservations.update');
-
+    // Gestion dédiée des chambres par établissement
+    Route::get('/etablissements/{establishmentId}/chambres', [HoteController::class, 'rooms'])->name('rooms.index');
+    Route::get('/etablissements/{establishmentId}/chambres/{roomId}/modifier', [HoteController::class, 'editRoom'])->name('rooms.edit');
     Route::post('/etablissements/{establishmentId}/chambres', [HoteController::class, 'storeRoom'])->name('rooms.store');
     Route::put('/etablissements/{establishmentId}/chambres/{roomId}', [HoteController::class, 'updateRoom'])->name('rooms.update');
     Route::delete('/etablissements/{establishmentId}/chambres/{roomId}', [HoteController::class, 'deleteRoom'])->name('rooms.destroy');
+
+    Route::get('/reservations', [HoteController::class, 'reservations'])->name('reservations');
+    Route::patch('/reservations/{id}', [HoteController::class, 'updateReservation'])->name('reservations.update');
 });
 
 /*
@@ -69,9 +72,21 @@ Route::prefix('espace-hote')->name('hote.')->middleware(['auth', 'hote'])->group
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('/etablissements', [AdminController::class, 'establishments'])->name('establishments');
+Route::get('/etablissements', [AdminController::class, 'establishments'])->name('establishments');
+    Route::get('/etablissements/{id}/modifier', [AdminController::class, 'editEstablishment'])->name('establishments.edit');
+    Route::put('/etablissements/{id}', [AdminController::class, 'updateEstablishment'])->name('establishments.update');
     Route::post('/etablissements/{id}/toggle', [AdminController::class, 'toggleEstablishment'])->name('establishments.toggle');
     Route::delete('/etablissements/{id}', [AdminController::class, 'deleteEstablishment'])->name('establishments.destroy');
+    Route::get('/etablissements/{id}/chambres', [AdminController::class, 'establishmentRooms'])->name('establishments.rooms');
+    Route::get('/etablissements/{establishmentId}/chambres/{roomId}/modifier', [AdminController::class, 'editRoom'])->name('rooms.edit');
+    Route::put('/etablissements/{establishmentId}/chambres/{roomId}', [AdminController::class, 'updateRoom'])->name('rooms.update');
+
+    // Modifications en attente d'approbation (hôtels + chambres)
+    Route::get('/modifications', [AdminController::class, 'pendingChanges'])->name('pending');
+    Route::post('/modifications/etablissements/{id}/approuver', [AdminController::class, 'approvePendingEstablishment'])->name('pending.establishments.approve');
+    Route::post('/modifications/etablissements/{id}/rejeter', [AdminController::class, 'rejectPendingEstablishment'])->name('pending.establishments.reject');
+    Route::post('/modifications/chambres/{id}/approuver', [AdminController::class, 'approvePendingRoom'])->name('pending.rooms.approve');
+    Route::post('/modifications/chambres/{id}/rejeter', [AdminController::class, 'rejectPendingRoom'])->name('pending.rooms.reject');
 
     Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users');
     Route::patch('/utilisateurs/{id}', [AdminController::class, 'updateUserRole'])->name('users.update');

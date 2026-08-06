@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
 use App\Models\Establishment;
+use App\Models\PendingEstablishmentChange;
+use App\Models\PendingRoomChange;
 use App\Models\Reservation;
+use App\Models\Room;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,8 +23,10 @@ class AdminController extends Controller
             'reservations' => Reservation::count(),
             'revenue' => Transaction::where('status', 'reussie')->sum('amount'),
             'commission' => Transaction::where('status', 'reussie')->sum('commission'),
-            'pending_reservations' => Reservation::where('status', 'en_attente')->count(),
+'pending_reservations' => Reservation::where('status', 'en_attente')->count(),
             'unread_messages' => ContactMessage::where('is_read', false)->count(),
+            'pending_changes' => PendingEstablishmentChange::where('status', 'en_attente')->count()
+                + PendingRoomChange::where('status', 'en_attente')->count(),
         ];
 
         $latestReservations = Reservation::with(['user', 'establishment'])
@@ -141,10 +146,220 @@ public function transactions()
         return view('backoffice.admin.messages', compact('messages'));
     }
 
-    public function markMessageRead(int $id)
+public function markMessageRead(int $id)
     {
         ContactMessage::findOrFail($id)->update(['is_read' => true]);
 
         return back()->with('status', 'Message marqué comme lu.');
+    }
+
+    /**
+     * Liste des modifications en attente d'approbation (hôtels + chambres).
+     */
+    public function pendingChanges()
+    {
+        $pendingEstablishments = PendingEstablishmentChange::with(['establishment', 'user'])
+            ->where('status', 'en_attente')
+            ->latest()
+            ->get();
+
+        $pendingRooms = PendingRoomChange::with(['room', 'establishment', 'user'])
+            ->where('status', 'en_attente')
+            ->latest()
+            ->get();
+
+        return view('backoffice.admin.pending', compact('pendingEstablishments', 'pendingRooms'));
+    }
+
+    /**
+     * Approuve une modification d'établissement : applique les données puis marque comme approuvée.
+     */
+    public function approvePendingEstablishment(int $id)
+    {
+        $change = PendingEstablishmentChange::findOrFail($id);
+
+        if ($change->status !== 'en_attente') {
+            return back()->with('status', 'Cette modification a déjà été traitée.');
+        }
+
+        $establishment = $change->establishment;
+
+        // Applique les nouvelles valeurs (sauf champs non modifiables)
+        $data = collect($change->data)->except([
+            'id', 'user_id', 'slug', 'created_at', 'updated_at',
+            'rating', 'reviews_count', 'is_featured', 'is_available',
+        ])->toArray();
+
+        $establishment->update($data);
+
+        $change->update([
+            'status' => 'approuvee',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return back()->with('status', 'Modification de l\'établissement approuvée et appliquée.');
+    }
+
+    /**
+     * Rejette une modification d'établissement.
+     */
+    public function rejectPendingEstablishment(int $id)
+    {
+        $change = PendingEstablishmentChange::findOrFail($id);
+
+        $change->update([
+            'status' => 'rejetee',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return back()->with('status', 'Modification de l\'établissement rejetée.');
+    }
+
+    /**
+     * Approuve une modification de chambre (create/update/delete).
+     */
+    public function approvePendingRoom(int $id)
+    {
+        $change = PendingRoomChange::findOrFail($id);
+
+        if ($change->status !== 'en_attente') {
+            return back()->with('status', 'Cette modification a déjà été traitée.');
+        }
+
+        switch ($change->action) {
+            case 'create':
+            case 'update':
+                $data = collect($change->data)->except([
+                    'id', 'establishment_id', 'created_at', 'updated_at',
+                ])->toArray();
+
+                if ($change->action === 'create') {
+                    $room = $change->establishment->rooms()->create($data);
+                } else {
+                    $room = $change->room;
+                    $room?->update($data);
+                }
+                break;
+
+            case 'delete':
+                $change->room?->delete();
+                break;
+        }
+
+        $change->update([
+            'status' => 'approuvee',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return back()->with('status', 'Modification de la chambre approuvée et appliquée.');
+    }
+
+    /**
+     * Rejette une modification de chambre.
+     */
+    public function rejectPendingRoom(int $id)
+    {
+        $change = PendingRoomChange::findOrFail($id);
+
+        $change->update([
+            'status' => 'rejetee',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return back()->with('status', 'Modification de la chambre rejetée.');
+    }
+
+/**
+     * Liste des chambres d'un établissement (vue admin).
+     */
+    public function establishmentRooms(int $establishmentId)
+    {
+        $establishment = Establishment::with('rooms')->findOrFail($establishmentId);
+
+        return view('backoffice.admin.rooms', compact('establishment'));
+    }
+
+    /**
+     * Formulaire d'édition directe d'un établissement (admin).
+     */
+    public function editEstablishment(int $id)
+    {
+        $establishment = Establishment::with(['amenities', 'locality', 'type'])->findOrFail($id);
+
+        $localities = \App\Models\Locality::orderBy('name')->get();
+        $types = \App\Models\EstablishmentType::orderBy('name')->get();
+        $amenities = \App\Models\Amenity::orderBy('name')->get();
+
+        return view('backoffice.admin.edit-establishment', compact('establishment', 'localities', 'types', 'amenities'));
+    }
+
+    /**
+     * Mise à jour directe d'un établissement (admin) — applique immédiatement.
+     */
+    public function updateEstablishment(Request $request, int $id)
+    {
+        $establishment = Establishment::findOrFail($id);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'establishment_type_id' => ['required', 'exists:establishment_types,id'],
+            'locality_id' => ['required', 'exists:localities,id'],
+            'address' => ['required', 'string', 'max:255'],
+            'short_description' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'price_from' => ['required', 'numeric', 'min:0'],
+            'capacity' => ['required', 'integer', 'min:1'],
+            'cover_image' => ['nullable', 'url'],
+            'is_available' => ['sometimes', 'boolean'],
+            'is_featured' => ['sometimes', 'boolean'],
+            'amenities' => ['array'],
+            'amenities.*' => ['exists:amenities,id'],
+        ]);
+
+        $establishment->update(array_merge($data, [
+            'is_available' => $request->boolean('is_available'),
+            'is_featured' => $request->boolean('is_featured'),
+        ]));
+
+        $establishment->amenities()->sync($data['amenities'] ?? []);
+
+        return redirect()->route('admin.establishments')
+            ->with('status', 'Établissement mis à jour directement par l\'administrateur.');
+    }
+
+    /**
+     * Formulaire d'édition directe d'une chambre (admin).
+     */
+    public function editRoom(int $establishmentId, int $roomId)
+    {
+        $establishment = Establishment::findOrFail($establishmentId);
+        $room = $establishment->rooms()->findOrFail($roomId);
+
+        return view('backoffice.admin.edit-room', compact('establishment', 'room'));
+    }
+
+    /**
+     * Mise à jour directe d'une chambre (admin) — applique immédiatement.
+     */
+    public function updateRoom(Request $request, int $establishmentId, int $roomId)
+    {
+        $establishment = Establishment::findOrFail($establishmentId);
+        $room = $establishment->rooms()->findOrFail($roomId);
+
+        $room->update($request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'description' => ['nullable', 'string'],
+            'capacity' => ['required', 'integer', 'min:1'],
+            'price_per_night' => ['required', 'numeric', 'min:0'],
+            'quantity' => ['required', 'integer', 'min:1'],
+            'is_available' => ['sometimes', 'boolean'],
+        ]));
+
+        return redirect()->route('admin.establishments.rooms', $establishment->id)
+            ->with('status', 'Chambre mise à jour directement par l\'administrateur.');
     }
 }
