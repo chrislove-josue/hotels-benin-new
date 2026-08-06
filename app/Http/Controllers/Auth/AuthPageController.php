@@ -83,7 +83,7 @@ class AuthPageController extends Controller
             return redirect()->route('hote.dashboard')->with('status', 'Bienvenue ! Votre espace hôte est prêt.');
         }
 
-        return redirect()->route('home')->with('status', 'Bienvenue ! Votre compte a été créé.');
+        return redirect()->route('reservations.dashboard')->with('status', 'Bienvenue ! Votre compte a été créé.');
     }
 
     public function logout(Request $request): RedirectResponse

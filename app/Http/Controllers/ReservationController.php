@@ -75,7 +75,7 @@ class ReservationController extends Controller
         return view('reservations.confirm', compact('reservation'));
     }
 
-    /**
+/**
      * Espace voyageur : liste de ses réservations.
      */
     public function myReservations()
@@ -86,6 +86,40 @@ class ReservationController extends Controller
             ->paginate(10);
 
         return view('reservations.index', compact('reservations'));
+    }
+
+    /**
+     * Tableau de bord du voyageur : statistiques et activités récentes.
+     */
+    public function dashboard()
+    {
+        $reservations = Reservation::with(['establishment', 'room', 'transaction'])
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        $totalReservations = $reservations->count();
+        $upcomingReservations = $reservations->whereIn('status', ['en_attente', 'confirmee'])->count();
+        $totalSpent = $reservations->where('status', 'confirmee')->sum('amount');
+        $pendingPayments = $reservations->where('status', 'en_attente')->count();
+
+        $upcoming = $reservations
+            ->where('status', '!=', 'annulee')
+            ->where('check_out', '>=', now()->toDateString())
+            ->sortBy('check_in')
+            ->take(5);
+
+        $latest = $reservations->take(6);
+
+        return view('reservations.dashboard', compact(
+            'reservations',
+            'totalReservations',
+            'upcomingReservations',
+            'totalSpent',
+            'pendingPayments',
+            'upcoming',
+            'latest'
+        ));
     }
 
     /**

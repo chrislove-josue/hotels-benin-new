@@ -182,7 +182,7 @@
                     </button>
 
                     <p class="text-center text-xs text-gray-400">
-                        Paiement sécurisé simulé · inclut 10% de commission de service
+                        <i class="bi bi-shield-check"></i> Paiement sécurisé simulé
                     </p>
                 </form>
 

@@ -61,12 +61,8 @@
                 @if($reservation->transaction)
                     <dl class="space-y-3 text-sm">
                         <div class="flex justify-between">
-                            <dt class="text-gray-500">Montant</dt>
+                            <dt class="text-gray-500">Montant total</dt>
                             <dd class="font-display font-bold text-hb-blue">{{ number_format($reservation->amount, 0, ',', ' ') }} FCFA</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-gray-500">Commission</dt>
-                            <dd class="font-semibold text-gray-700">{{ number_format($reservation->commission, 0, ',', ' ') }} FCFA</dd>
                         </div>
                         <div class="flex justify-between">
                             <dt class="text-gray-500">Méthode</dt>

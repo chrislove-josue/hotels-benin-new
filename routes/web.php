@@ -52,6 +52,7 @@ Route::post('/etablissements/{establishment:slug}/reserver', [ReservationControl
     ->name('reservations.store');
 
 Route::prefix('espace-voyageur')->name('reservations.')->middleware('auth')->group(function () {
+    Route::get('/dashboard', [ReservationController::class, 'dashboard'])->name('dashboard');
     Route::get('/', [ReservationController::class, 'myReservations'])->name('index');
     Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
     Route::get('/{reservation}/confirmation', [ReservationController::class, 'confirm'])->name('confirm');
