@@ -3,45 +3,60 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
-/**
- * Contrôleur "vitrine" pour les formulaires de connexion / inscription.
- * Conformément au cahier des charges, la partie publique affiche
- * uniquement les formulaires et une validation basique des champs :
- * aucune logique de session avancée n'est implémentée ici (le back-office
- * gèrera l'authentification réelle).
- */
 class AuthPageController extends Controller
 {
     public function showLogin()
     {
+        if (Auth::check()) {
+            return redirect($this->homeFor(Auth::user()));
+        }
+
         return view('auth.login');
     }
 
-    public function login(Request $request)
+    public function login(Request $request): RedirectResponse
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => ['required', 'email'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string'],
         ], [], [
             'email' => 'e-mail',
             'password' => 'mot de passe',
         ]);
 
-        return back()->with('status', 'Formulaire validé. La connexion sera activée avec le back-office.');
+        $remember = $request->boolean('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+
+            return redirect()->intended($this->homeFor(Auth::user()));
+        }
+
+        return back()->withErrors([
+            'email' => 'Ces identifiants ne correspondent pas à nos enregistrements.',
+        ])->onlyInput('email');
     }
 
     public function showRegister()
     {
+        if (Auth::check()) {
+            return redirect($this->homeFor(Auth::user()));
+        }
+
         return view('auth.register');
     }
 
-    public function register(Request $request)
+    public function register(Request $request): RedirectResponse
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:180'],
+            'email' => ['required', 'email', 'max:180', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:30'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:voyageur,hote'],
@@ -53,6 +68,42 @@ class AuthPageController extends Controller
             'role' => 'profil',
         ]);
 
-        return back()->with('status', 'Formulaire validé. Votre compte sera créé dès l\'activation du back-office.');
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'password' => Hash::make($data['password']),
+            'role' => $data['role'],
+        ]);
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        if ($user->isHote()) {
+            return redirect()->route('hote.dashboard')->with('status', 'Bienvenue ! Votre espace hôte est prêt.');
+        }
+
+        return redirect()->route('home')->with('status', 'Bienvenue ! Votre compte a été créé.');
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home');
+    }
+
+    protected function homeFor(User $user): string
+    {
+        if ($user->isAdmin()) {
+            return route('admin.dashboard');
+        }
+        if ($user->isHote()) {
+            return route('hote.dashboard');
+        }
+
+        return route('home');
     }
 }
