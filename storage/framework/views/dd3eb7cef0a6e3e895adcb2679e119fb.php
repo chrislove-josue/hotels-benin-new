@@ -55,22 +55,70 @@
         </div>
     </div>
 
-    
+
     <div class="relative border-t border-white/10 bg-white/5 backdrop-blur">
-        <div class="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-8 sm:px-6 md:grid-cols-4 lg:px-8">
-            <?php $__currentLoopData = [
-                ['value' => $localities->count(), 'suffix' => '+', 'label' => 'Villes couvertes'],
-                ['value' => $featured->count() + $topRated->count(), 'suffix' => '+', 'label' => 'Établissements'],
-                ['value' => '4.8', 'suffix' => '/5', 'label' => 'Note moyenne'],
-                ['value' => '24h', 'suffix' => '', 'label' => 'Réponse support'],
-            ]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $stat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div class="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-8 sm:px-6 md:grid-cols-4 lg:px-8"
+             x-data="stats()" x-init="init">
+            <?php
+                $stats = [
+                    ['value' => max(8, $localities->count()), 'suffix' => '+', 'label' => 'Villes couvertes', 'decimals' => 0],
+                    ['value' => max(13, $featured->count() + $topRated->count()), 'suffix' => '+', 'label' => 'Établissements', 'decimals' => 0],
+                    ['value' => 4.8, 'suffix' => '/5', 'label' => 'Note moyenne', 'decimals' => 1],
+                    ['value' => 24, 'suffix' => 'h', 'label' => 'Réponse support', 'decimals' => 0],
+                ];
+            ?>
+            <?php $__currentLoopData = $stats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $stat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="text-center" data-reveal>
-                    <p class="font-display text-3xl font-bold text-hb-gold"><?php echo e($stat['value']); ?><span class="text-hb-orange"><?php echo e($stat['suffix']); ?></span></p>
+                    <p class="font-display text-3xl font-bold text-hb-gold">
+                        <span x-ref="val<?php echo e($i); ?>" x-text="display(<?php echo e($i); ?>)"></span><span class="text-hb-orange"><?php echo e($stat['suffix']); ?></span>
+                    </p>
                     <p class="mt-1 text-xs font-semibold uppercase tracking-wider text-white/60"><?php echo e($stat['label']); ?></p>
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
+
+    <script>
+        function stats() {
+            return {
+                values: <?php echo json_encode(array_column($stats, 'value'), 512) ?>,
+                decimals: <?php echo json_encode(array_column($stats, 'decimals'), 512) ?>,
+                animated: false,
+                init() {
+                    const io = new IntersectionObserver((entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting && !this.animated) {
+                                this.animated = true;
+                                this.animate();
+                                io.unobserve(entry.target);
+                            }
+                        });
+                    }, { threshold: 0.3 });
+                    io.observe(this.$el);
+                },
+                animate() {
+                    this.values.forEach((target, i) => {
+                        const el = this.$refs['val' + i];
+                        const total = 1500;
+                        const start = performance.now();
+                        const step = (now) => {
+                            const p = Math.min((now - start) / total, 1);
+                            const eased = 1 - Math.pow(1 - p, 3);
+                            const current = target * eased;
+                            el.textContent = this.decimals[i] > 0
+                                ? current.toFixed(this.decimals[i])
+                                : Math.round(current);
+                            if (p < 1) requestAnimationFrame(step);
+                        };
+                        requestAnimationFrame(step);
+                    });
+                },
+                display(i) {
+                    return this.decimals[i] > 0 ? this.values[i].toFixed(this.decimals[i]) : this.values[i];
+                },
+            };
+        }
+    </script>
 </section>
 
 
@@ -256,7 +304,7 @@
             <div class="divider-gold mx-auto"></div>
         </div>
 
-        <div class="relative mx-auto max-w-3xl">
+<div class="relative mx-auto max-w-3xl" @mouseenter="stop()" @mouseleave="start()">
             <div class="overflow-hidden">
                 <div class="flex transition-transform duration-500 ease-out" :style="'transform: translateX(-' + (slide * 100) + '%)'">
                     <?php
@@ -309,14 +357,25 @@
         </div>
     </div>
 
-    <script>
+<script>
         function testimonials() {
             return {
                 slide: 0,
                 items: <?php echo json_encode($testimonials, 15, 512) ?>,
+                timer: null,
+                init() {
+                    this.start();
+                },
+                start() {
+                    this.stop();
+                    this.timer = setInterval(() => this.next(), 5000);
+                },
+                stop() {
+                    if (this.timer) clearInterval(this.timer);
+                },
                 next() { this.slide = (this.slide + 1) % this.items.length; },
                 prev() { this.slide = (this.slide - 1 + this.items.length) % this.items.length; },
-                go(i) { this.slide = i; },
+                go(i) { this.slide = i; this.start(); },
             };
         }
     </script>

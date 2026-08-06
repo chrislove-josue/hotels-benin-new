@@ -30,19 +30,58 @@
         <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=900&q=80" alt="Équipe Hôtels Bénin" class="rounded-2xl shadow-card-lg">
     </div>
 
-    <div class="mt-20 grid grid-cols-1 gap-6 sm:grid-cols-3" data-reveal>
-        <div class="card p-6 text-center hover:-translate-y-1">
-            <p class="bg-gradient-to-r from-hb-gold to-hb-orange bg-clip-text font-display text-4xl font-bold text-transparent">50+</p>
-            <p class="mt-2 text-sm text-gray-500">Établissements partenaires</p>
-        </div>
-        <div class="card p-6 text-center hover:-translate-y-1">
-            <p class="bg-gradient-to-r from-hb-gold to-hb-orange bg-clip-text font-display text-4xl font-bold text-transparent">10</p>
-            <p class="mt-2 text-sm text-gray-500">Villes couvertes au Bénin</p>
-        </div>
-        <div class="card p-6 text-center hover:-translate-y-1">
-            <p class="bg-gradient-to-r from-hb-gold to-hb-orange bg-clip-text font-display text-4xl font-bold text-transparent">100%</p>
-            <p class="mt-2 text-sm text-gray-500">Équipe basée à Cotonou</p>
-        </div>
+<div class="mt-20 grid grid-cols-1 gap-6 sm:grid-cols-3" data-reveal x-data="aboutStats()" x-init="init">
+        <?php
+            $aboutStats = [
+                ['value' => 50, 'suffix' => '+', 'label' => 'Établissements partenaires'],
+                ['value' => 10, 'suffix' => '', 'label' => 'Villes couvertes au Bénin'],
+                ['value' => 100, 'suffix' => '%', 'label' => 'Équipe basée à Cotonou'],
+            ];
+        ?>
+        <?php $__currentLoopData = $aboutStats; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $stat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <div class="card p-6 text-center hover:-translate-y-1">
+                <p class="bg-gradient-to-r from-hb-gold to-hb-orange bg-clip-text font-display text-4xl font-bold text-transparent">
+                    <span x-ref="val<?php echo e($i); ?>">0</span><?php echo e($stat['suffix']); ?>
+
+                </p>
+                <p class="mt-2 text-sm text-gray-500"><?php echo e($stat['label']); ?></p>
+            </div>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+        <script>
+            function aboutStats() {
+                return {
+                    values: <?php echo json_encode(array_column($aboutStats, 'value'), 512) ?>,
+                    animated: false,
+                    init() {
+                        const io = new IntersectionObserver((entries) => {
+                            entries.forEach((entry) => {
+                                if (entry.isIntersecting && !this.animated) {
+                                    this.animated = true;
+                                    this.animate();
+                                    io.unobserve(entry.target);
+                                }
+                            });
+                        }, { threshold: 0.3 });
+                        io.observe(this.$el);
+                    },
+                    animate() {
+                        this.values.forEach((target, i) => {
+                            const el = this.$refs['val' + i];
+                            const total = 1500;
+                            const start = performance.now();
+                            const step = (now) => {
+                                const p = Math.min((now - start) / total, 1);
+                                const eased = 1 - Math.pow(1 - p, 3);
+                                el.textContent = Math.round(target * eased);
+                                if (p < 1) requestAnimationFrame(step);
+                            };
+                            requestAnimationFrame(step);
+                        });
+                    },
+                };
+            }
+        </script>
     </div>
 
     <div class="mt-20" data-reveal>
