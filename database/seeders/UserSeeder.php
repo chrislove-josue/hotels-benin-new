@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             ['name' => 'Bienvenu Zinsou', 'email' => 'bienvenu.zinsou@hotels-benin.bj'],
         ];
 
-        foreach ($hotes as $hote) {
+foreach ($hotes as $hote) {
             User::create([
                 'name' => $hote['name'],
                 'email' => $hote['email'],
@@ -28,6 +28,17 @@ class UserSeeder extends Seeder
                 'phone' => '+229 ' . random_int(90000000, 99999999),
             ]);
         }
+
+        // Compte administrateur de démonstration
+        User::firstOrCreate(
+            ['email' => 'admin@hotels-benin.bj'],
+            [
+                'name' => 'Administrateur Hôtels Bénin',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'phone' => '+229 21 30 00 00',
+            ]
+        );
 
         // Voyageurs (pour les avis)
         User::factory()->count(25)->create([

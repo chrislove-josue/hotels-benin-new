@@ -22,4 +22,17 @@ Approche : Play CDN Tailwind v3 + Alpine CDN + Bootstrap Icons, config inline da
 - [x] 15. `home.blade.php` : section "Catégories avec images"
 - [x] 16. `home.blade.php` : carrousel "Témoignages" (Alpine)
 
+## Phase 3 — Back-office (icônes Bootstrap + design system complet)
+- [x] 17. `layouts/backoffice.blade.php` : ajout CDN Bootstrap Icons + compléter le design system + icônes Bootstrap dans la navigation
+- [x] 18. `backoffice/admin/dashboard.blade.php` : icônes Bootstrap dans les cartes stats + sections
+- [x] 19. `backoffice/admin/establishments.blade.php` : icônes Bootstrap
+- [x] 20. `backoffice/admin/users.blade.php` : icônes Bootstrap
+- [x] 21. `backoffice/admin/reservations.blade.php` : icônes Bootstrap
+- [x] 22. `backoffice/admin/transactions.blade.php` : icônes Bootstrap
+- [x] 23. `backoffice/admin/messages.blade.php` : icônes Bootstrap
+- [x] 24. `backoffice/hote/dashboard.blade.php` : icônes Bootstrap
+- [x] 25. `backoffice/hote/create-establishment.blade.php` : icônes Bootstrap
+- [x] 26. `backoffice/hote/edit-establishment.blade.php` : icônes Bootstrap
+- [x] 27. `backoffice/hote/reservations.blade.php` : icônes Bootstrap
+
 Vérification : toutes les routes retournent 200 après les modifications.

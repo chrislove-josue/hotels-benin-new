@@ -31,8 +31,17 @@
             <button @click="searchOpen = !searchOpen" class="inline-flex h-10 w-10 items-center justify-center rounded-full text-hb-blue transition hover:bg-hb-cream" aria-label="Rechercher">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </button>
-            <a href="<?php echo e(route('login.show')); ?>" class="rounded-full px-4 py-2 text-sm font-semibold text-hb-blue transition hover:bg-hb-cream">Connexion</a>
-            <a href="<?php echo e(route('register.show')); ?>" class="btn-gold !px-5 !py-2.5 text-sm">Devenir hôte</a>
+<?php if(auth()->guard()->check()): ?>
+                <a href="<?php echo e(auth()->user()->isAdmin() ? route('admin.dashboard') : (auth()->user()->isHote() ? route('hote.dashboard') : route('home'))); ?>"
+                   class="rounded-full px-4 py-2 text-sm font-semibold text-hb-blue transition hover:bg-hb-cream">Mon espace</a>
+                <form action="<?php echo e(route('logout')); ?>" method="POST" class="inline">
+                    <?php echo csrf_field(); ?>
+                    <button type="submit" class="btn-outline-blue !px-5 !py-2.5 text-sm">Déconnexion</button>
+                </form>
+            <?php else: ?>
+                <a href="<?php echo e(route('login.show')); ?>" class="rounded-full px-4 py-2 text-sm font-semibold text-hb-blue transition hover:bg-hb-cream">Connexion</a>
+                <a href="<?php echo e(route('register.show')); ?>" class="btn-gold !px-5 !py-2.5 text-sm">Devenir hôte</a>
+            <?php endif; ?>
         </div>
 
         
@@ -81,9 +90,17 @@
             <a href="<?php echo e(route('establishments.index')); ?>" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue <?php echo e(request()->routeIs('establishments.*') ? 'bg-hb-cream text-hb-blue' : ''); ?>">Établissements</a>
             <a href="<?php echo e(route('about')); ?>" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue">À propos</a>
             <a href="<?php echo e(route('contact.create')); ?>" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue">Contact</a>
-            <div class="my-2 h-px bg-gray-100"></div>
-            <a href="<?php echo e(route('login.show')); ?>" class="rounded-xl px-4 py-3 text-sm font-semibold text-hb-blue transition hover:bg-hb-cream">Connexion</a>
-            <a href="<?php echo e(route('register.show')); ?>" @click="mobileOpen = false" class="btn-gold mt-1">Devenir hôte</a>
+<div class="my-2 h-px bg-gray-100"></div>
+            <?php if(auth()->guard()->check()): ?>
+                <a href="<?php echo e(auth()->user()->isAdmin() ? route('admin.dashboard') : (auth()->user()->isHote() ? route('hote.dashboard') : route('home'))); ?>" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-hb-blue transition hover:bg-hb-cream">Mon espace</a>
+                <form action="<?php echo e(route('logout')); ?>" method="POST" class="mt-1">
+                    <?php echo csrf_field(); ?>
+                    <button type="submit" class="btn-outline-blue w-full">Déconnexion</button>
+                </form>
+            <?php else: ?>
+                <a href="<?php echo e(route('login.show')); ?>" class="rounded-xl px-4 py-3 text-sm font-semibold text-hb-blue transition hover:bg-hb-cream">Connexion</a>
+                <a href="<?php echo e(route('register.show')); ?>" @click="mobileOpen = false" class="btn-gold mt-1">Devenir hôte</a>
+            <?php endif; ?>
         </nav>
     </div>
 </header>

@@ -64,9 +64,14 @@ class Establishment extends Model
         return $this->hasMany(Room::class);
     }
 
-    public function reviews()
+public function reviews()
     {
         return $this->hasMany(Review::class)->latest();
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
     }
 
     public function amenities()
