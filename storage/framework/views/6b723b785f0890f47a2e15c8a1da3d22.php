@@ -3,7 +3,7 @@
 <?php $__env->startSection('title', 'Mes réservations — Hôtels Bénin'); ?>
 
 <?php $__env->startSection('content'); ?>
-<section class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+<section>
     <nav class="mb-6 flex items-center gap-1 text-sm text-gray-500">
         <a href="<?php echo e(route('home')); ?>" class="hover:text-hb-blue">Accueil</a> <span>/</span>
         <span class="font-semibold text-hb-blue">Mes réservations</span>
@@ -73,4 +73,4 @@
 </section>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\Projects\hotels-benin-new\resources\views\reservations\index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.voyageur', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\Projects\hotels-benin-new\resources\views\reservations\index.blade.php ENDPATH**/ ?>

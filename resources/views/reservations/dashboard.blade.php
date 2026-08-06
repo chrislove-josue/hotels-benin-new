@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.voyageur')
 
 @section('title', 'Mon tableau de bord — Hôtels Bénin')
 
 @section('content')
-<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+<section>
     {{-- En-tête --}}
     <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>

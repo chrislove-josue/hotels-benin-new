@@ -3,7 +3,7 @@
 <?php $__env->startSection('title', 'Réservation '.$reservation->reference.' — Hôtels Bénin'); ?>
 
 <?php $__env->startSection('content'); ?>
-<section class="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+<section>
     <nav class="mb-6 flex items-center gap-1 text-sm text-gray-500">
         <a href="<?php echo e(route('home')); ?>" class="hover:text-hb-blue">Accueil</a> <span>/</span>
         <a href="<?php echo e(route('reservations.index')); ?>" class="hover:text-hb-blue">Mes réservations</a> <span>/</span>
@@ -62,12 +62,8 @@
                 <?php if($reservation->transaction): ?>
                     <dl class="space-y-3 text-sm">
                         <div class="flex justify-between">
-                            <dt class="text-gray-500">Montant</dt>
+                            <dt class="text-gray-500">Montant total</dt>
                             <dd class="font-display font-bold text-hb-blue"><?php echo e(number_format($reservation->amount, 0, ',', ' ')); ?> FCFA</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-gray-500">Commission</dt>
-                            <dd class="font-semibold text-gray-700"><?php echo e(number_format($reservation->commission, 0, ',', ' ')); ?> FCFA</dd>
                         </div>
                         <div class="flex justify-between">
                             <dt class="text-gray-500">Méthode</dt>
@@ -108,4 +104,4 @@
 </section>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\Projects\hotels-benin-new\resources\views\reservations\show.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.voyageur', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\Projects\hotels-benin-new\resources\views\reservations\show.blade.php ENDPATH**/ ?>

@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.voyageur')
 
 @section('title', 'Mes réservations — Hôtels Bénin')
 
 @section('content')
-<section class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+<section>
     <nav class="mb-6 flex items-center gap-1 text-sm text-gray-500">
         <a href="{{ route('home') }}" class="hover:text-hb-blue">Accueil</a> <span>/</span>
         <span class="font-semibold text-hb-blue">Mes réservations</span>

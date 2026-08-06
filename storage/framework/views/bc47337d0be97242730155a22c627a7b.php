@@ -3,7 +3,7 @@
 <?php $__env->startSection('title', 'Mon tableau de bord — Hôtels Bénin'); ?>
 
 <?php $__env->startSection('content'); ?>
-<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+<section>
     
     <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -140,4 +140,4 @@
 </section>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\Projects\hotels-benin-new\resources\views\reservations\dashboard.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.voyageur', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\Projects\hotels-benin-new\resources\views\reservations\dashboard.blade.php ENDPATH**/ ?>
