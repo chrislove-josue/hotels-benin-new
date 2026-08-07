@@ -2169,3 +2169,32 @@
 #9 E:/Projects/hotels-benin-new/test_authenticated_render.php(24): Illuminate/View/View->render()
 #10 {main}
 "} 
+[2026-08-07 11:43:12] local.ERROR: Undefined variable $errors (View: E:\Projects\hotels-benin-new\resources\views\establishments\show.blade.php) {"userId":8,"exception":"[object] (Illuminate\\View\\ViewException(code: 0): Undefined variable $errors (View: E:\\Projects\\hotels-benin-new\\resources\\views\\establishments\\show.blade.php) at E:/Projects/hotels-benin-new/storage/framework/views/2ae4bf7487881a5ffd237a8d09b096ed.php:230)
+[stacktrace]
+#0 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(59): Illuminate/View/Engines/CompilerEngine->handleViewException()
+#1 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(76): Illuminate/View/Engines/PhpEngine->evaluatePath()
+#2 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/View.php(208): Illuminate/View/Engines/CompilerEngine->get()
+#3 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/View.php(191): Illuminate/View/View->getContents()
+#4 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/View.php(160): Illuminate/View/View->renderContents()
+#5 E:/Projects/hotels-benin-new/storage/framework/testing/tests/test_authenticated_render.php(24): Illuminate/View/View->render()
+#6 {main}
+
+[previous exception] [object] (ErrorException(code: 0): Undefined variable $errors at E:/Projects/hotels-benin-new/storage/framework/views/2ae4bf7487881a5ffd237a8d09b096ed.php:230)
+[stacktrace]
+#0 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(263): Illuminate/Foundation/Bootstrap/HandleExceptions->handleError()
+#1 E:/Projects/hotels-benin-new/storage/framework/views/2ae4bf7487881a5ffd237a8d09b096ed.php(230): Illuminate/Foundation/Bootstrap/HandleExceptions->{closure:Illuminate/Foundation/Bootstrap/HandleExceptions::forwardsTo():262}()
+#2 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(123): require('...')
+#3 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php(124): Illuminate/Filesystem/Filesystem::{closure:Illuminate/Filesystem/Filesystem::getRequire():120}()
+#4 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(57): Illuminate/Filesystem/Filesystem->getRequire()
+#5 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(76): Illuminate/View/Engines/PhpEngine->evaluatePath()
+#6 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/View.php(208): Illuminate/View/Engines/CompilerEngine->get()
+#7 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/View.php(191): Illuminate/View/View->getContents()
+#8 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/View.php(160): Illuminate/View/View->renderContents()
+#9 E:/Projects/hotels-benin-new/storage/framework/testing/tests/test_authenticated_render.php(24): Illuminate/View/View->render()
+#10 {main}
+"} 
+[2026-08-07 12:03:40] local.ERROR: Too few arguments to function Illuminate\Auth\Middleware\Authenticate::__construct(), 0 passed in E:\Projects\hotels-benin-new\storage\framework\testing\tests\test_security_csrf_sessions.php on line 123 and exactly 1 expected {"exception":"[object] (ArgumentCountError(code: 0): Too few arguments to function Illuminate\\Auth\\Middleware\\Authenticate::__construct(), 0 passed in E:\\Projects\\hotels-benin-new\\storage\\framework\\testing\\tests\\test_security_csrf_sessions.php on line 123 and exactly 1 expected at E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php:32)
+[stacktrace]
+#0 E:/Projects/hotels-benin-new/storage/framework/testing/tests/test_security_csrf_sessions.php(123): Illuminate/Auth/Middleware/Authenticate->__construct()
+#1 {main}
+"} 

@@ -1,4 +1,4 @@
-# TODO — Avis sur les chambres
+ # TODO — Avis sur les chambres
 
 ## Objectif
 Permettre à tout utilisateur connecté (voyageur) de donner un avis sur une chambre spécifique d'un établissement.
@@ -49,3 +49,12 @@ Permettre à tout utilisateur connecté (voyageur) de donner un avis sur une cha
 - [x] Relations `room->reviews` et `review->room` fonctionnelles
 - [x] Pages publiques HTTP 200 (établissement, liste)
 - [x] Route POST protégée (419 CSRF pour guest)
+- [x] Suite de tests unitaires stockée dans `storage/framework/testing/tests/` (47 tests, 0 échec)
+### 10. Tests sécuritaires ajoutés
+- [x] `test_security_input_validation.php` — validation des entrées (XSS, injection SQL, longueurs, types, email, mot de passe, rôles, budget) — 27 tests
+- [x] `test_security_csrf_sessions.php` — protection CSRF, jeton de session, hash bcrypt, données cachées, config session — 23 tests
+- [x] `test_security_idor.php` — anti-IDOR (propriété réservations, établissements hôtes, isolation) — 11 tests
+- [x] `test_security_hardening.php` — durcissement (contraintes table, rating 1-5, intégrité référentielle, cascade) — 18 tests
+- [x] `test_security_suite.php` — suite consolidée sécurité — 23 tests
+- [x] Lanceur mis à jour (regex compteur accents/sans accents)
+- [x] Récapitulatif global : **9 suites, 149 tests réussis, 0 échec** ✅
