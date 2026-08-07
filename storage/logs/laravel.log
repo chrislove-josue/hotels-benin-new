@@ -1751,3 +1751,11 @@
 #38 E:/Projects/hotels-benin-new/artisan(12): Illuminate/Foundation/Application->handleCommand()
 #39 {main}
 "} 
+[2026-08-07 08:58:43] local.ERROR: Undefined constant Carbon\Carbon::VERSION {"exception":"[object] (Error(code: 0): Undefined constant Carbon\\Carbon::VERSION at E:/Projects/hotels-benin-new/test_nights.php:8)
+[stacktrace]
+#0 {main}
+"} 
+[2026-08-07 08:59:39] local.ERROR: Undefined constant Carbon\Carbon::VERSION {"exception":"[object] (Error(code: 0): Undefined constant Carbon\\Carbon::VERSION at E:/Projects/hotels-benin-new/test_nights.php:8)
+[stacktrace]
+#0 {main}
+"} 

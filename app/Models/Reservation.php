@@ -31,7 +31,9 @@ protected $fillable = [
         $in = \Illuminate\Support\Carbon::parse($checkIn);
         $out = \Illuminate\Support\Carbon::parse($checkOut);
 
-        return max(1, $out->diffInDays($in));
+        // Carbon 3 : diffInDays() retourne une valeur signée.
+        // $in->diffInDays($out) donne un nombre positif (4 pour 01/02 → 05/02).
+        return max(1, $in->diffInDays($out));
     }
 
     /**
