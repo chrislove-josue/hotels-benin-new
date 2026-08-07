@@ -35,9 +35,13 @@
                     <label class="mb-1 block text-xs font-semibold text-gray-500">E-mail</label>
                     <input type="email" name="email" value="{{ old('email') }}" class="input-field" required>
                 </div>
-                <div>
-                    <label class="mb-1 block text-xs font-semibold text-gray-500">Téléphone</label>
-                    <input type="tel" name="phone" value="{{ old('phone') }}" class="input-field" placeholder="+229 ...">
+<div>
+                    <label class="mb-1 block text-xs font-semibold text-gray-500">Téléphone / WhatsApp <span class="text-hb-orange">*</span></label>
+                    <div class="relative">
+                        <i class="bi bi-whatsapp pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-hb-gold"></i>
+                        <input type="tel" name="phone" value="{{ old('phone') }}" class="input-field !pl-10" placeholder="+229 01 23 45 67" required>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-400">Utilisé pour vous contacter et pour WhatsApp.</p>
                 </div>
                 <div>
                     <label class="mb-1 block text-xs font-semibold text-gray-500">Vous êtes</label>

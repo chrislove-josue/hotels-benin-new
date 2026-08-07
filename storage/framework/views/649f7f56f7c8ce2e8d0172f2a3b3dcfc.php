@@ -13,6 +13,7 @@
         <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
             <tr>
                 <th class="px-5 py-3">Utilisateur</th>
+                <th class="px-5 py-3">Téléphone / WhatsApp</th>
                 <th class="px-5 py-3">Rôle</th>
                 <th class="px-5 py-3">Établissements</th>
                 <th class="px-5 py-3">Réservations</th>
@@ -28,9 +29,19 @@
                             <div class="flex h-9 w-9 items-center justify-center rounded-full bg-hb-blue text-sm font-bold text-white"><?php echo e(strtoupper(substr($user->name, 0, 1))); ?></div>
                             <div class="min-w-0">
                                 <p class="truncate font-semibold text-hb-blue"><?php echo e($user->name); ?></p>
-                                <p class="truncate text-xs text-gray-400"><?php echo e($user->email); ?></p>
+<p class="truncate text-xs text-gray-400"><?php echo e($user->email); ?></p>
                             </div>
                         </div>
+                    </td>
+                    <td class="px-5 py-3">
+                        <?php if($user->phone): ?>
+                            <a href="https://wa.me/<?php echo e(preg_replace('/[^0-9]/', '', $user->phone)); ?>" target="_blank" class="inline-flex items-center gap-1 font-mono text-xs font-semibold text-green-600 hover:underline">
+                                <i class="bi bi-whatsapp"></i> <?php echo e($user->phone); ?>
+
+                            </a>
+                        <?php else: ?>
+                            <span class="text-xs text-gray-400">—</span>
+                        <?php endif; ?>
                     </td>
                     <td class="px-5 py-3">
                         <span class="badge-pill <?php echo e($user->role === 'admin' ? 'bg-hb-gold/20 text-hb-blue' : ($user->role === 'hote' ? 'bg-hb-orange/10 text-hb-orange-dark' : 'bg-gray-100 text-gray-600')); ?>">
@@ -56,7 +67,7 @@
                 </tr>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
-                    <td colspan="6" class="px-5 py-8 text-center text-gray-400">Aucun utilisateur.</td>
+<td colspan="7" class="px-5 py-8 text-center text-gray-400">Aucun utilisateur.</td>
                 </tr>
             <?php endif; ?>
         </tbody>

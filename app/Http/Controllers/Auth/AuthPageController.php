@@ -54,16 +54,16 @@ class AuthPageController extends Controller
 
     public function register(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+$data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:180', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'max:30'],
+            'phone' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9\s\-\.]{8,30}$/'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:voyageur,hote'],
         ], [], [
             'name' => 'nom',
             'email' => 'e-mail',
-            'phone' => 'téléphone',
+            'phone' => 'numéro de téléphone / WhatsApp',
             'password' => 'mot de passe',
             'role' => 'profil',
         ]);
