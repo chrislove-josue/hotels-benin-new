@@ -1759,3 +1759,19 @@
 [stacktrace]
 #0 {main}
 "} 
+[2026-08-07 10:44:44] local.ERROR: The "--columns" option does not exist. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\RuntimeException(code: 0): The \"--columns\" option does not exist. at E:/Projects/hotels-benin-new/vendor/symfony/console/Input/ArgvInput.php:226)
+[stacktrace]
+#0 E:/Projects/hotels-benin-new/vendor/symfony/console/Input/ArgvInput.php(153): Symfony/Component/Console/Input/ArgvInput->addLongOption()
+#1 E:/Projects/hotels-benin-new/vendor/symfony/console/Input/ArgvInput.php(88): Symfony/Component/Console/Input/ArgvInput->parseLongOption()
+#2 E:/Projects/hotels-benin-new/vendor/symfony/console/Input/ArgvInput.php(77): Symfony/Component/Console/Input/ArgvInput->parseToken()
+#3 E:/Projects/hotels-benin-new/vendor/symfony/console/Input/Input.php(53): Symfony/Component/Console/Input/ArgvInput->parse()
+#4 E:/Projects/hotels-benin-new/vendor/symfony/console/Command/Command.php(238): Symfony/Component/Console/Input/Input->bind()
+#5 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Console/Command.php(261): Symfony/Component/Console/Command/Command->run()
+#6 E:/Projects/hotels-benin-new/vendor/symfony/console/Application.php(1144): Illuminate/Console/Command->run()
+#7 E:/Projects/hotels-benin-new/vendor/symfony/console/Application.php(379): Symfony/Component/Console/Application->doRunCommand()
+#8 E:/Projects/hotels-benin-new/vendor/symfony/console/Application.php(218): Symfony/Component/Console/Application->doRun()
+#9 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#10 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1242): Illuminate/Foundation/Console/Kernel->handle()
+#11 E:/Projects/hotels-benin-new/artisan(12): Illuminate/Foundation/Application->handleCommand()
+#12 {main}
+"} 

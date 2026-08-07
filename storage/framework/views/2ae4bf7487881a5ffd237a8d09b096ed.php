@@ -68,21 +68,92 @@
             <div class="my-8 h-px bg-gradient-to-r from-transparent via-hb-gold/40 to-transparent"></div>
 
             <h2 class="mb-4 font-display text-xl font-bold text-hb-blue-deeper">Chambres / espaces disponibles</h2>
-            <div class="space-y-3">
+            <div class="space-y-4">
                 <?php $__currentLoopData = $establishment->rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div class="flex flex-col justify-between gap-2 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition hover:border-hb-gold/50 hover:shadow-md sm:flex-row sm:items-center">
-                        <div class="flex items-start gap-3">
-<span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-hb-blue/10 text-hb-blue"><i class="bi bi-door-open"></i></span>
-                            <div>
-                                <p class="font-semibold text-hb-blue"><?php echo e($room->name); ?></p>
-                                <p class="text-sm text-gray-500"><?php echo e($room->description); ?></p>
-                                <p class="mt-1 text-xs text-gray-400">Capacité : <?php echo e($room->capacity); ?> pers.</p>
+                    <?php $roomAvg = round($room->reviews->avg('rating') ?? 0, 1); ?>
+                    <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition hover:border-hb-gold/50 hover:shadow-md">
+                        
+                        <div class="flex flex-col justify-between gap-2 p-4 sm:flex-row sm:items-center">
+                            <div class="flex items-start gap-3">
+                                <span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-hb-blue/10 text-hb-blue"><i class="bi bi-door-open"></i></span>
+                                <div>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <p class="font-semibold text-hb-blue"><?php echo e($room->name); ?></p>
+                                        <?php if($roomAvg > 0): ?>
+                                            <span class="flex items-center gap-1 rounded-full bg-hb-gold/10 px-2 py-0.5 text-xs font-semibold text-hb-gold">
+                                                ★ <?php echo e(number_format($roomAvg, 1)); ?> <span class="font-normal text-gray-400">(<?php echo e($room->reviews->count()); ?>)</span>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <p class="text-sm text-gray-500"><?php echo e($room->description); ?></p>
+                                    <p class="mt-1 text-xs text-gray-400">Capacité : <?php echo e($room->capacity); ?> pers.</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-display text-lg font-bold text-hb-blue"><?php echo e(number_format($room->price_per_night, 0, ',', ' ')); ?> FCFA</p>
+                                <p class="text-xs text-gray-400">/ nuit</p>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <p class="font-display text-lg font-bold text-hb-blue"><?php echo e(number_format($room->price_per_night, 0, ',', ' ')); ?> FCFA</p>
-                            <p class="text-xs text-gray-400">/ nuit</p>
-                        </div>
+
+                        
+                        <?php if($room->reviews->isNotEmpty()): ?>
+                            <div class="border-t border-gray-100 bg-hb-cream/50 px-4 py-3">
+                                <p class="mb-2 text-xs font-bold uppercase tracking-wide text-gray-500"><i class="bi bi-chat-square-text"></i> Avis sur cette chambre (<?php echo e($room->reviews->count()); ?>)</p>
+                                <div class="space-y-2">
+                                    <?php $__currentLoopData = $room->reviews->take(3); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $review): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <div class="rounded-lg bg-white p-3 shadow-sm">
+                                            <div class="mb-1 flex items-center justify-between gap-2">
+                                                <p class="text-sm font-semibold text-hb-blue"><?php echo e($review->user->name); ?></p>
+                                                <span class="text-sm font-semibold text-hb-gold"><?php echo e(str_repeat('★', $review->rating)); ?><?php echo e(str_repeat('☆', 5 - $review->rating)); ?></span>
+                                            </div>
+                                            <?php if($review->title): ?>
+                                                <p class="text-sm font-semibold text-gray-700"><?php echo e($review->title); ?></p>
+                                            <?php endif; ?>
+                                            <p class="mt-0.5 text-sm text-gray-600"><?php echo e($review->comment); ?></p>
+                                        </div>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        
+                        <?php if(auth()->guard()->check()): ?>
+                            <?php if(!in_array($room->id, $reviewedRoomIds)): ?>
+                                <div class="border-t border-gray-100 px-4 py-3">
+                                    <form action="<?php echo e(route('reviews.store', $room)); ?>" method="POST" class="space-y-3" x-data="{ rating: 5 }">
+                                        <?php echo csrf_field(); ?>
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <p class="text-sm font-semibold text-hb-blue"><i class="bi bi-pencil-square"></i> Donner mon avis sur cette chambre</p>
+                                            <div class="flex gap-0.5 text-xl text-hb-gold">
+                                                <template x-for="i in 5" :key="i">
+                                                    <button type="button" @click="rating = i" :class="i <= rating ? 'text-hb-gold' : 'text-gray-300'" class="transition hover:scale-110" aria-label="Étoile">
+                                                        <i class="bi bi-star-fill"></i>
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="rating" :value="rating">
+                                        <div>
+                                            <input type="text" name="title" placeholder="Titre (optionnel)" class="input-field !py-2 text-sm">
+                                        </div>
+                                        <div>
+                                            <textarea name="comment" rows="2" placeholder="Racontez votre expérience dans cette chambre..." class="input-field !py-2 text-sm" required></textarea>
+                                        </div>
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="btn-primary !px-4 !py-2 text-xs"><i class="bi bi-send"></i> Publier l'avis</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            <?php else: ?>
+                                <div class="border-t border-gray-100 bg-green-50/60 px-4 py-2.5 text-center text-xs font-medium text-green-700">
+                                    <i class="bi bi-check-circle"></i> Vous avez déjà donné votre avis sur cette chambre.
+                                </div>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <div class="border-t border-gray-100 bg-hb-sand/50 px-4 py-2.5 text-center text-xs text-gray-500">
+                                <a href="<?php echo e(route('login.show')); ?>" class="font-semibold text-hb-orange hover:underline">Connectez-vous</a> pour laisser un avis sur cette chambre.
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>

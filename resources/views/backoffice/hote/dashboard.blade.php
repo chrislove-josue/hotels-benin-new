@@ -51,6 +51,7 @@
                         <span class="badge-pill {{ $establishment->is_available ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
                             {{ $establishment->is_available ? 'En ligne' : 'En attente de validation' }}
                         </span>
+                        <span class="badge-pill bg-hb-gold/10 text-hb-gold">★ {{ number_format($establishment->rating, 1) }} ({{ $establishment->reviews_count }})</span>
                     </div>
                     <p class="mt-1 text-sm text-gray-500">{{ $establishment->type->name }} · {{ $establishment->locality->name }}</p>
                     <p class="mt-1 text-xs text-gray-400">{{ $establishment->rooms_count ?? $establishment->rooms->count() }} chambre(s) · {{ $establishment->reservations->count() }} réservation(s)</p>
@@ -70,4 +71,32 @@
         </div>
     @endforelse
 </div>
+
+{{-- Avis récents sur les chambres --}}
+@if($reviews->isNotEmpty())
+<div class="mt-8">
+    <h2 class="font-display text-xl font-bold text-hb-blue">Avis récents sur vos chambres</h2>
+    <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        @foreach($reviews as $review)
+            <div class="card p-5">
+                <div class="mb-2 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-3">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-hb-blue to-hb-blue-deeper font-bold text-hb-gold">{{ strtoupper(substr($review->user->name, 0, 1)) }}</span>
+                        <div>
+                            <p class="text-sm font-semibold text-hb-blue">{{ $review->user->name }}</p>
+                            <p class="text-xs text-gray-400">{{ $review->room->name ?? 'Chambre' }} · {{ $review->establishment->name }}</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-semibold text-hb-gold">{{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}</span>
+                </div>
+                @if($review->title)
+                    <p class="text-sm font-semibold text-gray-700">{{ $review->title }}</p>
+                @endif
+                <p class="mt-1 text-sm text-gray-600">{{ $review->comment }}</p>
+                <p class="mt-2 text-[11px] text-gray-400">{{ $review->created_at->diffForHumans() }}</p>
+            </div>
+        @endforeach
+    </div>
+</div>
+@endif
 @endsection

@@ -9,6 +9,7 @@ use App\Models\Locality;
 use App\Models\PendingEstablishmentChange;
 use App\Models\PendingRoomChange;
 use App\Models\Reservation;
+use App\Models\Review;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,18 +24,29 @@ class HoteController extends Controller
             ->latest()
             ->get();
 
-        $totalReservations = Reservation::whereIn('establishment_id', $establishments->pluck('id'))->count();
-        $pendingReservations = Reservation::whereIn('establishment_id', $establishments->pluck('id'))
+        $establishmentIds = $establishments->pluck('id');
+
+        $totalReservations = Reservation::whereIn('establishment_id', $establishmentIds)->count();
+        $pendingReservations = Reservation::whereIn('establishment_id', $establishmentIds)
             ->where('status', 'en_attente')->count();
         $monthlyRevenue = $establishments->flatMap->reservations
             ->where('status', 'confirmee')
             ->sum('amount');
 
+        // Avis reçus sur les chambres des établissements de l'hôte.
+        $roomIds = $establishments->flatMap->rooms->pluck('id');
+        $reviews = Review::with(['user', 'room', 'establishment'])
+            ->whereIn('room_id', $roomIds)
+            ->latest()
+            ->take(8)
+            ->get();
+
         return view('backoffice.hote.dashboard', compact(
             'establishments',
             'totalReservations',
             'pendingReservations',
-            'monthlyRevenue'
+            'monthlyRevenue',
+            'reviews'
         ));
     }
 

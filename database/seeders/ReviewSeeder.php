@@ -32,16 +32,25 @@ class ReviewSeeder extends Seeder
     {
         $voyageurs = User::where('role', 'voyageur')->get();
 
-        Establishment::all()->each(function (Establishment $establishment) use ($voyageurs) {
+        Establishment::with('rooms')->each(function (Establishment $establishment) use ($voyageurs) {
             $reviewers = $voyageurs->random(min(random_int(3, 7), $voyageurs->count()));
             $ratings = [];
+            $roomRatings = [];
 
             foreach ($reviewers as $user) {
                 $rating = random_int(3, 5);
                 $ratings[] = $rating;
 
+                // ~70% des avis sont liés à une chambre précise
+                $room = null;
+                if ($establishment->rooms->isNotEmpty() && random_int(1, 100) <= 70) {
+                    $room = $establishment->rooms->random();
+                    $roomRatings[] = $rating;
+                }
+
                 Review::create([
                     'establishment_id' => $establishment->id,
+                    'room_id' => $room?->id,
                     'user_id' => $user->id,
                     'rating' => $rating,
                     'title' => $this->titles[array_rand($this->titles)],
