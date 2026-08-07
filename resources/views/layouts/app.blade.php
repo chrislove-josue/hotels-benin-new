@@ -165,7 +165,7 @@
 
     <main class="flex-1">
         @if (session('status'))
-            <div class="mx-auto mt-4 max-w-4xl rounded-xl bg-hb-blue/10 px-4 py-3 text-center text-sm font-medium text-hb-blue">
+            <div class="mx-auto mt-4 max-w-5xl rounded-xl bg-hb-blue/10 px-4 py-3 text-center text-sm font-medium text-hb-blue">
                 {{ session('status') }}
             </div>
         @endif

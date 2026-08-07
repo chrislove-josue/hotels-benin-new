@@ -21,7 +21,7 @@
     </div>
 <?php endif; ?>
 
-<form action="<?php echo e(isset($event) ? route('admin.events.update', $event->id) : route('admin.events.store')); ?>" method="POST" class="card p-6 space-y-4">
+<form action="<?php echo e(isset($event) ? route('admin.events.update', $event->id) : route('admin.events.store')); ?>" method="POST" enctype="multipart/form-data" class="card p-6 space-y-4">
     <?php echo csrf_field(); ?>
     <?php if(isset($event)): ?>
         <?php echo method_field('PUT'); ?>
@@ -58,9 +58,18 @@
         </div>
     </div>
 
-    <div>
+<div>
         <label class="label">Image de couverture (URL)</label>
         <input type="url" name="cover_image" value="<?php echo e(old('cover_image', $event->cover_image ?? '')); ?>" class="input-field" placeholder="https://...">
+        <?php if(isset($event) && $event->cover_image): ?>
+            <img src="<?php echo e($event->cover_image); ?>" alt="Aperçu" class="mt-2 h-24 w-40 rounded-lg object-cover">
+        <?php endif; ?>
+    </div>
+
+    <div>
+        <label class="label">Ou téléverser une image</label>
+        <input type="file" name="cover_image_file" accept="image/*" class="input-field">
+        <p class="mt-1 text-xs text-gray-400">JPG, PNG, WebP — 5 Mo max. Prioritaire sur l'URL.</p>
     </div>
 
     <div>

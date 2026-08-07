@@ -11,12 +11,14 @@ use App\Models\PendingRoomChange;
 use App\Models\Reservation;
 use App\Models\Review;
 use App\Models\Room;
+use App\Traits\UploadsImages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class HoteController extends Controller
 {
+    use UploadsImages;
     public function dashboard()
     {
         $establishments = Establishment::where('user_id', Auth::id())
@@ -59,7 +61,7 @@ class HoteController extends Controller
         return view('backoffice.hote.create-establishment', compact('localities', 'types', 'amenities'));
     }
 
-    public function storeEstablishment(Request $request)
+public function storeEstablishment(Request $request)
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
@@ -71,9 +73,16 @@ class HoteController extends Controller
             'price_from' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1'],
             'cover_image' => ['nullable', 'url'],
+            'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'images' => ['array'],
+            'images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'amenities' => ['array'],
             'amenities.*' => ['exists:amenities,id'],
         ]);
+
+        // Upload de la couverture (fichier prioritaire sur l'URL)
+        $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null)
+            ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80';
 
         $establishment = Auth::user()->establishments()->create([
             'name' => $data['name'],
@@ -85,11 +94,17 @@ class HoteController extends Controller
             'description' => $data['description'],
             'price_from' => $data['price_from'],
             'capacity' => $data['capacity'],
-            'cover_image' => $data['cover_image'] ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80',
+            'cover_image' => $cover,
             'is_available' => false, // en attente de validation par l'admin
         ]);
 
         $establishment->amenities()->sync($data['amenities'] ?? []);
+
+        // Sauvegarde des images de galerie uploadées
+        $gallery = $this->storeUploadedImages($request->file('images', []));
+        foreach ($gallery as $i => $path) {
+            $establishment->images()->create(['path' => $path, 'position' => $i]);
+        }
 
         return redirect()->route('hote.dashboard')
             ->with('status', 'Établissement créé. Il sera visible après validation par un administrateur.');
@@ -105,7 +120,7 @@ class HoteController extends Controller
         return view('backoffice.hote.edit-establishment', compact('establishment', 'localities', 'types', 'amenities'));
     }
 
-    public function updateEstablishment(Request $request, int $id)
+public function updateEstablishment(Request $request, int $id)
     {
         $establishment = Establishment::where('user_id', Auth::id())->findOrFail($id);
 
@@ -119,11 +134,27 @@ class HoteController extends Controller
             'price_from' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1'],
             'cover_image' => ['nullable', 'url'],
+            'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'images' => ['array'],
+            'images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'amenities' => ['array'],
             'amenities.*' => ['exists:amenities,id'],
         ]);
 
-// Emettre une modification en attente d'approbation admin au lieu d'appliquer directement
+        // Upload de la couverture (fichier prioritaire sur l'URL)
+        $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);
+        if ($cover) {
+            $data['cover_image'] = $cover;
+        }
+
+        // Images de galerie uploadées (stockées immédiatement, chemins ajoutés aux données en attente)
+        $gallery = $this->storeUploadedImages($request->file('images', []));
+        if ($gallery) {
+            $existing = $establishment->images->pluck('path')->toArray();
+            $data['gallery_add'] = array_merge($existing, $gallery);
+        }
+
+        // Emettre une modification en attente d'approbation admin au lieu d'appliquer directement
         PendingEstablishmentChange::create([
             'establishment_id' => $establishment->id,
             'user_id' => Auth::id(),
@@ -191,13 +222,21 @@ public function storeRoom(Request $request, int $establishmentId)
     {
         $establishment = Establishment::where('user_id', Auth::id())->findOrFail($establishmentId);
 
-        $data = $request->validate([
+$data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'description' => ['nullable', 'string'],
             'capacity' => ['required', 'integer', 'min:1'],
             'price_per_night' => ['required', 'numeric', 'min:0'],
             'quantity' => ['required', 'integer', 'min:1'],
+            'cover_image' => ['nullable', 'url'],
+            'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
+
+        // Upload de la couverture de la chambre (fichier prioritaire sur l'URL)
+        $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);
+        if ($cover) {
+            $data['cover_image'] = $cover;
+        }
 
         // Création en attente d'approbation admin
         PendingRoomChange::create([
@@ -222,7 +261,15 @@ public function storeRoom(Request $request, int $establishmentId)
             'capacity' => ['required', 'integer', 'min:1'],
             'price_per_night' => ['required', 'numeric', 'min:0'],
             'quantity' => ['required', 'integer', 'min:1'],
+            'cover_image' => ['nullable', 'url'],
+            'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
+
+        // Upload de la couverture de la chambre (fichier prioritaire sur l'URL)
+        $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);
+        if ($cover) {
+            $data['cover_image'] = $cover;
+        }
 
         // Modification en attente d'approbation admin
         PendingRoomChange::create([

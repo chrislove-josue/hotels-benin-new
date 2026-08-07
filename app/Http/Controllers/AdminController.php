@@ -11,11 +11,13 @@ use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Traits\UploadsImages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    use UploadsImages;
     public function dashboard()
     {
         $stats = [
@@ -301,7 +303,7 @@ public function markMessageRead(int $id)
     /**
      * Mise à jour directe d'un établissement (admin) — applique immédiatement.
      */
-    public function updateEstablishment(Request $request, int $id)
+public function updateEstablishment(Request $request, int $id)
     {
         $establishment = Establishment::findOrFail($id);
 
@@ -315,11 +317,20 @@ public function markMessageRead(int $id)
             'price_from' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1'],
             'cover_image' => ['nullable', 'url'],
+            'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'images' => ['array'],
+            'images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'is_available' => ['sometimes', 'boolean'],
             'is_featured' => ['sometimes', 'boolean'],
             'amenities' => ['array'],
             'amenities.*' => ['exists:amenities,id'],
         ]);
+
+        // Upload de la couverture (fichier prioritaire sur l'URL)
+        $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);
+        if ($cover) {
+            $data['cover_image'] = $cover;
+        }
 
         $establishment->update(array_merge($data, [
             'is_available' => $request->boolean('is_available'),
@@ -327,6 +338,13 @@ public function markMessageRead(int $id)
         ]));
 
         $establishment->amenities()->sync($data['amenities'] ?? []);
+
+        // Ajout des images de galerie uploadées
+        $gallery = $this->storeUploadedImages($request->file('images', []));
+        $position = $establishment->images()->max('position') + 1;
+        foreach ($gallery as $i => $path) {
+            $establishment->images()->create(['path' => $path, 'position' => $position + $i]);
+        }
 
         return redirect()->route('admin.establishments')
             ->with('status', 'Établissement mis à jour directement par l\'administrateur.');
@@ -346,19 +364,29 @@ public function markMessageRead(int $id)
     /**
      * Mise à jour directe d'une chambre (admin) — applique immédiatement.
      */
-    public function updateRoom(Request $request, int $establishmentId, int $roomId)
+public function updateRoom(Request $request, int $establishmentId, int $roomId)
     {
         $establishment = Establishment::findOrFail($establishmentId);
         $room = $establishment->rooms()->findOrFail($roomId);
 
-        $room->update($request->validate([
+        $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'description' => ['nullable', 'string'],
             'capacity' => ['required', 'integer', 'min:1'],
             'price_per_night' => ['required', 'numeric', 'min:0'],
             'quantity' => ['required', 'integer', 'min:1'],
+            'cover_image' => ['nullable', 'url'],
+            'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'is_available' => ['sometimes', 'boolean'],
-        ]));
+        ]);
+
+        // Upload de la couverture de la chambre (fichier prioritaire sur l'URL)
+        $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);
+        if ($cover) {
+            $data['cover_image'] = $cover;
+        }
+
+        $room->update($data);
 
         return redirect()->route('admin.establishments.rooms', $establishment->id)
             ->with('status', 'Chambre mise à jour directement par l\'administrateur.');
@@ -400,9 +428,15 @@ public function markMessageRead(int $id)
     /**
      * Enregistre un nouvel événement.
      */
-    public function storeEvent(Request $request)
+public function storeEvent(Request $request)
     {
         $data = $this->validatedEventData($request);
+
+        // Upload de la couverture de l'événement (fichier prioritaire sur l'URL)
+        $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);
+        if ($cover) {
+            $data['cover_image'] = $cover;
+        }
 
         Event::create(array_merge($data, [
             'slug' => \Illuminate\Support\Str::slug($data['title']) . '-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(4)),
@@ -439,7 +473,13 @@ public function markMessageRead(int $id)
     {
         $event = Event::findOrFail($id);
 
-        $data = $this->validatedEventData($request);
+$data = $this->validatedEventData($request);
+
+        // Upload de la couverture de l'événement (fichier prioritaire sur l'URL)
+        $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);
+        if ($cover) {
+            $data['cover_image'] = $cover;
+        }
 
         $event->update(array_merge($data, [
             'is_available' => $request->boolean('is_available'),
@@ -483,8 +523,9 @@ public function markMessageRead(int $id)
             'description' => ['required', 'string'],
             'date_start' => ['required', 'date'],
             'date_end' => ['nullable', 'date', 'after_or_equal:date_start'],
-            'location' => ['nullable', 'string', 'max:120'],
+'location' => ['nullable', 'string', 'max:120'],
             'cover_image' => ['nullable', 'url'],
+            'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
     }
 }

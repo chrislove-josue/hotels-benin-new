@@ -2326,3 +2326,28 @@
 [stacktrace]
 #0 {main}
 "} 
+[2026-08-07 16:22:35] local.ERROR: Class "AddCoverImageToRoomsTable" not found {"exception":"[object] (Error(code: 0): Class \"AddCoverImageToRoomsTable\" not found at E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:558)
+[stacktrace]
+#0 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(236): Illuminate/Database/Migrations/Migrator->resolvePath()
+#1 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(211): Illuminate/Database/Migrations/Migrator->runUp()
+#2 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(138): Illuminate/Database/Migrations/Migrator->runPending()
+#3 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(118): Illuminate/Database/Migrations/Migrator->run()
+#4 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(672): Illuminate/Database/Console/Migrations/MigrateCommand->{closure:Illuminate/Database/Console/Migrations/MigrateCommand::runMigrations():111}()
+#5 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(111): Illuminate/Database/Migrations/Migrator->usingConnection()
+#6 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(90): Illuminate/Database/Console/Migrations/MigrateCommand->runMigrations()
+#7 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Database/Console/Migrations/MigrateCommand->handle()
+#8 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#9 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(96): Illuminate/Container/Util::unwrapIfClosure()
+#10 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#11 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Container/Container.php(800): Illuminate/Container/BoundMethod::call()
+#12 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Console/Command.php(292): Illuminate/Container/Container->call()
+#13 E:/Projects/hotels-benin-new/vendor/symfony/console/Command/Command.php(284): Illuminate/Console/Command->execute()
+#14 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Console/Command.php(261): Symfony/Component/Console/Command/Command->run()
+#15 E:/Projects/hotels-benin-new/vendor/symfony/console/Application.php(1144): Illuminate/Console/Command->run()
+#16 E:/Projects/hotels-benin-new/vendor/symfony/console/Application.php(379): Symfony/Component/Console/Application->doRunCommand()
+#17 E:/Projects/hotels-benin-new/vendor/symfony/console/Application.php(218): Symfony/Component/Console/Application->doRun()
+#18 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#19 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1242): Illuminate/Foundation/Console/Kernel->handle()
+#20 E:/Projects/hotels-benin-new/artisan(12): Illuminate/Foundation/Application->handleCommand()
+#21 {main}
+"} 
