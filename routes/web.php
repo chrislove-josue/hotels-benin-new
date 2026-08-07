@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthPageController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EstablishmentController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HoteController;
 use App\Http\Controllers\ReservationController;
@@ -24,6 +25,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/etablissements', [EstablishmentController::class, 'index'])->name('establishments.index');
 Route::get('/etablissements/{slug}', [EstablishmentController::class, 'show'])->name('establishments.show');
+
+Route::get('/evenements', [EventController::class, 'index'])->name('events.index');
+Route::get('/evenements/{slug}', [EventController::class, 'show'])->name('events.show');
 
 Route::get('/a-propos', [AboutController::class, 'index'])->name('about');
 

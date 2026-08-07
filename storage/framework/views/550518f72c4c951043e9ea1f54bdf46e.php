@@ -48,6 +48,7 @@
                 <li><a href="<?php echo e(route('establishments.index', ['type' => 'hotel'])); ?>" class="transition hover:text-hb-gold">Hôtels</a></li>
                 <li><a href="<?php echo e(route('establishments.index', ['type' => 'residence-meublee'])); ?>" class="transition hover:text-hb-gold">Résidences meublées</a></li>
                 <li><a href="<?php echo e(route('establishments.index', ['type' => 'salle-de-fete'])); ?>" class="transition hover:text-hb-gold">Salles de fête</a></li>
+                <li><a href="<?php echo e(route('events.index')); ?>" class="transition hover:text-hb-gold">Événements & programmes</a></li>
             </ul>
         </div>
 

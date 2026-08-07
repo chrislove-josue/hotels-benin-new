@@ -21,7 +21,10 @@
                 Établissements
             </a>
 
-            <a href="{{ route('about') }}" class="rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('about') ? 'bg-hb-cream text-hb-blue' : '' }}">À propos</a>
+<a href="{{ route('about') }}" class="rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('about') ? 'bg-hb-cream text-hb-blue' : '' }}">À propos</a>
+            <a href="{{ route('events.index') }}" class="rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('events.*') ? 'bg-hb-cream text-hb-blue' : '' }}">
+               Événements
+            </a>
             <a href="{{ route('contact.create') }}" class="rounded-full px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('contact.*') ? 'bg-hb-cream text-hb-blue' : '' }}">Contact</a>
         </nav>
 
@@ -89,6 +92,9 @@
 <a href="{{ route('home') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('home') ? 'bg-hb-cream text-hb-blue' : '' }}">Accueil</a>
             <a href="{{ route('establishments.index') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue {{ request()->routeIs('establishments.*') ? 'bg-hb-cream text-hb-blue' : '' }}">Établissements</a>
             <a href="{{ route('about') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue">À propos</a>
+            <a href="{{ route('events.index') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue">
+               Événements
+            </a>
             <a href="{{ route('contact.create') }}" @click="mobileOpen = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-hb-cream hover:text-hb-blue">Contact</a>
 <div class="my-2 h-px bg-gray-100"></div>
 @auth
