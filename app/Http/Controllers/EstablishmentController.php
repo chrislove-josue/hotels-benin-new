@@ -47,14 +47,6 @@ public function index(Request $request)
         // Charge aussi les avis de chaque chambre pour un affichage groupé par chambre.
         $establishment->load(['rooms.reviews' => fn ($q) => $q->with('user')->latest()]);
 
-        // Chambres déjà évaluées par l'utilisateur connecté (pour masquer le formulaire).
-        $reviewedRoomIds = auth()->check()
-            ? \App\Models\Review::where('user_id', auth()->id())
-                ->whereIn('room_id', $establishment->rooms->pluck('id'))
-                ->pluck('room_id')
-                ->all()
-            : [];
-
         $similar = Establishment::with(['locality', 'type'])
             ->where('id', '!=', $establishment->id)
             ->where('locality_id', $establishment->locality_id)
@@ -62,6 +54,6 @@ public function index(Request $request)
             ->take(3)
             ->get();
 
-        return view('establishments.show', compact('establishment', 'similar', 'reviewedRoomIds'));
+        return view('establishments.show', compact('establishment', 'similar'));
     }
 }

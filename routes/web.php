@@ -52,6 +52,10 @@ Route::post('/chambres/{room}/avis', [ReviewController::class, 'store'])
     ->middleware('auth')
     ->name('reviews.store');
 
+Route::post('/etablissements/{establishment}/avis', [ReviewController::class, 'storeEstablishment'])
+    ->middleware('auth')
+    ->name('reviews.establishments.store');
+
 /*
 |--------------------------------------------------------------------------
 | Réservations & espace voyageur

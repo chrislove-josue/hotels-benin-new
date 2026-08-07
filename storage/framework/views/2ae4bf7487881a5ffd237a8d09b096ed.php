@@ -118,37 +118,31 @@
 
                         
                         <?php if(auth()->guard()->check()): ?>
-                            <?php if(!in_array($room->id, $reviewedRoomIds)): ?>
-                                <div class="border-t border-gray-100 px-4 py-3">
-                                    <form action="<?php echo e(route('reviews.store', $room)); ?>" method="POST" class="space-y-3" x-data="{ rating: 5 }">
-                                        <?php echo csrf_field(); ?>
-                                        <div class="flex flex-wrap items-center justify-between gap-2">
-                                            <p class="text-sm font-semibold text-hb-blue"><i class="bi bi-pencil-square"></i> Donner mon avis sur cette chambre</p>
-                                            <div class="flex gap-0.5 text-xl text-hb-gold">
-                                                <template x-for="i in 5" :key="i">
-                                                    <button type="button" @click="rating = i" :class="i <= rating ? 'text-hb-gold' : 'text-gray-300'" class="transition hover:scale-110" aria-label="Étoile">
-                                                        <i class="bi bi-star-fill"></i>
-                                                    </button>
-                                                </template>
-                                            </div>
+                            <div class="border-t border-gray-100 px-4 py-3">
+                                <form action="<?php echo e(route('reviews.store', $room)); ?>" method="POST" class="space-y-3" x-data="{ rating: 5 }">
+                                    <?php echo csrf_field(); ?>
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <p class="text-sm font-semibold text-hb-blue"><i class="bi bi-pencil-square"></i> Donner mon avis sur cette chambre</p>
+                                        <div class="flex gap-0.5 text-xl text-hb-gold">
+                                            <template x-for="i in 5" :key="i">
+                                                <button type="button" @click="rating = i" :class="i <= rating ? 'text-hb-gold' : 'text-gray-300'" class="transition hover:scale-110" aria-label="Étoile">
+                                                    <i class="bi bi-star-fill"></i>
+                                                </button>
+                                            </template>
                                         </div>
-                                        <input type="hidden" name="rating" :value="rating">
-                                        <div>
-                                            <input type="text" name="title" placeholder="Titre (optionnel)" class="input-field !py-2 text-sm">
-                                        </div>
-                                        <div>
-                                            <textarea name="comment" rows="2" placeholder="Racontez votre expérience dans cette chambre..." class="input-field !py-2 text-sm" required></textarea>
-                                        </div>
-                                        <div class="flex justify-end">
-                                            <button type="submit" class="btn-primary !px-4 !py-2 text-xs"><i class="bi bi-send"></i> Publier l'avis</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            <?php else: ?>
-                                <div class="border-t border-gray-100 bg-green-50/60 px-4 py-2.5 text-center text-xs font-medium text-green-700">
-                                    <i class="bi bi-check-circle"></i> Vous avez déjà donné votre avis sur cette chambre.
-                                </div>
-                            <?php endif; ?>
+                                    </div>
+                                    <input type="hidden" name="rating" :value="rating">
+                                    <div>
+                                        <input type="text" name="title" placeholder="Titre (optionnel)" class="input-field !py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <textarea name="comment" rows="2" placeholder="Racontez votre expérience dans cette chambre..." class="input-field !py-2 text-sm" required></textarea>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="submit" class="btn-primary !px-4 !py-2 text-xs"><i class="bi bi-send"></i> Publier l'avis</button>
+                                    </div>
+                                </form>
+                            </div>
                         <?php else: ?>
                             <div class="border-t border-gray-100 bg-hb-sand/50 px-4 py-2.5 text-center text-xs text-gray-500">
                                 <a href="<?php echo e(route('login.show')); ?>" class="font-semibold text-hb-orange hover:underline">Connectez-vous</a> pour laisser un avis sur cette chambre.
@@ -161,6 +155,40 @@
             <div class="my-8 h-px bg-gradient-to-r from-transparent via-hb-gold/40 to-transparent"></div>
 
             <h2 class="mb-4 font-display text-xl font-bold text-hb-blue-deeper">Avis des voyageurs (<?php echo e($establishment->reviews_count); ?>)</h2>
+
+            
+            <?php if(auth()->guard()->check()): ?>
+                <div class="mb-4 rounded-xl border border-hb-gold/30 bg-white p-4 shadow-sm">
+                    <form action="<?php echo e(route('reviews.establishments.store', $establishment)); ?>" method="POST" class="space-y-3" x-data="{ rating: 5 }">
+                        <?php echo csrf_field(); ?>
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <p class="text-sm font-semibold text-hb-blue"><i class="bi bi-pencil-square"></i> Donner mon avis sur <?php echo e($establishment->name); ?></p>
+                            <div class="flex gap-0.5 text-xl text-hb-gold">
+                                <template x-for="i in 5" :key="i">
+                                    <button type="button" @click="rating = i" :class="i <= rating ? 'text-hb-gold' : 'text-gray-300'" class="transition hover:scale-110" aria-label="Étoile">
+                                        <i class="bi bi-star-fill"></i>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                        <input type="hidden" name="rating" :value="rating">
+                        <div>
+                            <input type="text" name="title" placeholder="Titre (optionnel)" class="input-field !py-2 text-sm">
+                        </div>
+                        <div>
+                            <textarea name="comment" rows="2" placeholder="Racontez votre expérience dans cet établissement..." class="input-field !py-2 text-sm" required></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="btn-primary !px-4 !py-2 text-xs"><i class="bi bi-send"></i> Publier l'avis</button>
+                        </div>
+                    </form>
+                </div>
+            <?php else: ?>
+                <div class="mb-4 rounded-xl bg-hb-sand/50 px-4 py-3 text-center text-xs text-gray-500">
+                    <a href="<?php echo e(route('login.show')); ?>" class="font-semibold text-hb-orange hover:underline">Connectez-vous</a> pour laisser un avis sur cet établissement.
+                </div>
+            <?php endif; ?>
+
             <div class="space-y-4">
                 <?php $__empty_1 = true; $__currentLoopData = $establishment->reviews->take(6); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $review): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <div class="rounded-xl bg-white p-4 shadow-sm">
