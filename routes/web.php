@@ -138,6 +138,15 @@ Route::get('/etablissements', [AdminController::class, 'establishments'])->name(
 
     Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
 
-    Route::get('/messages', [AdminController::class, 'messages'])->name('messages');
+Route::get('/messages', [AdminController::class, 'messages'])->name('messages');
     Route::post('/messages/{id}/read', [AdminController::class, 'markMessageRead'])->name('messages.read');
+
+    // Gestion des événements
+    Route::get('/evenements', [AdminController::class, 'events'])->name('events');
+    Route::get('/evenements/nouveau', [AdminController::class, 'createEvent'])->name('events.create');
+    Route::post('/evenements', [AdminController::class, 'storeEvent'])->name('events.store');
+    Route::get('/evenements/{id}/modifier', [AdminController::class, 'editEvent'])->name('events.edit');
+    Route::put('/evenements/{id}', [AdminController::class, 'updateEvent'])->name('events.update');
+    Route::post('/evenements/{id}/toggle', [AdminController::class, 'toggleEvent'])->name('events.toggle');
+    Route::delete('/evenements/{id}', [AdminController::class, 'deleteEvent'])->name('events.destroy');
 });

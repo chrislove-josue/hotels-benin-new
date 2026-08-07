@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
 use App\Models\Establishment;
+use App\Models\Event;
 use App\Models\PendingEstablishmentChange;
 use App\Models\PendingRoomChange;
 use App\Models\Reservation;
@@ -361,5 +362,129 @@ public function markMessageRead(int $id)
 
         return redirect()->route('admin.establishments.rooms', $establishment->id)
             ->with('status', 'Chambre mise à jour directement par l\'administrateur.');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Gestion des événements (admin)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Liste paginée de tous les événements.
+     */
+    public function events()
+    {
+        $events = Event::latest()
+            ->paginate(15);
+
+        return view('backoffice.admin.events', compact('events'));
+    }
+
+    /**
+     * Formulaire de création d'un événement.
+     */
+    public function createEvent()
+    {
+        $categories = [
+            'festival' => 'Festival',
+            'culture' => 'Culture & Arts',
+            'sport' => 'Sport',
+            'affaires' => 'Affaires & Conférences',
+            'religieux' => 'Religieux',
+        ];
+
+        return view('backoffice.admin.edit-event', compact('categories'));
+    }
+
+    /**
+     * Enregistre un nouvel événement.
+     */
+    public function storeEvent(Request $request)
+    {
+        $data = $this->validatedEventData($request);
+
+        Event::create(array_merge($data, [
+            'slug' => \Illuminate\Support\Str::slug($data['title']) . '-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(4)),
+            'is_available' => $request->boolean('is_available'),
+            'is_featured' => $request->boolean('is_featured'),
+        ]));
+
+        return redirect()->route('admin.events')
+            ->with('status', 'Événement créé et publié.');
+    }
+
+    /**
+     * Formulaire de modification d'un événement.
+     */
+    public function editEvent(int $id)
+    {
+        $event = Event::findOrFail($id);
+
+        $categories = [
+            'festival' => 'Festival',
+            'culture' => 'Culture & Arts',
+            'sport' => 'Sport',
+            'affaires' => 'Affaires & Conférences',
+            'religieux' => 'Religieux',
+        ];
+
+        return view('backoffice.admin.edit-event', compact('event', 'categories'));
+    }
+
+    /**
+     * Met à jour un événement existant.
+     */
+    public function updateEvent(Request $request, int $id)
+    {
+        $event = Event::findOrFail($id);
+
+        $data = $this->validatedEventData($request);
+
+        $event->update(array_merge($data, [
+            'is_available' => $request->boolean('is_available'),
+            'is_featured' => $request->boolean('is_featured'),
+        ]));
+
+        return redirect()->route('admin.events')
+            ->with('status', 'Événement mis à jour.');
+    }
+
+    /**
+     * Active / désactive un événement (visibilité sur la vitrine publique).
+     */
+    public function toggleEvent(int $id)
+    {
+        $event = Event::findOrFail($id);
+        $event->update(['is_available' => ! $event->is_available]);
+
+        return back()->with('status', 'Visibilité de l\'événement mise à jour.');
+    }
+
+    /**
+     * Supprime un événement.
+     */
+    public function deleteEvent(int $id)
+    {
+        Event::findOrFail($id)->delete();
+
+        return back()->with('status', 'Événement supprimé.');
+    }
+
+    /**
+     * Validation partagée des données d'un événement.
+     */
+    private function validatedEventData(Request $request): array
+    {
+        return $request->validate([
+            'title' => ['required', 'string', 'max:150'],
+            'category' => ['required', 'in:festival,culture,sport,affaires,religieux'],
+            'short_description' => ['nullable', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'date_start' => ['required', 'date'],
+            'date_end' => ['nullable', 'date', 'after_or_equal:date_start'],
+            'location' => ['nullable', 'string', 'max:120'],
+            'cover_image' => ['nullable', 'url'],
+        ]);
     }
 }

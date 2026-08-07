@@ -120,6 +120,9 @@
                     <a href="{{ route('admin.pending') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.pending') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
                         <i class="bi bi-clipboard-check text-lg"></i> Modifications
                     </a>
+                    <a href="{{ route('admin.events') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.events*') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
+                        <i class="bi bi-calendar-event text-lg"></i> Événements
+                    </a>
                 @else
                     <a href="{{ route('hote.dashboard') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('hote.dashboard') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
                         <i class="bi bi-speedometer2 text-lg"></i> Tableau de bord
