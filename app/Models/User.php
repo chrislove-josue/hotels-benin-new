@@ -11,13 +11,14 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = [
+protected $fillable = [
         'name',
         'email',
         'password',
         'role',
         'phone',
         'avatar',
+        'is_approved',
     ];
 
     protected $hidden = [
@@ -30,6 +31,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_approved' => 'boolean',
         ];
     }
 
@@ -61,5 +63,21 @@ public function reviews()
     public function isVoyageur(): bool
     {
         return $this->role === 'voyageur';
+    }
+
+    /**
+     * Le compte a-t-il été approuvé par un administrateur ?
+     */
+    public function isApproved(): bool
+    {
+        return (bool) $this->is_approved;
+    }
+
+    /**
+     * Le compte est-il en attente d'approbation par un administrateur ?
+     */
+    public function isPending(): bool
+    {
+        return ! $this->isApproved();
     }
 }

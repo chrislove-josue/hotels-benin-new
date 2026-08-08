@@ -26,6 +26,7 @@ foreach ($hotes as $hote) {
                 'password' => Hash::make('password'),
                 'role' => 'hote',
                 'phone' => '+229 ' . random_int(90000000, 99999999),
+                'is_approved' => true,
             ]);
         }
 
@@ -37,13 +38,18 @@ foreach ($hotes as $hote) {
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'phone' => '+229 21 30 00 00',
+                'is_approved' => true,
             ]
         );
+
+        // Mise à jour du mot de passe de l'admin (au cas où un compte existait déjà)
+        User::where('email', 'admin@hotels-benin.bj')->update(['is_approved' => true]);
 
         // Voyageurs (pour les avis)
         User::factory()->count(25)->create([
             'role' => 'voyageur',
             'password' => Hash::make('password'),
+            'is_approved' => true,
         ]);
     }
 }

@@ -42,6 +42,7 @@ Route::prefix('connexion')->name('login.')->group(function () {
 Route::prefix('inscription')->name('register.')->group(function () {
     Route::get('/', [AuthPageController::class, 'showRegister'])->name('show');
     Route::post('/', [AuthPageController::class, 'register'])->name('submit');
+    Route::get('/compte-en-attente', [AuthPageController::class, 'pending'])->name('pending');
 });
 
 Route::post('/deconnexion', [AuthPageController::class, 'logout'])->name('logout');
@@ -53,11 +54,11 @@ Route::post('/deconnexion', [AuthPageController::class, 'logout'])->name('logout
 | Tout utilisateur connecté peut laisser un avis sur une chambre.
 */
 Route::post('/chambres/{room}/avis', [ReviewController::class, 'store'])
-    ->middleware('auth')
+    ->middleware(['auth'])
     ->name('reviews.store');
 
 Route::post('/etablissements/{establishment}/avis', [ReviewController::class, 'storeEstablishment'])
-    ->middleware('auth')
+    ->middleware(['auth'])
     ->name('reviews.establishments.store');
 
 /*
@@ -70,7 +71,7 @@ Route::post('/etablissements/{establishment:slug}/reserver', [ReservationControl
     ->middleware('auth')
     ->name('reservations.store');
 
-Route::prefix('espace-voyageur')->name('reservations.')->middleware('auth')->group(function () {
+Route::prefix('espace-voyageur')->name('reservations.')->middleware(['auth', 'approved'])->group(function () {
     Route::get('/dashboard', [ReservationController::class, 'dashboard'])->name('dashboard');
     Route::get('/', [ReservationController::class, 'myReservations'])->name('index');
     Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
@@ -87,7 +88,7 @@ Route::prefix('espace-voyageur')->name('reservations.')->middleware('auth')->gro
 |--------------------------------------------------------------------------
 | Espace réservé aux utilisateurs ayant le rôle "hote".
 */
-Route::prefix('espace-hote')->name('hote.')->middleware(['auth', 'hote'])->group(function () {
+Route::prefix('espace-hote')->name('hote.')->middleware(['auth', 'hote', 'approved'])->group(function () {
     Route::get('/', [HoteController::class, 'dashboard'])->name('dashboard');
     Route::get('/etablissements/nouveau', [HoteController::class, 'createEstablishment'])->name('establishments.create');
     Route::post('/etablissements', [HoteController::class, 'storeEstablishment'])->name('establishments.store');
@@ -130,8 +131,15 @@ Route::get('/etablissements', [AdminController::class, 'establishments'])->name(
     Route::post('/modifications/chambres/{id}/approuver', [AdminController::class, 'approvePendingRoom'])->name('pending.rooms.approve');
     Route::post('/modifications/chambres/{id}/rejeter', [AdminController::class, 'rejectPendingRoom'])->name('pending.rooms.reject');
 
-    Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users');
-    Route::patch('/utilisateurs/{id}', [AdminController::class, 'updateUserRole'])->name('users.update');
+Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users');
+    Route::get('/utilisateurs/nouveau', [AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/utilisateurs', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::get('/utilisateurs/{id}/modifier', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::put('/utilisateurs/{id}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/utilisateurs/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+    Route::patch('/utilisateurs/{id}/role', [AdminController::class, 'updateUserRole'])->name('users.role');
+    Route::post('/utilisateurs/{id}/approuver', [AdminController::class, 'approveUser'])->name('users.approve');
+    Route::post('/utilisateurs/{id}/rejeter', [AdminController::class, 'rejectUser'])->name('users.reject');
 
     Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations');
     Route::patch('/reservations/{id}', [AdminController::class, 'updateReservation'])->name('reservations.update');

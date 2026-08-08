@@ -22,7 +22,7 @@ class AuthPageController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
-        $credentials = $request->validate([
+$credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ], [], [
@@ -33,9 +33,22 @@ class AuthPageController extends Controller
         $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
+            $user = Auth::user();
+
+            // Compte non approuvé par un administrateur : connexion bloquée.
+            if ($user->isPending()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'email' => 'Votre compte est en attente d\'approbation par un administrateur. Veuillez réessayer plus tard.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
-            return redirect()->intended($this->homeFor(Auth::user()));
+            return redirect()->intended($this->homeFor($user));
         }
 
         return back()->withErrors([
@@ -68,22 +81,26 @@ $data = $request->validate([
             'role' => 'profil',
         ]);
 
-        $user = User::create([
+$user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
             'password' => Hash::make($data['password']),
             'role' => $data['role'],
+            // Nouveau compte : en attente d'approbation par un administrateur.
+            'is_approved' => false,
         ]);
 
-        Auth::login($user);
-        $request->session()->regenerate();
+        // On ne connecte pas automatiquement : le compte doit être approuvé d'abord.
+        return redirect()->route('register.pending');
+    }
 
-        if ($user->isHote()) {
-            return redirect()->route('hote.dashboard')->with('status', 'Bienvenue ! Votre espace hôte est prêt.');
-        }
-
-        return redirect()->route('reservations.dashboard')->with('status', 'Bienvenue ! Votre compte a été créé.');
+    /**
+     * Page intermédiaire affichée après l'inscription : compte en attente d'approbation.
+     */
+    public function pending()
+    {
+        return view('auth.pending');
     }
 
     public function logout(Request $request): RedirectResponse

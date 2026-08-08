@@ -27,9 +27,10 @@ class AdminController extends Controller
             'revenue' => Transaction::where('status', 'reussie')->sum('amount'),
             'commission' => Transaction::where('status', 'reussie')->sum('commission'),
 'pending_reservations' => Reservation::where('status', 'en_attente')->count(),
-            'unread_messages' => ContactMessage::where('is_read', false)->count(),
+'unread_messages' => ContactMessage::where('is_read', false)->count(),
             'pending_changes' => PendingEstablishmentChange::where('status', 'en_attente')->count()
                 + PendingRoomChange::where('status', 'en_attente')->count(),
+            'pending_users' => User::where('is_approved', false)->count(),
         ];
 
         $latestReservations = Reservation::with(['user', 'establishment'])
@@ -112,6 +113,30 @@ public function updateUserRole(Request $request, int $id)
         return back()->with('status', 'Rôle de l\'utilisateur mis à jour.');
     }
 
+    /**
+     * Approuve le compte d'un utilisateur (hôte ou voyageur) en attente de validation.
+     */
+    public function approveUser(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->update(['is_approved' => true]);
+
+        return back()->with('status', "Le compte de {$user->name} a été approuvé.");
+    }
+
+    /**
+     * Rejette le compte d'un utilisateur (compte désactivé / non approuvé).
+     */
+    public function rejectUser(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->update(['is_approved' => false]);
+
+        return back()->with('status', "Le compte de {$user->name} a été désactivé.");
+    }
+
     public function reservations()
     {
         $reservations = Reservation::with(['user', 'establishment', 'room'])
@@ -154,6 +179,114 @@ public function markMessageRead(int $id)
         ContactMessage::findOrFail($id)->update(['is_read' => true]);
 
         return back()->with('status', 'Message marqué comme lu.');
+    }
+
+/**
+     * Formulaire de création d'un utilisateur par l'administrateur.
+     */
+    public function createUser()
+    {
+        return view('backoffice.admin.create-user');
+    }
+
+    /**
+     * Enregistre un nouvel utilisateur créé par l'administrateur.
+     */
+    public function storeUser(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:180', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'max:30', 'regex:/^\+?[0-9\s\-\.]{8,30}$/'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', 'in:voyageur,hote,admin'],
+            'is_approved' => ['sometimes', 'boolean'],
+        ], [], [
+            'name' => 'nom',
+            'email' => 'e-mail',
+            'phone' => 'numéro de téléphone / WhatsApp',
+            'password' => 'mot de passe',
+            'role' => 'profil',
+        ]);
+
+        User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+            'role' => $data['role'],
+            'is_approved' => $request->boolean('is_approved'),
+        ]);
+
+        return redirect()->route('admin.users')
+            ->with('status', 'Utilisateur créé avec succès.');
+    }
+
+    /**
+     * Formulaire de modification d'un utilisateur.
+     */
+    public function editUser(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        return view('backoffice.admin.edit-user', compact('user'));
+    }
+
+    /**
+     * Met à jour un utilisateur.
+     */
+    public function updateUser(Request $request, int $id)
+    {
+        $user = User::findOrFail($id);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:180', 'unique:users,email,' . $user->id],
+            'phone' => ['nullable', 'string', 'max:30', 'regex:/^\+?[0-9\s\-\.]{8,30}$/'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', 'in:voyageur,hote,admin'],
+            'is_approved' => ['sometimes', 'boolean'],
+        ], [], [
+            'name' => 'nom',
+            'email' => 'e-mail',
+            'phone' => 'numéro de téléphone / WhatsApp',
+            'password' => 'mot de passe',
+            'role' => 'profil',
+        ]);
+
+        $user->update([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'role' => $data['role'],
+            'is_approved' => $request->boolean('is_approved'),
+        ]);
+
+        // Mot de passe fourni => mise à jour uniquement si non vide.
+        if (! empty($data['password'])) {
+            $user->update(['password' => \Illuminate\Support\Facades\Hash::make($data['password'])]);
+        }
+
+        return redirect()->route('admin.users')
+            ->with('status', 'Utilisateur mis à jour avec succès.');
+    }
+
+    /**
+     * Supprime un utilisateur.
+     */
+    public function destroyUser(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        // Empêche de supprimer son propre compte.
+        if ($user->id === auth()->id()) {
+            return back()->with('status', 'Vous ne pouvez pas supprimer votre propre compte.');
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        return back()->with('status', "L'utilisateur {$name} a été supprimé.");
     }
 
     /**

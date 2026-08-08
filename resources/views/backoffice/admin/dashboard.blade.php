@@ -84,6 +84,15 @@
                 <h2 class="font-display text-lg font-bold text-hb-blue">Valorisation en attente</h2>
                 <p class="text-xs text-gray-500">{{ $stats['unread_messages'] }} message(s) non lu(s)</p>
             </div>
+            <div class="flex items-center justify-between gap-3 border-b border-gray-50 px-5 py-3">
+                <div>
+                    <p class="text-sm font-semibold text-gray-700">Comptes en attente</p>
+                    <p class="text-xs text-gray-400">Hôtes & voyageurs à valider</p>
+                </div>
+                <a href="{{ route('admin.users') }}" class="flex items-center gap-1 text-xs font-bold text-hb-orange">
+                    {{ $stats['pending_users'] }} <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
             <div class="divide-y divide-gray-50">
                 @forelse($pendingEstablishments as $item)
                     <div class="flex items-center justify-between gap-2 px-5 py-3">
