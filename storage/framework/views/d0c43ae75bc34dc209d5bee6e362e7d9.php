@@ -43,6 +43,22 @@
             </dl>
         </div>
 
+
+        <div class="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4">
+            <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600"><i class="bi bi-check2-circle"></i></span>
+            <div>
+                <p class="font-semibold text-green-700">Chambre disponible pour vos dates</p>
+                <p class="text-sm text-green-600">
+                    La chambre « <?php echo e($reservation->room->name); ?> » est encore disponible pour ce séjour.
+                    <?php if($availableUnits > 1): ?>
+                        <span class="font-semibold"><?php echo e($availableUnits); ?></span> unité(s) restante(s) sur cette période.
+                    <?php else: ?>
+                        Vous profitez d'une des dernières unités disponibles !
+                    <?php endif; ?>
+                </p>
+            </div>
+        </div>
+
         
         <div class="card p-6">
             <div class="mb-4 flex items-center gap-2">

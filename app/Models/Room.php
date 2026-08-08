@@ -37,4 +37,44 @@ protected $fillable = [
     {
         return $this->hasMany(Review::class);
     }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    /**
+     * Nombre d'unités restantes disponibles pour ce type de chambre sur une période donnée.
+     *
+     * Compte les réservations actives (en_attente + confirmee) dont les dates
+     * chevauchent [checkIn, checkOut] et retourne quantity - réservations.
+     *
+     * @param string $checkIn
+     * @param string $checkOut
+     * @param int|null $excludeReservationId réservation à ignorer (ex: la sienne)
+     * @return int
+     */
+    public function availableUnitsFor(string $checkIn, string $checkOut, ?int $excludeReservationId = null): int
+    {
+        $booked = $this->reservations()
+            ->whereIn('status', ['en_attente', 'confirmee'])
+            ->when($excludeReservationId, fn ($q) => $q->where('id', '!=', $excludeReservationId))
+            ->where(function ($q) use ($checkIn, $checkOut) {
+                // Chevauchement : réservation existante commence avant la fin demandée
+                // ET se termine après le début demandé.
+                $q->where('check_in', '<', $checkOut)
+                    ->where('check_out', '>', $checkIn);
+            })
+            ->count();
+
+        return max(0, (int) $this->quantity - $booked);
+    }
+
+    /**
+     * Indique si la chambre est complète sur la période (plus aucune unité libre).
+     */
+    public function isUnavailableFor(string $checkIn, string $checkOut, ?int $excludeReservationId = null): bool
+    {
+        return $this->availableUnitsFor($checkIn, $checkOut, $excludeReservationId) <= 0;
+    }
 }

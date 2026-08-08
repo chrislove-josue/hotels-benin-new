@@ -43,6 +43,22 @@
             </dl>
         </div>
 
+{{-- Bandeau de confirmation de disponibilité --}}
+        <div class="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4">
+            <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600"><i class="bi bi-check2-circle"></i></span>
+            <div>
+                <p class="font-semibold text-green-700">Chambre disponible pour vos dates</p>
+                <p class="text-sm text-green-600">
+                    La chambre « {{ $reservation->room->name }} » est encore disponible pour ce séjour.
+                    @if($availableUnits > 1)
+                        <span class="font-semibold">{{ $availableUnits }}</span> unité(s) restante(s) sur cette période.
+                    @else
+                        Vous profitez d'une des dernières unités disponibles !
+                    @endif
+                </p>
+            </div>
+        </div>
+
         {{-- Formulaire de paiement simulé --}}
         <div class="card p-6">
             <div class="mb-4 flex items-center gap-2">

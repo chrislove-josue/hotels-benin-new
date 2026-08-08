@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $__env->yieldContent('title', 'Back-office — Hôtels Bénin'); ?></title>
+    <title><?php echo $__env->yieldContent('title', 'Espace voyageur — Hôtels Bénin'); ?></title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -63,14 +63,11 @@
             .btn-outline { @apply btn border-2 border-hb-blue/20 bg-white text-hb-blue hover:border-hb-gold hover:text-hb-gold; }
             .btn-outline-blue { @apply btn border-2 border-hb-blue text-hb-blue hover:bg-hb-blue hover:text-white; }
             .btn-white { @apply btn bg-white text-hb-blue-deeper shadow-md hover:-translate-y-0.5 hover:shadow-lg; }
-            .btn-danger { @apply btn bg-red-500 text-white hover:bg-red-600; }
             .card { @apply overflow-hidden rounded-2xl bg-white shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-card-lg; }
             .input-field { @apply w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-hb-blue focus:outline-none focus:ring-2 focus:ring-hb-blue/20; }
             .label { @apply mb-1 block text-xs font-semibold text-gray-500; }
-.stat-card { @apply card p-5 flex items-center gap-4; }
+            .stat-card { @apply card p-5 flex items-center gap-4; }
             .badge-pill { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold; }
-            .divider-gold { @apply mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-hb-gold to-hb-orange; }
-            .animation-fade-up { animation: fadeUp 0.7s ease-out both; }
         }
     </style>
 
@@ -78,62 +75,29 @@
 </head>
 <body class="min-h-screen font-sans">
 
-
-<?php
-    $isAdmin = auth()->user()?->isAdmin();
-    $isHote = auth()->user()?->isHote();
-?>
-
 <div x-data="{ sidebarOpen: false }" class="min-h-screen lg:flex">
 
     
-    <aside class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full transform bg-hb-blue-deeper text-white transition lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 <?php echo e($isAdmin ? 'lg:flex' : 'lg:flex'); ?>" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
+    <aside class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full transform bg-hb-blue-deeper text-white transition lg:sticky lg:top-0 lg:h-screen lg:translate-x-0" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
         <div class="flex h-full flex-col">
             <a href="<?php echo e(route('home')); ?>" class="flex items-center gap-2.5 border-b border-white/10 px-6 py-5">
                 <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-hb-gold to-hb-gold-light font-display text-lg font-bold text-hb-blue-deeper">HB</span>
                 <div>
                     <p class="font-display text-lg font-bold leading-none">Hôtels Bénin</p>
-                    <p class="mt-1 text-[11px] uppercase tracking-wider text-hb-gold"><?php echo e($isAdmin ? 'Administration' : 'Espace hôte'); ?></p>
+                    <p class="mt-1 text-[11px] uppercase tracking-wider text-hb-gold">Espace voyageur</p>
                 </div>
             </a>
 
-<nav class="flex-1 space-y-1 px-3 py-4">
-                <?php if($isAdmin): ?>
-                    <a href="<?php echo e(route('admin.dashboard')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.dashboard') ? 'bg-hb-gold w-64 text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-speedometer2 text-lg"></i> Tableau de bord
-                    </a>
-                    <a href="<?php echo e(route('admin.establishments')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.establishments') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-building text-lg"></i> Établissements
-                    </a>
-                    <a href="<?php echo e(route('admin.users')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.users') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-people text-lg"></i> Utilisateurs
-                    </a>
-                    <a href="<?php echo e(route('admin.reservations')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.reservations') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-calendar-check text-lg"></i> Réservations
-                    </a>
-                    <a href="<?php echo e(route('admin.transactions')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.transactions') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-credit-card text-lg"></i> Transactions
-                    </a>
-<a href="<?php echo e(route('admin.messages')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.messages') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-envelope text-lg"></i> Messages
-                    </a>
-                    <a href="<?php echo e(route('admin.pending')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.pending') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-clipboard-check text-lg"></i> Modifications
-                    </a>
-                    <a href="<?php echo e(route('admin.events')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('admin.events*') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-calendar-event text-lg"></i> Événements
-                    </a>
-                <?php else: ?>
-                    <a href="<?php echo e(route('hote.dashboard')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('hote.dashboard') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-speedometer2 text-lg"></i> Tableau de bord
-                    </a>
-                    <a href="<?php echo e(route('hote.establishments.create')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition hover:bg-white/10">
-                        <i class="bi bi-plus-circle text-lg"></i> Nouvel établissement
-                    </a>
-                    <a href="<?php echo e(route('hote.reservations')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('hote.reservations') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
-                        <i class="bi bi-calendar-check text-lg"></i> Réservations
-                    </a>
-                <?php endif; ?>
+            <nav class="flex-1 space-y-1 px-3 py-4">
+                <a href="<?php echo e(route('reservations.dashboard')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('reservations.dashboard') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
+                    <i class="bi bi-speedometer2 text-lg"></i> Tableau de bord
+                </a>
+                <a href="<?php echo e(route('reservations.index')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition <?php echo e(request()->routeIs('reservations.index') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10'); ?>">
+                    <i class="bi bi-calendar-check text-lg"></i> Mes réservations
+                </a>
+                <a href="<?php echo e(route('establishments.index')); ?>" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition hover:bg-white/10">
+                    <i class="bi bi-search text-lg"></i> Rechercher
+                </a>
             </nav>
 
             <div class="border-t border-white/10 p-4">
@@ -162,7 +126,11 @@
 
             <div class="flex-1"></div>
 
-            <form action="<?php echo e(route('logout')); ?>" method="POST">
+            <a href="<?php echo e(route('establishments.index')); ?>" class="rounded-full px-4 py-2 text-sm font-semibold text-hb-blue transition hover:bg-hb-cream">
+                <i class="bi bi-plus-circle"></i> Réserver
+            </a>
+
+            <form action="<?php echo e(route('logout')); ?>" method="POST" class="ml-2">
                 <?php echo csrf_field(); ?>
                 <button type="submit" class="btn-outline !px-4 !py-2 text-xs">Déconnexion</button>
             </form>
@@ -170,7 +138,7 @@
 
         <main class="p-4 sm:p-6">
             <?php if(session('status')): ?>
-<div class="mb-6 flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                <div class="mb-6 flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
                     <i class="bi bi-check-circle-fill"></i> <?php echo e(session('status')); ?>
 
                 </div>
@@ -183,4 +151,4 @@
 
 </body>
 </html>
-<?php /**PATH E:\Projects\hotels-benin-new\resources\views/layouts/backoffice.blade.php ENDPATH**/ ?>
+<?php /**PATH E:\Projects\hotels-benin-new\resources\views/layouts/voyageur.blade.php ENDPATH**/ ?>

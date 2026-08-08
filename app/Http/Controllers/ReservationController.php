@@ -26,10 +26,17 @@ class ReservationController extends Controller
             'payment_method' => ['required', 'in:mtn_momo,moov_money,card'],
         ]);
 
-        $room = Room::where('id', $data['room_id'])
+$room = Room::where('id', $data['room_id'])
             ->where('establishment_id', $establishment->id)
             ->where('is_available', true)
             ->firstOrFail();
+
+        // Vérification de disponibilité : bloquer si la chambre est complète sur la période.
+        if ($room->isUnavailableFor($data['check_in'], $data['check_out'])) {
+            return back()
+                ->withErrors(['room_id' => "La chambre « {$room->name} » est complète pour ces dates. Choisissez une autre période ou une autre chambre."])
+                ->withInput();
+        }
 
         $nights = Reservation::nightsBetween($data['check_in'], $data['check_out']);
         $amount = $nights * (float) $room->price_per_night;
