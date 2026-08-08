@@ -18,7 +18,7 @@
     </div>
 @endif
 
-<form action="{{ route('hote.establishments.store') }}" method="POST" class="space-y-6">
+<form action="{{ route('hote.establishments.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
     @csrf
 
     <div class="card p-6">
@@ -58,9 +58,25 @@
                 <label class="label">Capacité (pers.) *</label>
                 <input type="number" name="capacity" value="{{ old('capacity', 2) }}" class="input-field" min="1" required>
             </div>
-            <div class="sm:col-span-2">
-                <label class="label">URL de l'image de couverture</label>
+</div>
+    </div>
+
+    <div class="card p-6">
+        <h2 class="mb-4 font-display text-lg font-bold text-hb-blue"><i class="bi bi-image"></i> Photos</h2>
+        <div class="space-y-4">
+            <div>
+                <label class="label">Image de couverture (fichier)</label>
+                <input type="file" name="cover_image_file" accept="image/*" class="input-field !py-2">
+                <p class="mt-1 text-xs text-gray-400">JPG, PNG ou WebP — 5 Mo max.</p>
+            </div>
+            <div>
+                <label class="label">Ou URL de l'image de couverture</label>
                 <input type="url" name="cover_image" value="{{ old('cover_image') }}" class="input-field" placeholder="https://...">
+            </div>
+            <div>
+                <label class="label">Galerie d'images (plusieurs fichiers)</label>
+                <input type="file" name="images[]" accept="image/*" multiple class="input-field !py-2">
+                <p class="mt-1 text-xs text-gray-400">Vous pouvez sélectionner plusieurs photos. JPG, PNG ou WebP — 5 Mo max chacune.</p>
             </div>
         </div>
     </div>

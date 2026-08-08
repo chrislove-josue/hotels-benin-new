@@ -19,7 +19,7 @@
     </div>
 @endif
 
-<form action="{{ route('hote.rooms.update', [$establishment->id, $room->id]) }}" method="POST" class="card p-6 space-y-4">
+<form action="{{ route('hote.rooms.update', [$establishment->id, $room->id]) }}" method="POST" enctype="multipart/form-data" class="card p-6 space-y-4">
     @csrf
     @method('PUT')
 
@@ -42,10 +42,23 @@
             <label class="label">Prix / nuit *</label>
             <input type="number" name="price_per_night" value="{{ old('price_per_night', $room->price_per_night) }}" class="input-field" min="0" required>
         </div>
-        <div>
+<div>
             <label class="label">Quantité *</label>
             <input type="number" name="quantity" value="{{ old('quantity', $room->quantity) }}" class="input-field" min="1" required>
         </div>
+    </div>
+
+    <div>
+        <label class="label">Image de couverture de la chambre (fichier)</label>
+        @if($room->cover_image)
+            <img src="{{ $room->cover_image }}" alt="Chambre" class="mb-2 h-32 w-full rounded-xl object-cover">
+        @endif
+        <input type="file" name="cover_image_file" accept="image/*" class="input-field !py-2">
+        <p class="mt-1 text-xs text-gray-400">JPG, PNG ou WebP — 5 Mo max. Laissez vide pour conserver l'image actuelle.</p>
+    </div>
+    <div>
+        <label class="label">Ou URL de l'image de couverture</label>
+        <input type="url" name="cover_image" value="{{ old('cover_image', $room->cover_image) }}" class="input-field">
     </div>
 
     <div class="flex items-center gap-3">

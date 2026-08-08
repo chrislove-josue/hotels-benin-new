@@ -1,3 +1,4 @@
+
 @extends('layouts.backoffice')
 
 @section('title', 'Modifier l\'établissement — Administration')
@@ -19,7 +20,7 @@
     </div>
 @endif
 
-<form action="{{ route('admin.establishments.update', $establishment->id) }}" method="POST" class="card p-6 space-y-4">
+<form action="{{ route('admin.establishments.update', $establishment->id) }}" method="POST" enctype="multipart/form-data" class="card p-6 space-y-4">
     @csrf
     @method('PUT')
 
@@ -61,9 +62,31 @@
             <input type="number" name="capacity" value="{{ old('capacity', $establishment->capacity) }}" class="input-field" min="1" required>
         </div>
     </div>
+<div>
+        <label class="label">Image de couverture (fichier)</label>
+        @if($establishment->cover_image)
+            <img src="{{ $establishment->cover_image }}" alt="Couverture" class="mb-2 h-32 w-full rounded-xl object-cover">
+        @endif
+        <input type="file" name="cover_image_file" accept="image/*" class="input-field !py-2">
+        <p class="mt-1 text-xs text-gray-400">JPG, PNG ou WebP — 5 Mo max. Laissez vide pour conserver l'image actuelle.</p>
+    </div>
     <div>
-        <label class="label">Image de couverture (URL)</label>
+        <label class="label">Ou URL de l'image de couverture</label>
         <input type="url" name="cover_image" value="{{ old('cover_image', $establishment->cover_image) }}" class="input-field">
+    </div>
+    <div>
+        <label class="label">Ajouter des photos à la galerie</label>
+        <input type="file" name="images[]" accept="image/*" multiple class="input-field !py-2">
+        @if($establishment->images->isNotEmpty())
+            <div class="mt-2 flex flex-wrap gap-2">
+                @foreach($establishment->images as $image)
+                    <img src="{{ $image->path }}" alt="" class="h-16 w-20 rounded-lg object-cover">
+                @endforeach
+            </div>
+            <p class="mt-1 text-xs text-gray-400">Les nouvelles photos seront ajoutées à cette galerie.</p>
+        @else
+            <p class="mt-1 text-xs text-gray-400">Aucune photo de galerie pour le moment.</p>
+        @endif
     </div>
     <div>
         <label class="label">Courte description *</label>

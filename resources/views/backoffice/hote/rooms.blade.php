@@ -14,7 +14,7 @@
 {{-- Formulaire d'ajout --}}
 <div class="card mb-6 p-6">
     <h2 class="mb-4 flex items-center gap-2 font-display text-lg font-bold text-hb-blue"><i class="bi bi-plus-circle"></i> Ajouter une chambre / un espace</h2>
-    <form action="{{ route('hote.rooms.store', $establishment->id) }}" method="POST" class="space-y-3">
+    <form action="{{ route('hote.rooms.store', $establishment->id) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
         @csrf
         <div>
             <label class="label">Nom *</label>
@@ -33,10 +33,19 @@
                 <label class="label">Prix / nuit *</label>
                 <input type="number" name="price_per_night" class="input-field" min="0" required>
             </div>
-            <div>
+<div>
                 <label class="label">Quantité *</label>
                 <input type="number" name="quantity" class="input-field" min="1" value="1" required>
             </div>
+        </div>
+        <div>
+            <label class="label">Image de couverture de la chambre (fichier)</label>
+            <input type="file" name="cover_image_file" accept="image/*" class="input-field !py-2">
+            <p class="mt-1 text-xs text-gray-400">JPG, PNG ou WebP — 5 Mo max.</p>
+        </div>
+        <div>
+            <label class="label">Ou URL de l'image de couverture</label>
+            <input type="url" name="cover_image" class="input-field" placeholder="https://...">
         </div>
         <button type="submit" class="btn-gold"><i class="bi bi-check-lg"></i> Ajouter la chambre</button>
     </form>
