@@ -94,11 +94,36 @@ $driver = DB::connection()->getDriverName();
         return back()->with('status', 'Établissement supprimé.');
     }
 
-    public function users()
+public function users(Request $request)
     {
-        $users = User::withCount('establishments', 'reservations')
-            ->latest()
-            ->paginate(15);
+        $query = User::withCount('establishments', 'reservations');
+
+        // Recherche par nom, e-mail ou téléphone
+        if ($search = trim($request->query('search', ''))) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtre par rôle
+        if ($role = $request->query('role')) {
+            $query->where('role', $role);
+        }
+
+        // Filtre par statut : en_attente | approuve | desactive
+        if ($status = $request->query('statut')) {
+            if ($status === 'en_attente') {
+                $query->where('is_approved', false)->where('role', '!=', 'admin');
+            } elseif ($status === 'approuve') {
+                $query->where('is_approved', true);
+            } elseif ($status === 'desactive') {
+                $query->where('is_approved', false)->where('role', '!=', 'admin');
+            }
+        }
+
+        $users = $query->latest()->paginate(15)->withQueryString();
 
         return view('backoffice.admin.users', compact('users'));
     }
