@@ -66,15 +66,19 @@
             <h3 class="mb-4 text-sm font-bold uppercase tracking-wider text-hb-gold">Contact</h3>
 <ul class="space-y-2.5 text-sm text-white/80">
                 <li class="flex items-start gap-2"><i class="bi bi-geo-alt mt-0.5 text-hb-gold"></i> Cotonou, Bénin</li>
-                <li class="flex items-center gap-2"><i class="bi bi-telephone text-hb-gold"></i> +229 21 30 00 00</li>
+                <li class="flex items-center gap-2"><i class="bi bi-telephone text-hb-gold"></i> +229 01 98 12 33 53</li>
                 <li class="flex items-center gap-2"><i class="bi bi-envelope text-hb-gold"></i> contact@hotels-benin.bj</li>
-                <li class="flex items-start gap-2"><i class="bi bi-clock mt-0.5 text-hb-gold"></i> Lun – Sam : 8h00 – 19h00</li>
+                <li class="flex items-start gap-2"><i class="bi bi-clock mt-0.5 text-hb-gold"></i> Lun – Dim : 8h00 – 22h00</li>
             </ul>
         </div>
     </div>
 
     <div class="relative border-t border-white/10 py-6 text-center text-xs text-white/60">
-        &copy; <?php echo e(date('Y')); ?> Hôtels Bénin — Tous droits réservés. Fait avec <span class="text-hb-orange">♥</span> au Bénin.
-    </div>
+&copy; <?php echo e(date('Y')); ?> Hôtels Bénin — Tous droits réservés. Conçu et développé par
+<span class="text-hb-orange pl-1">
+    <a href="https://wa.me/22998123353" target="_blank" rel="noopener noreferrer">
+        CJN TECH
+    </a>
+</span>.    </div>
 </footer>
 <?php /**PATH E:\Projects\hotels-benin-new\resources\views/partials/footer.blade.php ENDPATH**/ ?>
