@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Auth;
 class ReservationController extends Controller
 {
     /**
-     * Crée une réservation pour un voyageur connecté.
+     * Crée une réservation pour un voyageur connecté, puis l'envoie directement
+     * sur la page de paiement (le choix du moyen de paiement se fait au checkout).
      */
     public function store(Request $request, string $slug)
     {
@@ -23,10 +24,9 @@ class ReservationController extends Controller
             'check_in'  => ['required', 'date', 'after_or_equal:today'],
             'check_out' => ['required', 'date', 'after:check_in'],
             'guests'    => ['required', 'integer', 'min:1', 'max:20'],
-            'payment_method' => ['required', 'in:mtn_momo,moov_money,card'],
         ]);
 
-$room = Room::where('id', $data['room_id'])
+        $room = Room::where('id', $data['room_id'])
             ->where('establishment_id', $establishment->id)
             ->where('is_available', true)
             ->firstOrFail();
@@ -43,35 +43,35 @@ $room = Room::where('id', $data['room_id'])
         $commission = round($amount * 0.10, 2); // 10% commission plateforme
 
         $reservation = Reservation::create([
-            'user_id'         => Auth::id(),
-            'establishment_id'=> $establishment->id,
-            'room_id'         => $room->id,
-            'reference'       => Reservation::generateReference(),
-            'check_in'        => $data['check_in'],
-            'check_out'       => $data['check_out'],
-            'guests'          => $data['guests'],
-            'amount'          => $amount,
-            'commission'      => $commission,
-            'payment_method'  => $data['payment_method'],
-            'status'          => 'en_attente',
+            'user_id'          => Auth::id(),
+            'establishment_id' => $establishment->id,
+            'room_id'          => $room->id,
+            'reference'        => Reservation::generateReference(),
+            'check_in'         => $data['check_in'],
+            'check_out'        => $data['check_out'],
+            'guests'           => $data['guests'],
+            'amount'           => $amount,
+            'commission'       => $commission,
+            'payment_method'   => null,
+            'status'           => 'en_attente',
         ]);
 
-        // Créer la transaction associée (paiement en attente)
+        // Transaction en attente : le moyen de paiement sera renseigné au checkout.
         Transaction::create([
             'reservation_id' => $reservation->id,
             'amount'         => $amount,
             'commission'     => $commission,
-            'method'         => $data['payment_method'],
+            'method'         => null,
             'reference'      => 'TXN-'.strtoupper(substr($reservation->reference, 3)).'-'.strtoupper(\Illuminate\Support\Str::random(4)),
             'status'         => 'en_attente',
         ]);
 
-        return redirect()->route('reservations.confirm', $reservation)
-            ->with('status', 'Votre réservation a bien été enregistrée.');
+        return redirect()->route('reservations.checkout', $reservation)
+            ->with('status', 'Votre réservation a bien été enregistrée. Choisissez votre moyen de paiement.');
     }
 
     /**
-     * Page de confirmation après création de la réservation.
+     * Page de confirmation après création de la réservation (accessible directement si besoin).
      */
     public function confirm(Reservation $reservation)
     {
@@ -82,7 +82,7 @@ $room = Room::where('id', $data['room_id'])
         return view('reservations.confirm', compact('reservation'));
     }
 
-/**
+    /**
      * Espace voyageur : liste de ses réservations.
      */
     public function myReservations()

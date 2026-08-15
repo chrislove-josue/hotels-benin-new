@@ -268,12 +268,13 @@
                     </div>
 
                     <div>
-                        <label class="mb-1 block text-xs font-semibold text-gray-500">Moyen de paiement</label>
-                        <select name="payment_method" class="input-field" required>
-                            <option value="mtn_momo">MTN Mobile Money</option>
-                            <option value="moov_money">Moov Money</option>
-                            <option value="card">Carte bancaire</option>
-                        </select>
+                        <button type="submit" class="btn-primary w-full" :disabled="!selectedRoom">
+    <i class="bi bi-calendar-check"></i> Réserver et payer
+</button>
+
+<p class="text-center text-xs text-gray-400">
+    <i class="bi bi-shield-check"></i> Vous choisirez votre moyen de paiement à l'étape suivante
+</p>
                     </div>
 
                     <button type="submit" class="btn-primary w-full" :disabled="!selectedRoom">

@@ -2439,3 +2439,14 @@
 #38 E:/Projects/hotels-benin-new/artisan(12): Illuminate/Foundation/Application->handleCommand()
 #39 {main}
 "} 
+[2026-08-15 16:53:46] local.ERROR: Erreur création transaction FedaPay {"error":"Erreur d'authentification."} 
+[2026-08-15 17:01:45] local.ERROR: Cannot redeclare class App\Http\Controllers\ReservationController (previously declared in E:\Projects\hotels-benin-new\app\Http\Controllers\TransactionController.php:12) {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare class App\\Http\\Controllers\\ReservationController (previously declared in E:\\Projects\\hotels-benin-new\\app\\Http\\Controllers\\TransactionController.php:12) at E:/Projects/hotels-benin-new/app/Http/Controllers/TransactionController.php:12)
+[stacktrace]
+#0 {main}
+"} 
+[2026-08-15 17:02:00] local.ERROR: Cannot redeclare class App\Http\Controllers\ReservationController (previously declared in E:\Projects\hotels-benin-new\app\Http\Controllers\TransactionController.php:12) {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Cannot redeclare class App\\Http\\Controllers\\ReservationController (previously declared in E:\\Projects\\hotels-benin-new\\app\\Http\\Controllers\\TransactionController.php:12) at E:/Projects/hotels-benin-new/app/Http/Controllers/TransactionController.php:12)
+[stacktrace]
+#0 {main}
+"} 
+[2026-08-15 17:03:43] local.ERROR: Erreur création transaction FedaPay {"error":"Erreur d'authentification."} 
+[2026-08-15 17:05:42] local.ERROR: Erreur création transaction FedaPay {"error":"Erreur d'authentification."} 
