@@ -6,6 +6,7 @@
     <title>@yield('title', 'Hôtels Bénin — Réservez votre séjour au Bénin')</title>
     <meta name="description" content="@yield('meta_description', 'Hôtels, résidences, salles de fête et auberges au Bénin. Comparez, choisissez et réservez votre prochain séjour en toute simplicité.')">
 
+    <link rel="shortcut icon" href="{{ asset('storage/logo-or.png') }}" type="image/x-icon">
 {{-- Polices --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

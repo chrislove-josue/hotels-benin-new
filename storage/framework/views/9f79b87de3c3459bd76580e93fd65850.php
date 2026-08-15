@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="<?php echo e(asset('storage/logo-or.png')); ?>" type="image/x-icon">
 
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -81,7 +82,8 @@
     <aside class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full transform bg-hb-blue-deeper text-white transition lg:sticky lg:top-0 lg:h-screen lg:translate-x-0" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
         <div class="flex h-full flex-col">
             <a href="<?php echo e(route('home')); ?>" class="flex items-center gap-2.5 border-b border-white/10 px-6 py-5">
-                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-hb-gold to-hb-gold-light font-display text-lg font-bold text-hb-blue-deeper">HB</span>
+<img src="<?php echo e(asset('storage/logo-or.png')); ?>" alt="Hôtels Bénin"
+         class="h-16 w-16 rounded-full">
                 <div>
                     <p class="font-display text-lg font-bold leading-none">Hôtels Bénin</p>
                     <p class="mt-1 text-[11px] uppercase tracking-wider text-hb-gold">Espace voyageur</p>

@@ -15,15 +15,15 @@
     <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
 
         
-        <a href="<?php echo e(route('home')); ?>" class="group flex shrink-0 items-center gap-2.5">
-            <span class="relative flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-hb-blue to-hb-blue-deeper font-display text-lg font-bold text-hb-gold shadow-md transition group-hover:shadow-glow">
-                HB
-            </span>
+        
+<a href="<?php echo e(route('home')); ?>" class="group flex shrink-0 items-center gap-2.5">
+    <img src="<?php echo e(asset('storage/logo-or.png')); ?>" alt="Hôtels Bénin"
+         class="h-16 w-16 rounded-full transition ">
 
-            <span class="font-display text-xl font-bold tracking-tight text-hb-blue-deeper">
-                Hôtels <span class="text-hb-orange">Bénin</span>
-            </span>
-        </a>
+    <span class="font-display text-xl font-bold tracking-tight text-hb-blue-deeper">
+        Hôtels <span class="text-hb-orange">Bénin</span>
+    </span>
+</a>
 
 
         

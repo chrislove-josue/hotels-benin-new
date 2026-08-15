@@ -22,9 +22,10 @@
     <div class="relative mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
             <div class="mb-4 flex items-center gap-2.5">
-                <span class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-hb-gold to-hb-gold-light font-display text-lg font-bold text-hb-blue-deeper">HB</span>
-                <span class="font-display text-xl font-bold">Hôtels Bénin</span>
-            </div>
+    <img src="<?php echo e(asset('storage/logo-or.png')); ?>" alt="Hôtels Bénin"
+         class="h-11 w-11 rounded-full object-cover">
+    <span class="font-display text-xl font-bold">Hôtels Bénin</span>
+</div>
             <p class="text-sm leading-relaxed text-white/70">
                 La plateforme qui rassemble hôtels, résidences, villas et salles de fête du Bénin, pour préparer votre séjour en toute confiance.
             </p>
