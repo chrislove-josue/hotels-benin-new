@@ -69,36 +69,11 @@
 
         
         <div class="card p-6">
-            <div class="mb-4 flex items-center gap-2">
-                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-hb-gold/20 text-hb-orange"><i class="bi bi-credit-card"></i></span>
-                <h2 class="font-display text-lg font-bold text-hb-blue">Choisissez votre moyen de paiement</h2>
-            </div>
+           
 
             <form action="<?php echo e(route('reservations.process', $reservation)); ?>" method="POST" class="space-y-4">
                 <?php echo csrf_field(); ?>
 
-                <div class="grid grid-cols-1 gap-3">
-                    <?php $__currentLoopData = $methods; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <label class="flex cursor-pointer items-center justify-between gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 transition hover:border-hb-gold hover:bg-hb-cream has-[:checked]:border-hb-gold has-[:checked]:bg-hb-gold/10">
-                            <span class="flex items-center gap-3">
-                                <input type="radio" name="method" value="<?php echo e($key); ?>"
-                                       class="h-4 w-4 accent-hb-orange" required <?php if($loop->first): echo 'checked'; endif; ?>>
-                                <span class="text-sm font-semibold text-gray-700"><?php echo e($label); ?></span>
-                            </span>
-
-                            <?php if($key === 'fedapay'): ?>
-                                <span class="rounded-full bg-hb-blue px-3 py-1 text-xs font-semibold text-white">Recommandé</span>
-                            <?php endif; ?>
-                        </label>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </div>
-
-                <div class="rounded-xl bg-hb-sand p-4 text-xs text-gray-500">
-                    <p class="flex items-center gap-2">
-                        <i class="bi bi-info-circle text-hb-orange"></i>
-                        FedaPay vous redirige vers une page de paiement sécurisée (Mobile Money ou carte bancaire). Les autres méthodes sont une démonstration — aucun débit réel n'est effectué.
-                    </p>
-                </div>
 
                 <button type="submit" class="btn-primary w-full">
                     <i class="bi bi-check-circle"></i> Continuer vers le paiement — <?php echo e(number_format($reservation->amount, 0, ',', ' ')); ?> FCFA

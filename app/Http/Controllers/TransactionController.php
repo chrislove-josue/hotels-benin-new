@@ -48,26 +48,15 @@ class TransactionController extends Controller
             )
             : 0;
 
-        $methods = [
-            'fedapay'    => 'FedaPay (Mobile Money, Carte bancaire)',
-            'mtn_momo'   => 'MTN Mobile Money',
-            'moov_money' => 'Moov Money',
-            'card'       => 'Carte bancaire',
-        ];
-
-        return view('reservations.checkout', compact('reservation', 'methods', 'availableUnits'));
+        return view('reservations.checkout', compact('reservation', 'availableUnits'));
     }
 
     /**
-     * Traite le paiement choisi.
+     * Traite le paiement : redirige systématiquement vers FedaPay.
      */
     public function process(Request $request, Reservation $reservation)
     {
         abort_unless($reservation->user_id === Auth::id(), 403);
-
-        $request->validate([
-            'method' => ['required', 'in:fedapay,mtn_momo,moov_money,card'],
-        ]);
 
         if ($reservation->room && $reservation->room->isUnavailableFor(
             $reservation->check_in->toDateString(),
@@ -77,23 +66,7 @@ class TransactionController extends Controller
             return $this->cancelUnavailable($reservation);
         }
 
-        if ($request->method === 'fedapay') {
-            return $this->payWithFedaPay($reservation);
-        }
-
-        // Méthodes simulées existantes
-        $transaction = $reservation->transaction;
-
-        $transaction->update([
-            'status'    => 'reussie',
-            'method'    => $request->method,
-            'reference' => $transaction->reference ?? 'TXN-'.strtoupper(\Illuminate\Support\Str::random(10)),
-        ]);
-
-        $reservation->update(['status' => 'confirmee']);
-
-        return redirect()->route('reservations.show', $reservation)
-            ->with('status', 'Paiement réussi ! Votre réservation est confirmée.');
+        return $this->payWithFedaPay($reservation);
     }
 
     /**
@@ -119,9 +92,9 @@ class TransactionController extends Controller
             $token = $fedapayTransaction->generateToken();
 
             $reservation->transaction()->update([
-                'method'                   => 'fedapay',
-                'provider_transaction_id'  => $fedapayTransaction->id,
-                'status'                   => 'en_attente',
+                'method'                  => 'fedapay',
+                'provider_transaction_id' => $fedapayTransaction->id,
+                'status'                  => 'en_attente',
             ]);
 
             $reservation->update(['payment_method' => 'fedapay']);
@@ -131,14 +104,13 @@ class TransactionController extends Controller
             Log::error('Erreur création transaction FedaPay', ['error' => $e->getMessage()]);
 
             return back()->withErrors([
-                'method' => "Impossible de contacter FedaPay pour le moment. Réessayez dans un instant.",
+                'fedapay' => "Impossible de contacter FedaPay pour le moment. Réessayez dans un instant.",
             ]);
         }
     }
 
     /**
      * Retour du client après paiement FedaPay (callback_url).
-     * Ne jamais faire confiance aux query params seuls : on revérifie côté API.
      */
     public function fedapayCallback(Request $request, Reservation $reservation)
     {
@@ -207,7 +179,7 @@ class TransactionController extends Controller
     {
         $transaction = $reservation->transaction;
         if (! $transaction || $transaction->status === 'reussie') {
-            return; // déjà traité, on évite les doublons
+            return;
         }
 
         if ($status === 'approved') {
