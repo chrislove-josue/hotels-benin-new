@@ -17,6 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'approved' => \App\Http\Middleware\EnsureUserIsApproved::class,
         ]);
     })
+
+    ->withMiddleware(function (Middleware $middleware) {
+    $middleware->validateCsrfTokens(except: [
+        'webhooks/fedapay',
+    ]);
+})
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

@@ -77,10 +77,21 @@ Route::prefix('espace-voyageur')->name('reservations.')->middleware(['auth', 'ap
     Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
     Route::get('/{reservation}/confirmation', [ReservationController::class, 'confirm'])->name('confirm');
 
-    // Paiement simulé
+    // Paiement
     Route::get('/{reservation}/paiement', [TransactionController::class, 'checkout'])->name('checkout');
     Route::post('/{reservation}/paiement', [TransactionController::class, 'process'])->name('process');
+    Route::get('/{reservation}/paiement/fedapay/retour', [TransactionController::class, 'fedapayCallback'])->name('fedapay.callback');
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Webhooks — Paiement FedaPay
+|--------------------------------------------------------------------------
+| Appelé par les serveurs FedaPay (pas de session, pas de CSRF).
+*/
+Route::post('/webhooks/fedapay', [TransactionController::class, 'fedapayWebhook'])
+    ->name('webhooks.fedapay');
 
 /*
 |--------------------------------------------------------------------------

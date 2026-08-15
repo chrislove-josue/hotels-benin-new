@@ -24,7 +24,7 @@
                     <dt class="text-gray-500">Chambre</dt>
                     <dd class="font-semibold text-gray-700">{{ $reservation->room->name ?? '—' }}</dd>
                 </div>
-<div class="flex justify-between">
+                <div class="flex justify-between">
                     <dt class="text-gray-500">Séjour</dt>
                     <dd class="font-semibold text-gray-700">{{ optional($reservation->check_in)->format('d/m/Y') }} → {{ optional($reservation->check_out)->format('d/m/Y') }} ({{ $reservation->nights() }} {{ $reservation->nights() > 1 ? 'jours' : 'jour' }})</dd>
                 </div>
@@ -43,7 +43,7 @@
             </dl>
         </div>
 
-{{-- Bandeau de confirmation de disponibilité --}}
+        {{-- Bandeau de confirmation de disponibilité --}}
         <div class="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4">
             <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600"><i class="bi bi-check2-circle"></i></span>
             <div>
@@ -59,7 +59,15 @@
             </div>
         </div>
 
-        {{-- Formulaire de paiement simulé --}}
+        @if ($errors->any())
+            <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                @foreach ($errors->all() as $error)
+                    <p class="flex items-center gap-2"><i class="bi bi-exclamation-triangle"></i> {{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
+        {{-- Formulaire de paiement --}}
         <div class="card p-6">
             <div class="mb-4 flex items-center gap-2">
                 <span class="flex h-8 w-8 items-center justify-center rounded-full bg-hb-gold/20 text-hb-orange"><i class="bi bi-credit-card"></i></span>
@@ -69,22 +77,31 @@
             <form action="{{ route('reservations.process', $reservation) }}" method="POST" class="space-y-4">
                 @csrf
 
-                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div class="grid grid-cols-1 gap-3">
                     @foreach($methods as $key => $label)
-                        <label class="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 transition hover:border-hb-gold hover:bg-hb-cream has-[:checked]:border-hb-gold has-[:checked]:bg-hb-gold/10">
-                            <input type="radio" name="method" value="{{ $key }}"
-                                   class="h-4 w-4 accent-hb-orange" required @checked($loop->first)>
-                            <span class="text-sm font-semibold text-gray-700">{{ $label }}</span>
+                        <label class="flex cursor-pointer items-center justify-between gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 transition hover:border-hb-gold hover:bg-hb-cream has-[:checked]:border-hb-gold has-[:checked]:bg-hb-gold/10">
+                            <span class="flex items-center gap-3">
+                                <input type="radio" name="method" value="{{ $key }}"
+                                       class="h-4 w-4 accent-hb-orange" required @checked($loop->first)>
+                                <span class="text-sm font-semibold text-gray-700">{{ $label }}</span>
+                            </span>
+
+                            @if($key === 'fedapay')
+                                <span class="rounded-full bg-hb-blue px-3 py-1 text-xs font-semibold text-white">Recommandé</span>
+                            @endif
                         </label>
                     @endforeach
                 </div>
 
                 <div class="rounded-xl bg-hb-sand p-4 text-xs text-gray-500">
-                    <p class="flex items-center gap-2"><i class="bi bi-info-circle text-hb-orange"></i> Paiement simulé — aucun débit réel ne sera effectué dans cette démonstration.</p>
+                    <p class="flex items-center gap-2">
+                        <i class="bi bi-info-circle text-hb-orange"></i>
+                        FedaPay vous redirige vers une page de paiement sécurisée (Mobile Money ou carte bancaire). Les autres méthodes sont une démonstration — aucun débit réel n'est effectué.
+                    </p>
                 </div>
 
                 <button type="submit" class="btn-primary w-full">
-                    <i class="bi bi-check-circle"></i> Payer {{ number_format($reservation->amount, 0, ',', ' ') }} FCFA
+                    <i class="bi bi-check-circle"></i> Continuer vers le paiement — {{ number_format($reservation->amount, 0, ',', ' ') }} FCFA
                 </button>
             </form>
         </div>
