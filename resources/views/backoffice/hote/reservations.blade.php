@@ -8,6 +8,15 @@
     <p class="mt-1 text-sm text-gray-500">Liste des réservations sur vos établissements.</p>
 </div>
 
+@include('backoffice.partials.filters', [
+    'action' => route('hote.reservations'),
+    'fields' => [
+        ['name' => 'q', 'label' => 'Recherche', 'placeholder' => 'Référence, voyageur…'],
+        ['name' => 'statut', 'label' => 'Statut', 'type' => 'select',
+         'options' => ['' => 'Tous les statuts', 'en_attente' => 'En attente', 'confirmee' => 'Confirmée', 'annulee' => 'Annulée', 'terminee' => 'Terminée']],
+    ],
+])
+
 <div class="card overflow-x-auto">
     <table class="w-full min-w-[760px] text-left text-sm">
         <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">

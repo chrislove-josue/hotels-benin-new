@@ -10,6 +10,19 @@
     </div>
 </div>
 
+<?php echo $__env->make('backoffice.partials.filters', [
+    'action' => route('admin.establishments'),
+    'fields' => [
+        ['name' => 'q', 'label' => 'Recherche', 'placeholder' => 'Nom, adresse, propriétaire…'],
+        ['name' => 'type', 'label' => 'Type', 'type' => 'select',
+         'options' => ['' => 'Tous les types'] + $types->pluck('name', 'id')->all()],
+        ['name' => 'localite', 'label' => 'Localité', 'type' => 'select',
+         'options' => ['' => 'Toutes les localités'] + $localities->pluck('name', 'id')->all()],
+        ['name' => 'statut', 'label' => 'Statut', 'type' => 'select',
+         'options' => ['' => 'Tous les statuts', 'actif' => 'Active', 'en_attente' => 'En attente']],
+    ],
+], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
 <div class="card overflow-x-auto">
     <table class="w-full min-w-[720px] text-left text-sm">
         <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
