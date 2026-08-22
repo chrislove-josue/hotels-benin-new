@@ -46,8 +46,9 @@ protected $fillable = [
     /**
      * Nombre d'unités restantes disponibles pour ce type de chambre sur une période donnée.
      *
-     * Compte les réservations actives (en_attente + confirmee) dont les dates
-     * chevauchent [checkIn, checkOut] et retourne quantity - réservations.
+     * Compte les réservations actives dont les dates chevauchent [checkIn, checkOut] :
+     * - confirmee : toujours comptée ;
+     * - en_attente : comptée uniquement si non expirée (délai de paiement 24h dépassé = ignorée).
      *
      * @param string $checkIn
      * @param string $checkOut
@@ -57,7 +58,16 @@ protected $fillable = [
     public function availableUnitsFor(string $checkIn, string $checkOut, ?int $excludeReservationId = null): int
     {
         $booked = $this->reservations()
-            ->whereIn('status', ['en_attente', 'confirmee'])
+            ->where(function ($q) {
+                // Confirmée : bloque toujours. En attente : bloque tant qu'elle n'a pas expiré.
+                $q->where('status', 'confirmee')
+                    ->orWhere(function ($qq) {
+                        $qq->where('status', 'en_attente')
+                            ->where(function ($w) {
+                                $w->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                            });
+                    });
+            })
             ->when($excludeReservationId, fn ($q) => $q->where('id', '!=', $excludeReservationId))
             ->where(function ($q) use ($checkIn, $checkOut) {
                 // Chevauchement : réservation existante commence avant la fin demandée

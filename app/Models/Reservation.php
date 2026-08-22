@@ -9,7 +9,7 @@ class Reservation extends Model
 {
     use HasFactory;
 
-protected $fillable = [
+    protected $fillable = [
         'user_id',
         'establishment_id',
         'room_id',
@@ -21,6 +21,7 @@ protected $fillable = [
         'commission',
         'payment_method',
         'status',
+        'expires_at',
     ];
 
     /**
@@ -56,6 +57,28 @@ protected $fillable = [
         return 'HB-'.strtoupper(\Illuminate\Support\Str::random(8));
     }
 
+    /**
+     * Annule les réservations en attente dont le délai de paiement (24h) est dépassé
+     * et marque leurs transactions comme échouées. Retourne le nombre de réservations annulées.
+     */
+    public static function expireOverdue(): int
+    {
+        $overdue = self::with('transaction')
+            ->where('status', 'en_attente')
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<=', now())
+            ->get();
+
+        $overdue->each(function (self $reservation) {
+            if ($reservation->transaction && $reservation->transaction->status !== 'reussie') {
+                $reservation->transaction->update(['status' => 'echouee']);
+            }
+            $reservation->update(['status' => 'annulee']);
+        });
+
+        return $overdue->count();
+    }
+
     protected function casts(): array
     {
         return [
@@ -63,6 +86,7 @@ protected $fillable = [
             'check_out' => 'date',
             'amount' => 'decimal:2',
             'commission' => 'decimal:2',
+            'expires_at' => 'datetime',
         ];
     }
 

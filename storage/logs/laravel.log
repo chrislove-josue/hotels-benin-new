@@ -150,3 +150,13 @@
 "} 
 [2026-08-22 13:25:55] local.ERROR: Erreur création transaction FedaPay {"error":"La création de la transaction a échoué"} 
 [2026-08-22 13:26:31] local.ERROR: Erreur création transaction FedaPay {"error":"La création de la transaction a échoué"} 
+[2026-08-22 13:37:02] local.ERROR: A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'. {"exception":"[object] (LogicException(code: 0): A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'. at E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Console/Scheduling/CallbackEvent.php:141)
+[stacktrace]
+#0 E:/Projects/hotels-benin-new/routes/console.php(13): Illuminate/Console/Scheduling/CallbackEvent->withoutOverlapping()
+#1 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(523): require('...')
+#2 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(503): Illuminate/Foundation/Console/Kernel->discoverCommands()
+#3 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(196): Illuminate/Foundation/Console/Kernel->bootstrap()
+#4 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1242): Illuminate/Foundation/Console/Kernel->handle()
+#5 E:/Projects/hotels-benin-new/artisan(12): Illuminate/Foundation/Application->handleCommand()
+#6 {main}
+"} 

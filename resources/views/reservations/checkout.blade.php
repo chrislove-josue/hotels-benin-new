@@ -26,18 +26,18 @@
                 </div>
                 <div class="flex justify-between">
                     <dt class="text-gray-500">Séjour</dt>
-                    <dd class="font-semibold text-gray-700">{{ optional($reservation->check_in)->format('d/m/Y') }} → {{ optional($reservation->check_out)->format('d/m/Y') }} ({{ $reservation->nights() }} {{ $reservation->nights() > 1 ? 'jours' : 'jour' }})</dd>
+                    <dd class="font-semibold text-gray-700">{{ optional($reservation->check_in)->format('d/m/Y') }} → {{ optional($reservation->check_out)->format('d/m/Y') }} ({{ $reservation->nights() }} {{ $reservation->nights() > 1 ? 'nuits' : 'nuit' }})</dd>
                 </div>
                 <div class="flex justify-between">
                     <dt class="text-gray-500">Prix unitaire</dt>
-                    <dd class="font-semibold text-gray-700">{{ number_format($reservation->room->price_per_night, 0, ',', ' ') }} FCFA / jour</dd>
+                    <dd class="font-semibold text-gray-700">{{ number_format($reservation->room->price_per_night, 0, ',', ' ') }} FCFA / nuit</dd>
                 </div>
                 <div class="flex justify-between">
                     <dt class="text-gray-500">Voyageurs</dt>
                     <dd class="font-semibold text-gray-700">{{ $reservation->guests }}</dd>
                 </div>
                 <div class="mt-3 flex justify-between border-t border-gray-100 pt-3">
-                    <dt class="font-semibold text-hb-blue">Total à payer <span class="text-xs font-normal text-gray-500">({{ number_format($reservation->room->price_per_night, 0, ',', ' ') }} × {{ $reservation->nights() }})</span></dt>
+                    <dt class="font-semibold text-hb-blue">Total à payer <span class="text-xs font-normal text-gray-500">({{ number_format($reservation->room->price_per_night, 0, ',', ' ') }} × {{ $reservation->nights() }} nuit(s))</span></dt>
                     <dd class="font-display text-xl font-bold text-hb-blue">{{ number_format($reservation->amount, 0, ',', ' ') }} FCFA</dd>
                 </div>
             </dl>

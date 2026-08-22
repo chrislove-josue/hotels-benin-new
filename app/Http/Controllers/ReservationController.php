@@ -14,6 +14,9 @@ class ReservationController extends Controller
     /**
      * Crée une réservation pour un voyageur connecté, puis l'envoie directement
      * sur la page de paiement (le choix du moyen de paiement se fait au checkout).
+     *
+     * La création se fait dans une transaction SQL avec verrou sur la chambre :
+     * deux clients simultanés ne peuvent pas réserver la dernière unité.
      */
     public function store(Request $request, string $slug)
     {
@@ -26,48 +29,65 @@ class ReservationController extends Controller
             'guests'    => ['required', 'integer', 'min:1', 'max:20'],
         ]);
 
-        $room = Room::where('id', $data['room_id'])
+        // Vérifie l'existence de la chambre avant le verrou (404 propre).
+        Room::where('id', $data['room_id'])
             ->where('establishment_id', $establishment->id)
             ->where('is_available', true)
             ->firstOrFail();
 
-        // Vérification de disponibilité : bloquer si la chambre est complète sur la période.
-        if ($room->isUnavailableFor($data['check_in'], $data['check_out'])) {
-            return back()
-                ->withErrors(['room_id' => "La chambre « {$room->name} » est complète pour ces dates. Choisissez une autre période ou une autre chambre."])
-                ->withInput();
-        }
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($establishment, $data) {
+            $room = Room::where('id', $data['room_id'])
+                ->where('establishment_id', $establishment->id)
+                ->where('is_available', true)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $nights = Reservation::nightsBetween($data['check_in'], $data['check_out']);
-        $amount = $nights * (float) $room->price_per_night;
-        $commission = round($amount * 0.10, 2); // 10% commission plateforme
+            if ($data['guests'] > $room->capacity) {
+                return back()
+                    ->withErrors(['guests' => "Cette chambre accepte au maximum {$room->capacity} voyageur(s)."])
+                    ->withInput();
+            }
 
-        $reservation = Reservation::create([
-            'user_id'          => Auth::id(),
-            'establishment_id' => $establishment->id,
-            'room_id'          => $room->id,
-            'reference'        => Reservation::generateReference(),
-            'check_in'         => $data['check_in'],
-            'check_out'        => $data['check_out'],
-            'guests'           => $data['guests'],
-            'amount'           => $amount,
-            'commission'       => $commission,
-            'payment_method'   => null,
-            'status'           => 'en_attente',
-        ]);
+            // Vérification de disponibilité sous verrou : bloquer si la chambre est complète.
+            if ($room->isUnavailableFor($data['check_in'], $data['check_out'])) {
+                return back()
+                    ->withErrors(['room_id' => "La chambre « {$room->name} » est complète pour ces dates. Choisissez une autre période ou une autre chambre."])
+                    ->withInput();
+            }
 
-        // Transaction en attente : le moyen de paiement sera renseigné au checkout.
-        Transaction::create([
-            'reservation_id' => $reservation->id,
-            'amount'         => $amount,
-            'commission'     => $commission,
-            'method'         => null,
-            'reference'      => 'TXN-'.strtoupper(substr($reservation->reference, 3)).'-'.strtoupper(\Illuminate\Support\Str::random(4)),
-            'status'         => 'en_attente',
-        ]);
+            $nights = Reservation::nightsBetween($data['check_in'], $data['check_out']);
+            $amount = $nights * (float) $room->price_per_night;
+            $commission = round($amount * 0.10, 2); // 10% commission plateforme
 
-        return redirect()->route('reservations.checkout', $reservation)
-            ->with('status', 'Votre réservation a bien été enregistrée. Choisissez votre moyen de paiement.');
+            $reservation = Reservation::create([
+                'user_id'          => Auth::id(),
+                'establishment_id' => $establishment->id,
+                'room_id'          => $room->id,
+                'reference'        => Reservation::generateReference(),
+                'check_in'         => $data['check_in'],
+                'check_out'        => $data['check_out'],
+                'guests'           => $data['guests'],
+                'amount'           => $amount,
+                'commission'       => $commission,
+                'payment_method'   => null,
+                'status'           => 'en_attente',
+                // Sans paiement sous 24h, la réservation expire et libère la chambre.
+                'expires_at'       => now()->addDay(),
+            ]);
+
+            // Transaction en attente : le moyen de paiement sera renseigné au checkout.
+            Transaction::create([
+                'reservation_id' => $reservation->id,
+                'amount'         => $amount,
+                'commission'     => $commission,
+                'method'         => null,
+                'reference'      => 'TXN-'.strtoupper(substr($reservation->reference, 3)).'-'.strtoupper(\Illuminate\Support\Str::random(4)),
+                'status'         => 'en_attente',
+            ]);
+
+            return redirect()->route('reservations.checkout', $reservation)
+                ->with('status', 'Votre réservation a bien été enregistrée. Vous avez 24h pour finaliser le paiement.');
+        });
     }
 
     /**
@@ -100,6 +120,7 @@ class ReservationController extends Controller
      */
     public function dashboard()
     {
+        Reservation::expireOverdue();
         $reservations = Reservation::with(['establishment', 'room', 'transaction'])
             ->where('user_id', Auth::id())
             ->latest()
