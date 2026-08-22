@@ -88,6 +88,30 @@ class AdminController extends Controller
             ->take(10)
             ->get();
 
+        // ---- Classement des établissements par clients et revenus ----
+        // Clients = voyageurs DISTINCTS ayant une réservation confirmée ou terminée.
+        // Revenus = somme des transactions réussies liées à l'établissement.
+        $topEstablishments = DB::table('establishments as e')
+            ->leftJoin('users as u', 'u.id', '=', 'e.user_id')
+            ->leftJoin('reservations as r', 'r.establishment_id', '=', 'e.id')
+            ->leftJoin('transactions as t', function ($join) {
+                $join->on('t.reservation_id', '=', 'r.id')->where('t.status', 'reussie');
+            })
+            ->select(
+                'e.id',
+                'e.name',
+                'u.name as host_name',
+                DB::raw("COUNT(DISTINCT CASE WHEN r.status IN ('confirmee', 'terminee') THEN r.user_id END) as clients_count"),
+                DB::raw('COUNT(DISTINCT r.id) as reservations_count'),
+                DB::raw('COALESCE(SUM(t.amount), 0) as revenue'),
+                DB::raw('COALESCE(SUM(t.commission), 0) as commission')
+            )
+            ->groupBy('e.id', 'e.name', 'u.name')
+            ->orderByDesc('revenue')
+            ->orderByDesc('clients_count')
+            ->limit(10)
+            ->get();
+
         $pendingEstablishments = Establishment::where('is_available', false)
             ->with('type')
             ->latest()
@@ -111,7 +135,8 @@ $driver = DB::connection()->getDriverName();
             'latestReservations',
             'latestTransactions',
             'pendingEstablishments',
-            'revenueByMonth'
+            'revenueByMonth',
+            'topEstablishments'
         ));
     }
 

@@ -162,6 +162,56 @@
     </div>
 </div>
 
+
+<div class="card mt-6">
+    <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+        <div>
+            <h2 class="font-display text-lg font-bold text-hb-blue">Classement des établissements</h2>
+            <p class="text-xs text-gray-500">Top 10 — par revenus encaissés et nombre de clients distincts (réservations confirmées ou terminées).</p>
+        </div>
+        <a href="<?php echo e(route('admin.establishments')); ?>" class="text-xs font-semibold text-hb-orange hover:underline">Tout voir</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[720px] text-sm">
+            <thead>
+                <tr class="border-b border-gray-100 text-left text-xs uppercase tracking-wide text-gray-400">
+                    <th class="px-5 py-3 font-semibold">#</th>
+                    <th class="px-5 py-3 font-semibold">Établissement</th>
+                    <th class="px-5 py-3 font-semibold">Hôte</th>
+                    <th class="px-5 py-3 text-right font-semibold">Clients</th>
+                    <th class="px-5 py-3 text-right font-semibold">Réservations</th>
+                    <th class="px-5 py-3 text-right font-semibold">Revenus encaissés</th>
+                    <th class="px-5 py-3 text-right font-semibold">Commission</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                <?php $__empty_1 = true; $__currentLoopData = $topEstablishments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <tr class="hover:bg-gray-50/60">
+                        <td class="px-5 py-3">
+                            <?php if($i === 0): ?>
+                                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-hb-gold to-hb-orange text-xs font-bold text-white"><i class="bi bi-trophy"></i></span>
+                            <?php else: ?>
+                                <span class="text-sm font-bold text-gray-400"><?php echo e($i + 1); ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-5 py-3 font-semibold text-hb-blue"><?php echo e($item->name); ?></td>
+                        <td class="px-5 py-3 text-gray-600"><?php echo e($item->host_name ?? '—'); ?></td>
+                        <td class="px-5 py-3 text-right">
+                            <span class="font-bold text-hb-blue"><?php echo e($item->clients_count); ?></span>
+                            <span class="text-xs text-gray-400">client(s)</span>
+                        </td>
+                        <td class="px-5 py-3 text-right text-gray-600"><?php echo e($item->reservations_count); ?></td>
+                        <td class="px-5 py-3 text-right font-bold text-green-600"><?php echo e(number_format($item->revenue, 0, ',', ' ')); ?> FCFA</td>
+                        <td class="px-5 py-3 text-right text-gray-500"><?php echo e(number_format($item->commission, 0, ',', ' ')); ?> FCFA</td>
+                    </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <tr><td colspan="7" class="px-5 py-6 text-center text-sm text-gray-400">Aucun établissement pour le moment.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
     
     <div class="card lg:col-span-2">
