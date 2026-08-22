@@ -29,12 +29,17 @@ class PasswordResetController extends Controller
             'email' => 'e-mail',
         ]);
 
+        // Vérification explicite de l'existence du compte.
+        if (! User::where('email', $request->input('email'))->exists()) {
+            return back()->withErrors([
+                'email' => 'Aucun compte ne correspond à cette adresse e-mail.',
+            ])->onlyInput('email');
+        }
+
         $status = Password::sendResetLink($request->only('email'));
 
-        // Réponse volontairement identique que l'adresse existe ou non :
-        // on ne révèle pas quels comptes sont inscrits.
-        if ($status === Password::RESET_LINK_SENT || $status === Password::INVALID_USER) {
-            return back()->with('status', "Si cette adresse e-mail correspond à un compte, un lien de réinitialisation vient de vous être envoyé. Vérifiez votre boîte de réception (et vos spams).");
+        if ($status === Password::RESET_LINK_SENT) {
+            return back()->with('status', 'Un lien de réinitialisation vient de vous être envoyé par e-mail. Vérifiez votre boîte de réception (et vos spams).');
         }
 
         return back()->withErrors([
