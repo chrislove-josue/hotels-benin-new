@@ -15,6 +15,7 @@
     <table class="w-full min-w-[680px] text-left text-sm">
         <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
             <tr>
+                <th class="px-5 py-3">Image</th>
                 <th class="px-5 py-3">Nom</th>
                 <th class="px-5 py-3">Description</th>
                 <th class="px-5 py-3">Capacité</th>
@@ -27,6 +28,15 @@
         <tbody class="divide-y divide-gray-50">
             @forelse($establishment->rooms as $room)
                 <tr class="hover:bg-hb-cream/50">
+                    <td class="px-5 py-3">
+                        @if($room->cover_image)
+                            <a href="{{ $room->cover_image }}" target="_blank" title="Voir l'image">
+                                <img src="{{ $room->cover_image }}" alt="{{ $room->name }}" class="h-10 w-14 rounded-lg object-cover transition hover:scale-105">
+                            </a>
+                        @else
+                            <span class="flex h-10 w-14 items-center justify-center rounded-lg bg-gray-100 text-gray-300"><i class="bi bi-image"></i></span>
+                        @endif
+                    </td>
                     <td class="px-5 py-3 font-semibold text-hb-blue">{{ $room->name }}</td>
                     <td class="px-5 py-3 text-gray-600">{{ $room->description }}</td>
                     <td class="px-5 py-3 text-gray-600">{{ $room->capacity }} pers.</td>
@@ -45,7 +55,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-5 py-8 text-center text-gray-400">Aucune chambre pour cet établissement.</td>
+                    <td colspan="8" class="px-5 py-8 text-center text-gray-400">Aucune chambre pour cet établissement.</td>
                 </tr>
             @endforelse
         </tbody>

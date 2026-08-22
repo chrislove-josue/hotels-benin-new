@@ -256,7 +256,14 @@
             <div class="divide-y divide-gray-50">
                 @forelse($pendingEstablishments as $item)
                     <div class="flex items-center justify-between gap-2 px-5 py-3">
-                        <p class="truncate text-sm text-gray-700">{{ $item->name }}</p>
+                        <div class="flex min-w-0 items-center gap-3">
+                            @if($item->cover_image)
+                                <img src="{{ $item->cover_image }}" alt="{{ $item->name }}" class="h-10 w-14 shrink-0 rounded-lg object-cover">
+                            @else
+                                <span class="flex h-10 w-14 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-300"><i class="bi bi-building"></i></span>
+                            @endif
+                            <p class="truncate text-sm text-gray-700">{{ $item->name }}</p>
+                        </div>
                         <a href="{{ route('admin.establishments') }}" class="text-xs font-semibold text-hb-orange">Traiter</a>
                     </div>
                 @empty
