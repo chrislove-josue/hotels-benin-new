@@ -229,13 +229,58 @@ public function updateReservation(Request $request, int $id)
 
 public function transactions()
     {
-        $transactions = Transaction::with('reservation.establishment')
+        $transactions = Transaction::with(['reservation.establishment', 'reservation.user'])
             ->latest()
             ->paginate(15);
 
         $total = Transaction::where('status', 'reussie')->sum('amount');
 
         return view('backoffice.admin.transactions', compact('transactions', 'total'));
+    }
+
+    /**
+     * Mise à jour manuelle du statut d'une transaction par l'admin
+     * (paiement en espèces sur place, remboursement demandé par le client...).
+     * Une raison est exigée pour toute décision manuelle et la réservation liée
+     * est synchronisée : reussie => confirmee, remboursee => annulee.
+     */
+    public function updateTransaction(Request $request, int $id)
+    {
+        $transaction = Transaction::findOrFail($id);
+
+        $data = $request->validate([
+            'status' => ['required', 'in:en_attente,reussie,echouee,remboursee'],
+            // Raison obligatoire dès qu'une décision humaine est prise (pas pour « en attente »).
+            'reason' => ['required_if:status,reussie', 'required_if:status,echouee', 'required_if:status,remboursee', 'nullable', 'string', 'max:255'],
+        ], [], [
+            'status' => 'statut',
+            'reason' => 'raison',
+        ]);
+
+        $oldStatus = $transaction->status;
+        $transaction->update([
+            'status' => $data['status'],
+            'reason' => $data['reason'] ?? null,
+        ]);
+
+        if ($data['status'] !== $oldStatus) {
+            $reservation = $transaction->reservation;
+
+            if ($reservation) {
+                if ($data['status'] === 'reussie') {
+                    // Paiement réglé hors plateforme (espèces...) ou régularisé : on confirme.
+                    if (! $transaction->method) {
+                        $transaction->update(['method' => 'sur_place']);
+                    }
+                    $reservation->update(['status' => 'confirmee']);
+                } elseif ($data['status'] === 'remboursee') {
+                    // Remboursement accordé : la réservation ne peut plus être tenue.
+                    $reservation->update(['status' => 'annulee']);
+                }
+            }
+        }
+
+        return back()->with('status', "Transaction {$transaction->reference} mise à jour.");
     }
 
     public function messages()

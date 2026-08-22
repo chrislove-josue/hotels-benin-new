@@ -15,7 +15,9 @@ class Transaction extends Model
         'commission',
         'method',
         'reference',
+        'provider_transaction_id',
         'status',
+        'reason',
     ];
 
     protected function casts(): array

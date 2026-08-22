@@ -171,6 +171,7 @@ Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users');
     Route::patch('/reservations/{id}', [AdminController::class, 'updateReservation'])->name('reservations.update');
 
     Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
+    Route::patch('/transactions/{id}', [AdminController::class, 'updateTransaction'])->name('transactions.update');
 
 Route::get('/messages', [AdminController::class, 'messages'])->name('messages');
     Route::post('/messages/{id}/read', [AdminController::class, 'markMessageRead'])->name('messages.read');

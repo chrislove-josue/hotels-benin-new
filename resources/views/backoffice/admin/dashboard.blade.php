@@ -122,7 +122,7 @@
                         'en_attente' => 'bg-yellow-100 text-yellow-700',
                         'echouee' => 'bg-red-100 text-red-700',
                     ];
-                    $txLabels = ['reussie' => 'Réussie', 'en_attente' => 'En attente', 'echouee' => 'Échouée'];
+                    $txLabels = ['reussie' => 'Réussie', 'en_attente' => 'En attente', 'echouee' => 'Échouée', 'remboursee' => 'Remboursée'];
                 @endphp
                 @forelse($latestTransactions as $transaction)
                     <tr class="hover:bg-gray-50/60">
