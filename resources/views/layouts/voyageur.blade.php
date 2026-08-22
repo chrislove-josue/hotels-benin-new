@@ -97,6 +97,9 @@
                 <a href="{{ route('reservations.index') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('reservations.index') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
                     <i class="bi bi-calendar-check text-lg"></i> Mes réservations
                 </a>
+                <a href="{{ route('reservations.my_reviews') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('reservations.my_reviews') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
+                    <i class="bi bi-star text-lg"></i> Mes avis
+                </a>
                 <a href="{{ route('establishments.index') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition hover:bg-white/10">
                     <i class="bi bi-search text-lg"></i> Rechercher
                 </a>

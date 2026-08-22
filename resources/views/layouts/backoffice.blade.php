@@ -119,6 +119,9 @@
 <a href="{{ route('admin.messages') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.messages') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
                         <i class="bi bi-envelope text-lg"></i> Messages
                     </a>
+                    <a href="{{ route('admin.avis') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.avis*') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
+                        <i class="bi bi-star text-lg"></i> Avis
+                    </a>
                     <a href="{{ route('admin.pending') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.pending') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
                         <i class="bi bi-clipboard-check text-lg"></i> Modifications
                     </a>
@@ -134,6 +137,9 @@
                     </a>
                     <a href="{{ route('hote.reservations') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('hote.reservations') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
                         <i class="bi bi-calendar-check text-lg"></i> Réservations
+                    </a>
+                    <a href="{{ route('hote.avis') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('hote.avis') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
+                        <i class="bi bi-star text-lg"></i> Avis
                     </a>
                 @endif
             </nav>
