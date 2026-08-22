@@ -188,14 +188,27 @@ public function updateEstablishment(Request $request, int $id)
         return view('backoffice.hote.edit-room', compact('establishment', 'room'));
     }
 
-    public function reservations()
+    public function reservations(Request $request)
     {
         $establishmentIds = Establishment::where('user_id', Auth::id())->pluck('id');
 
+        $q = trim((string) $request->query('q', ''));
+        $status = $request->query('statut');
+
         $reservations = Reservation::with(['user', 'establishment', 'room'])
             ->whereIn('establishment_id', $establishmentIds)
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($w) use ($q) {
+                    $w->where('reference', 'like', "%{$q}%")
+                        ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$q}%")
+                            ->orWhere('email', 'like', "%{$q}%"));
+                });
+            })
+            ->when(in_array($status, ['en_attente', 'confirmee', 'annulee', 'terminee']),
+                fn ($query) => $query->where('status', $status))
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return view('backoffice.hote.reservations', compact('reservations'));
     }

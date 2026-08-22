@@ -140,13 +140,33 @@ $driver = DB::connection()->getDriverName();
         ));
     }
 
-    public function establishments()
+    public function establishments(Request $request)
     {
-        $establishments = Establishment::with(['locality', 'type', 'owner'])
-            ->latest()
-            ->paginate(15);
+        $q = trim((string) $request->query('q', ''));
+        $typeId = $request->query('type');
+        $localityId = $request->query('localite');
+        $status = $request->query('statut');
 
-        return view('backoffice.admin.establishments', compact('establishments'));
+        $establishments = Establishment::with(['locality', 'type', 'owner'])
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($w) use ($q) {
+                    $w->where('name', 'like', "%{$q}%")
+                        ->orWhere('address', 'like', "%{$q}%")
+                        ->orWhereHas('owner', fn ($o) => $o->where('name', 'like', "%{$q}%"));
+                });
+            })
+            ->when($typeId, fn ($query) => $query->where('establishment_type_id', $typeId))
+            ->when($localityId, fn ($query) => $query->where('locality_id', $localityId))
+            ->when($status === 'actif', fn ($query) => $query->where('is_available', true))
+            ->when($status === 'en_attente', fn ($query) => $query->where('is_available', false))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $types = \App\Models\EstablishmentType::orderBy('name')->get();
+        $localities = \App\Models\Locality::orderBy('name')->get();
+
+        return view('backoffice.admin.establishments', compact('establishments', 'types', 'localities'));
     }
 
     public function toggleEstablishment(int $id)
@@ -300,13 +320,31 @@ public function updateUserRole(Request $request, int $id)
         return back()->with('status', "Le compte de {$user->name} a été désactivé.");
     }
 
-    public function reservations()
+    public function reservations(Request $request)
     {
-        $reservations = Reservation::with(['user', 'establishment', 'room'])
-            ->latest()
-            ->paginate(15);
+        $q = trim((string) $request->query('q', ''));
+        $status = $request->query('statut');
+        $establishmentId = $request->query('etablissement');
 
-        return view('backoffice.admin.reservations', compact('reservations'));
+        $reservations = Reservation::with(['user', 'establishment', 'room'])
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($w) use ($q) {
+                    $w->where('reference', 'like', "%{$q}%")
+                        ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$q}%")
+                            ->orWhere('email', 'like', "%{$q}%"))
+                        ->orWhereHas('establishment', fn ($e) => $e->where('name', 'like', "%{$q}%"));
+                });
+            })
+            ->when(in_array($status, ['en_attente', 'confirmee', 'annulee', 'terminee']),
+                fn ($query) => $query->where('status', $status))
+            ->when($establishmentId, fn ($query) => $query->where('establishment_id', $establishmentId))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $establishments = Establishment::orderBy('name')->get(['id', 'name']);
+
+        return view('backoffice.admin.reservations', compact('reservations', 'establishments'));
     }
 
 public function updateReservation(Request $request, int $id)
@@ -320,11 +358,21 @@ public function updateReservation(Request $request, int $id)
         return back()->with('status', 'Réservation mise à jour.');
     }
 
-public function transactions()
+public function transactions(Request $request)
     {
+        $q = trim((string) $request->query('q', ''));
+        $status = $request->query('statut');
+        $method = trim((string) $request->query('methode', ''));
+
         $transactions = Transaction::with(['reservation.establishment', 'reservation.user'])
+            ->when($q !== '', fn ($query) => $query->where('reference', 'like', "%{$q}%")
+                ->orWhereHas('reservation', fn ($r) => $r->where('reference', 'like', "%{$q}%")))
+            ->when(in_array($status, ['en_attente', 'reussie', 'echouee', 'remboursee']),
+                fn ($query) => $query->where('status', $status))
+            ->when($method !== '', fn ($query) => $query->where('method', $method))
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         $total = Transaction::where('status', 'reussie')->sum('amount');
 
@@ -376,9 +424,25 @@ public function transactions()
         return back()->with('status', "Transaction {$transaction->reference} mise à jour.");
     }
 
-    public function messages()
+    public function messages(Request $request)
     {
-        $messages = ContactMessage::latest()->paginate(15);
+        $q = trim((string) $request->query('q', ''));
+        $state = $request->query('etat');
+
+        $messages = ContactMessage::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($w) use ($q) {
+                    $w->where('name', 'like', "%{$q}%")
+                        ->orWhere('email', 'like', "%{$q}%")
+                        ->orWhere('subject', 'like', "%{$q}%")
+                        ->orWhere('message', 'like', "%{$q}%");
+                });
+            })
+            ->when($state === 'lu', fn ($query) => $query->where('is_read', true))
+            ->when($state === 'non_lu', fn ($query) => $query->where('is_read', false))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('backoffice.admin.messages', compact('messages'));
     }
@@ -851,13 +915,24 @@ public function updateRoom(Request $request, int $establishmentId, int $roomId)
     |--------------------------------------------------------------------------
     */
 
-    /**
-     * Liste paginée de tous les événements.
-     */
-    public function events()
+    public function events(Request $request)
     {
-        $events = Event::latest()
-            ->paginate(15);
+        $q = trim((string) $request->query('q', ''));
+        $category = $request->query('categorie');
+        $visibility = $request->query('visibilite');
+
+        $events = Event::query()
+            ->when($q !== '', fn ($query) => $query->where(function ($w) use ($q) {
+                $w->where('title', 'like', "%{$q}%")
+                    ->orWhere('location', 'like', "%{$q}%");
+            }))
+            ->when(in_array($category, ['festival', 'culture', 'sport', 'affaires', 'religieux']),
+                fn ($query) => $query->where('category', $category))
+            ->when($visibility === 'en_ligne', fn ($query) => $query->where('is_available', true))
+            ->when($visibility === 'hors_ligne', fn ($query) => $query->where('is_available', false))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('backoffice.admin.events', compact('events'));
     }
