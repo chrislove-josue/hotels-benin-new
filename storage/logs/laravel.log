@@ -161,3 +161,7 @@
 #6 {main}
 "} 
 [2026-08-22 13:42:11] local.ERROR: Erreur création transaction FedaPay {"reservation":"HB-EJWEJECN","error":"La création de la transaction a échoué","http":400,"body":{"message":"La création de la transaction a échoué","errors":{"amount":["Le montant maximum de transactions autorisées est 300000."]},"model":"V1::Transaction"}} 
+[2026-08-22 16:06:50] local.ERROR: Maximum execution time of 30 seconds exceeded {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 30 seconds exceeded at E:/Projects/hotels-benin-new/vendor/composer/ClassLoader.php:429)
+[stacktrace]
+#0 {main}
+"} 
