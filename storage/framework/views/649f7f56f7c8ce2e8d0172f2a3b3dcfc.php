@@ -164,9 +164,16 @@
                             </td>
                             <td class="px-5 py-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="flex h-9 w-9 items-center justify-center rounded-full bg-hb-blue/10 text-sm font-bold text-hb-blue"><?php echo e(strtoupper(substr($user->name, 0, 1))); ?></div>
+                                    <div class="flex h-9 w-9 items-center justify-center rounded-full <?php echo e($user->role === 'admin' ? 'bg-hb-gold/20 text-hb-blue' : ($user->role === 'hote' ? 'bg-hb-orange/15 text-hb-orange-dark' : 'bg-hb-blue/10 text-hb-blue')); ?> text-sm font-bold"><?php echo e(strtoupper(substr($user->name, 0, 1))); ?></div>
                                     <div class="min-w-0">
-                                        <p class="truncate font-semibold text-hb-blue"><?php echo e($user->name); ?></p>
+                                        <p class="truncate font-semibold text-hb-blue"><?php echo e($user->name); ?>
+
+                                            <?php if($user->role === 'hote'): ?>
+                                                <span class="badge-pill ml-1 bg-hb-orange/10 text-hb-orange-dark" title="Cet utilisateur est aussi un hôte"><i class="bi bi-building"></i> aussi hôte</span>
+                                            <?php elseif($user->role === 'admin'): ?>
+                                                <span class="badge-pill ml-1 bg-hb-gold/20 text-hb-blue" title="Cet utilisateur est aussi un administrateur"><i class="bi bi-shield-lock"></i> admin</span>
+                                            <?php endif; ?>
+                                        </p>
                                         <p class="truncate text-xs text-gray-400"><?php echo e($user->email); ?></p>
                                     </div>
                                 </div>

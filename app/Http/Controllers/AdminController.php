@@ -231,8 +231,9 @@ public function users(Request $request)
             ->get();
 
         // ---- Voyageurs : classés par nombre de réservations, puis total dépensé ----
+        // Inclut aussi les hôtes et admins ayant effectué au moins une réservation :
+        // ils sont alors classés comme les autres, avec leur rôle secondaire affiché.
         $voyageurs = User::query()
-            ->where('role', 'voyageur')
             ->select('users.*')
             ->addSelect([
                 'voyageur_reservations_count' => Reservation::query()
@@ -244,6 +245,10 @@ public function users(Request $request)
                     ->where('transactions.status', 'reussie')
                     ->selectRaw('COALESCE(SUM(transactions.amount), 0)'),
             ])
+            ->where(function ($q) {
+                $q->where('role', 'voyageur')
+                    ->orWhereHas('reservations');
+            })
             ->tap($applyCommonFilters)
             ->orderByDesc('voyageur_reservations_count')
             ->orderByDesc('spent')
