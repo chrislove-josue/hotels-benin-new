@@ -148,3 +148,5 @@
 #70 E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('...')
 #71 {main}
 "} 
+[2026-08-22 13:25:55] local.ERROR: Erreur création transaction FedaPay {"error":"La création de la transaction a échoué"} 
+[2026-08-22 13:26:31] local.ERROR: Erreur création transaction FedaPay {"error":"La création de la transaction a échoué"} 
