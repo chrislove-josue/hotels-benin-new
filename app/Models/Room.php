@@ -87,4 +87,44 @@ protected $fillable = [
     {
         return $this->availableUnitsFor($checkIn, $checkOut, $excludeReservationId) <= 0;
     }
+
+    /**
+     * Nombre minimal d'unités requis pour honorer les réservations actives à venir.
+     *
+     * Calcule le pic de chevauchement (balayage) des réservations confirmées ou en
+     * attente non expirées dont le check_out est futur. Une baisse de `quantity`
+     * en dessous de ce seuil créerait du surbooking.
+     */
+    public function minRequiredQuantity(): int
+    {
+        $reservations = $this->reservations()
+            ->where(function ($q) {
+                $q->where('status', 'confirmee')
+                    ->orWhere(function ($qq) {
+                        $qq->where('status', 'en_attente')
+                            ->where(function ($w) {
+                                $w->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                            });
+                    });
+            })
+            ->whereDate('check_out', '>', now()->toDateString())
+            ->get(['check_in', 'check_out']);
+
+        $events = [];
+        foreach ($reservations as $reservation) {
+            $events[] = [$reservation->check_in, 1];
+            $events[] = [$reservation->check_out, -1];
+        }
+
+        // Tri chronologique ; à date égale les fins (-1) avant les débuts (+1)
+        usort($events, fn ($a, $b) => [$a[0], $a[1]] <=> [$b[0], $b[1]]);
+
+        $current = $peak = 0;
+        foreach ($events as [, $delta]) {
+            $current += $delta;
+            $peak = max($peak, $current);
+        }
+
+        return $peak;
+    }
 }
