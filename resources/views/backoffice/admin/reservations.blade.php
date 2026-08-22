@@ -8,6 +8,20 @@
     <p class="mt-1 text-sm text-gray-500">Suivi de toutes les réservations de la plateforme.</p>
 </div>
 
+@php
+    $resaLabels = ['en_attente' => 'En attente', 'confirmee' => 'Confirmée', 'annulee' => 'Annulée', 'terminee' => 'Terminée'];
+@endphp
+
+@include('backoffice.partials.filters', [
+    'action' => route('admin.reservations'),
+    'fields' => [
+        ['name' => 'q', 'label' => 'Recherche', 'placeholder' => 'Référence, voyageur, établissement…'],
+        ['name' => 'statut', 'label' => 'Statut', 'type' => 'select', 'options' => ['' => 'Tous les statuts'] + $resaLabels],
+        ['name' => 'etablissement', 'label' => 'Établissement', 'type' => 'select',
+         'options' => ['' => 'Tous les établissements'] + $establishments->pluck('name', 'id')->all()],
+    ],
+])
+
 <div class="card overflow-x-auto">
     <table class="w-full min-w-[760px] text-left text-sm">
         <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
@@ -31,7 +45,7 @@
                     <td class="px-5 py-3 font-semibold text-hb-blue">{{ number_format($reservation->amount, 0, ',', ' ') }} FCFA</td>
                     <td class="px-5 py-3">
                         <span class="badge-pill {{ match($reservation->status) { 'confirmee' => 'bg-green-100 text-green-700', 'en_attente' => 'bg-yellow-100 text-yellow-700', 'annulee' => 'bg-red-100 text-red-700', 'terminee' => 'bg-blue-100 text-blue-700', default => 'bg-gray-100 text-gray-600' } }}">
-                            {{ $reservation->status }}
+                            {{ $resaLabels[$reservation->status] ?? $reservation->status }}
                         </span>
                     </td>
                     <td class="px-5 py-3">
@@ -39,8 +53,8 @@
                             @csrf
                             @method('PATCH')
                             <select name="status" class="input-field !w-36 !py-1.5 text-xs">
-                                @foreach(['en_attente', 'confirmee', 'annulee', 'terminee'] as $status)
-                                    <option value="{{ $status }}" @selected($reservation->status === $status)>{{ $status }}</option>
+                                @foreach($resaLabels as $statusValue => $statusLabel)
+                                    <option value="{{ $statusValue }}" @selected($reservation->status === $statusValue)>{{ $statusLabel }}</option>
                                 @endforeach
                             </select>
 <button type="submit" class="btn-outline !px-3 !py-1.5 text-xs"><i class="bi bi-arrow-repeat"></i> MAJ</button>

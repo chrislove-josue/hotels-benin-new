@@ -30,7 +30,23 @@
         'echouee' => 'bg-red-100 text-red-700',
         'remboursee' => 'bg-purple-100 text-purple-700',
     ];
+    $methodLabels = [
+        '' => 'Toutes les méthodes',
+        'fedapay' => 'FedaPay (mobile money / carte)',
+        'moov_money' => 'Moov Money',
+        'mtn_money' => 'MTN MoMo',
+        'sur_place' => 'Sur place (espèces)',
+    ];
 @endphp
+
+@include('backoffice.partials.filters', [
+    'action' => route('admin.transactions'),
+    'fields' => [
+        ['name' => 'q', 'label' => 'Recherche', 'placeholder' => 'Référence transaction ou réservation…'],
+        ['name' => 'statut', 'label' => 'Statut', 'type' => 'select', 'options' => ['' => 'Tous les statuts'] + $txLabels],
+        ['name' => 'methode', 'label' => 'Méthode', 'type' => 'select', 'options' => $methodLabels],
+    ],
+])
 
 <div class="card overflow-x-auto">
     <table class="w-full min-w-[980px] text-left text-sm">
