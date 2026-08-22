@@ -20,13 +20,15 @@
     <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center" data-reveal>
         <div>
             <span class="section-eyebrow">Notre mission</span>
-            <h2 class="section-title mb-4">Valoriser l'hébergement local béninois</h2>
+            <h2 class="section-title mb-4">Connecter voyageurs et hébergements béninois</h2>
             <div class="divider-gold"></div>
             <p class="mt-6 leading-relaxed text-gray-600">
                 Hôtels Bénin est née d'un constat simple : il est souvent difficile de trouver, comparer et réserver un
-                hébergement de qualité au Bénin. Notre plateforme rassemble hôtels, résidences meublées, villas et
-                salles de fête, avec des informations fiables et une expérience de réservation pensée pour les
-                voyageurs comme pour les hôtes.
+                hébergement de qualité au Bénin. Notre équipe va directement à la rencontre des hôtels, résidences
+                meublées, villas et salles de fête : nous démarchons ces établissements, vérifions leurs chambres et
+                leurs espaces, et les rendons réservables en ligne. Les touristes et voyageurs accèdent ainsi à une
+                sélection fiable d'hébergements et de salles pour tous leurs séjours et événements, avec des
+                informations exactes et une réservation en quelques clics.
             </p>
         </div>
         <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=900&q=80" alt="Équipe Hôtels Bénin" class="rounded-2xl shadow-card-lg">
@@ -85,6 +87,7 @@
         </script>
     </div>
 
+    {{-- Section équipe masquée pour le moment — réactiver en supprimant les commentaires Blade.
     <div class="mt-20" data-reveal>
         <span class="section-eyebrow">L'équipe</span>
         <h2 class="section-title mb-8">Une équipe passionnée par le tourisme béninois</h2>
@@ -105,5 +108,6 @@
             @endforeach
         </div>
     </div>
+    --}}
 </section>
 @endsection
