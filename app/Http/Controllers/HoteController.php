@@ -232,6 +232,43 @@ public function updateEstablishment(Request $request, int $id)
         return back()->with('status', 'Réservation mise à jour.');
     }
 
+    /**
+     * Avis reçus sur les établissements et chambres de l'hôte.
+     */
+    public function reviews(Request $request)
+    {
+        $establishmentIds = Establishment::where('user_id', Auth::id())->pluck('id');
+
+        $q = trim((string) $request->query('q', ''));
+        $rating = $request->query('note');
+        $establishmentId = $request->query('etablissement');
+
+        $reviews = \App\Models\Review::with(['user', 'establishment', 'room'])
+            ->whereIn('establishment_id', $establishmentIds)
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($w) use ($q) {
+                    $w->where('comment', 'like', "%{$q}%")
+                        ->orWhere('title', 'like', "%{$q}%")
+                        ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$q}%"));
+                });
+            })
+            ->when(in_array((int) $rating, [1, 2, 3, 4, 5], true), fn ($query) => $query->where('rating', $rating))
+            ->when($establishmentId, fn ($query) => $query->where('establishment_id', $establishmentId))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $baseStats = \App\Models\Review::whereIn('establishment_id', $establishmentIds);
+        $stats = [
+            'total' => (clone $baseStats)->count(),
+            'avg'   => round((float) (clone $baseStats)->avg('rating'), 2),
+        ];
+
+        $establishments = Establishment::where('user_id', Auth::id())->orderBy('name')->get(['id', 'name']);
+
+        return view('backoffice.hote.reviews', compact('reviews', 'stats', 'establishments'));
+    }
+
 public function storeRoom(Request $request, int $establishmentId)
     {
         $establishment = Establishment::where('user_id', Auth::id())->findOrFail($establishmentId);

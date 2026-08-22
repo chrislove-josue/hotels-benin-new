@@ -447,11 +447,57 @@ public function transactions(Request $request)
         return view('backoffice.admin.messages', compact('messages'));
     }
 
-public function markMessageRead(int $id)
+    public function markMessageRead(int $id)
     {
         ContactMessage::findOrFail($id)->update(['is_read' => true]);
 
         return back()->with('status', 'Message marqué comme lu.');
+    }
+
+    /**
+     * Tous les avis de la plateforme avec statistiques et filtres.
+     */
+    public function reviews(Request $request)
+    {
+        $q = trim((string) $request->query('q', ''));
+        $rating = $request->query('note');
+        $type = $request->query('type');
+
+        $reviews = \App\Models\Review::with(['user', 'establishment', 'room'])
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($w) use ($q) {
+                    $w->where('comment', 'like', "%{$q}%")
+                        ->orWhere('title', 'like', "%{$q}%")
+                        ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$q}%"))
+                        ->orWhereHas('establishment', fn ($e) => $e->where('name', 'like', "%{$q}%"));
+                });
+            })
+            ->when(in_array((int) $rating, [1, 2, 3, 4, 5], true), fn ($query) => $query->where('rating', $rating))
+            ->when($type === 'chambre', fn ($query) => $query->whereNotNull('room_id'))
+            ->when($type === 'etablissement', fn ($query) => $query->whereNull('room_id'))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $stats = [
+            'total' => \App\Models\Review::count(),
+            'avg'   => round((float) \App\Models\Review::avg('rating'), 2),
+            'rooms' => \App\Models\Review::whereNotNull('room_id')->count(),
+            'establishments' => \App\Models\Review::whereNull('room_id')->count(),
+        ];
+
+        return view('backoffice.admin.reviews', compact('reviews', 'stats'));
+    }
+
+    /**
+     * Supprime un avis (modération).
+     */
+    public function destroyReview(int $id)
+    {
+        $review = \App\Models\Review::findOrFail($id);
+        $review->delete();
+
+        return back()->with('status', 'Avis supprimé.');
     }
 
 /**

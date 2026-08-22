@@ -100,6 +100,10 @@ Route::post('/etablissements/{establishment:slug}/reserver', [ReservationControl
 Route::prefix('espace-voyageur')->name('reservations.')->middleware(['auth', 'approved'])->group(function () {
     Route::get('/dashboard', [ReservationController::class, 'dashboard'])->name('dashboard');
     Route::get('/', [ReservationController::class, 'myReservations'])->name('index');
+
+    // Mes avis
+    Route::get('/mes-avis', [ReviewController::class, 'myReviews'])->name('my_reviews');
+    Route::delete('/mes-avis/{review}', [ReviewController::class, 'destroyOwn'])->name('reviews.destroy');
     Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
     Route::get('/{reservation}/confirmation', [ReservationController::class, 'confirm'])->name('confirm');
 
@@ -141,6 +145,9 @@ Route::prefix('espace-hote')->name('hote.')->middleware(['auth', 'hote', 'approv
 
     Route::get('/reservations', [HoteController::class, 'reservations'])->name('reservations');
     Route::patch('/reservations/{id}', [HoteController::class, 'updateReservation'])->name('reservations.update');
+
+    // Avis reçus sur ses établissements et chambres
+    Route::get('/avis', [HoteController::class, 'reviews'])->name('avis');
 });
 
 /*
@@ -187,6 +194,10 @@ Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users');
 
 Route::get('/messages', [AdminController::class, 'messages'])->name('messages');
     Route::post('/messages/{id}/read', [AdminController::class, 'markMessageRead'])->name('messages.read');
+
+    // Avis clients (modération)
+    Route::get('/avis', [AdminController::class, 'reviews'])->name('avis');
+    Route::delete('/avis/{id}', [AdminController::class, 'destroyReview'])->name('avis.destroy');
 
     // Gestion des événements
     Route::get('/evenements', [AdminController::class, 'events'])->name('events');

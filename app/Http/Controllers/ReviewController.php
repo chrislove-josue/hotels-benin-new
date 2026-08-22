@@ -11,6 +11,36 @@ use Illuminate\Support\Facades\Auth;
 class ReviewController extends Controller
 {
     /**
+     * Mes avis (espace voyageur) : tous les avis laissés par l'utilisateur.
+     */
+    public function myReviews()
+    {
+        $reviews = Review::with(['establishment', 'room'])
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->paginate(10);
+
+        return view('reservations.my-reviews', compact('reviews'));
+    }
+
+    /**
+     * Supprime son propre avis.
+     */
+    public function destroyOwn(Review $review)
+    {
+        abort_unless($review->user_id === Auth::id(), 403);
+
+        $establishment = $review->establishment;
+        $review->delete();
+
+        // Recalcule la note moyenne de l'établissement après suppression.
+        if ($establishment) {
+            $this->refreshEstablishmentRating($establishment);
+        }
+
+        return back()->with('status', 'Votre avis a été supprimé.');
+    }
+    /**
      * Soumet un avis sur une chambre par un utilisateur connecté.
      * Un utilisateur peut poster plusieurs avis sur la même chambre.
      */
