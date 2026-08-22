@@ -6,6 +6,7 @@
     <title><?php echo $__env->yieldContent('title', 'Hôtels Bénin — Réservez votre séjour au Bénin'); ?></title>
     <meta name="description" content="<?php echo $__env->yieldContent('meta_description', 'Hôtels, résidences, salles de fête et auberges au Bénin. Comparez, choisissez et réservez votre prochain séjour en toute simplicité.'); ?>">
 
+    <link rel="shortcut icon" href="<?php echo e(asset('storage/logo-or.png')); ?>" type="image/x-icon">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

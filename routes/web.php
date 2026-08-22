@@ -3,6 +3,7 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthPageController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EstablishmentController;
 use App\Http\Controllers\EventController;
@@ -46,6 +47,20 @@ Route::prefix('inscription')->name('register.')->group(function () {
 });
 
 Route::post('/deconnexion', [AuthPageController::class, 'logout'])->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Récupération de compte — mot de passe oublié
+|--------------------------------------------------------------------------
+| Envoi du lien par e-mail puis réinitialisation via le broker Laravel
+| (table password_reset_tokens, lien valable 60 minutes).
+*/
+Route::prefix('mot-de-passe')->name('password.')->group(function () {
+    Route::get('/oublie', [PasswordResetController::class, 'requestForm'])->name('request');
+    Route::post('/lien', [PasswordResetController::class, 'sendResetLink'])->name('email');
+    Route::get('/reinitialiser/{token}', [PasswordResetController::class, 'resetForm'])->name('reset');
+    Route::post('/reinitialiser', [PasswordResetController::class, 'reset'])->name('update');
+});
 
 /*
 |--------------------------------------------------------------------------

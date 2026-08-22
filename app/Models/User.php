@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPasswordNotificationFr;
 
 class User extends Authenticatable
 {
@@ -79,5 +80,13 @@ public function reviews()
     public function isPending(): bool
     {
         return ! $this->isApproved();
+    }
+
+    /**
+     * E-mail de réinitialisation de mot de passe en français.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotificationFr($token));
     }
 }

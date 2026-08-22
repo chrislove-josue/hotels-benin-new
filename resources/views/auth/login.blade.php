@@ -15,6 +15,12 @@
                 <p class="mt-1 text-sm text-gray-500">Accédez à votre espace voyageur ou hôte.</p>
             </div>
 
+            @if (session('status'))
+                <div class="mb-6 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-700">
+                    {{ session('status') }}
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-700">
                     <ul class="list-inside list-disc space-y-1">
@@ -40,7 +46,7 @@
                         <input type="checkbox" class="rounded border-gray-300 text-hb-blue focus:ring-hb-blue">
                         Se souvenir de moi
                     </label>
-                    <a href="#" class="font-semibold text-hb-orange">Mot de passe oublié ?</a>
+                    <a href="{{ route('password.request') }}" class="font-semibold text-hb-orange">Mot de passe oublié ?</a>
                 </div>
 <button type="submit" class="btn-primary w-full"><i class="bi bi-box-arrow-in-right"></i> Se connecter</button>
             </form>

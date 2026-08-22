@@ -14,10 +14,10 @@
 >
     <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
 
-        
+  
         
 <a href="<?php echo e(route('home')); ?>" class="group flex shrink-0 items-center gap-2.5">
-    <img src="<?php echo e(asset('storage/logo-or.png')); ?>" alt="Hôtels Bénin"
+    <img src="<?php echo e(asset('storage/logo.png')); ?>" alt="Hôtels Bénin"
          class="h-16 w-16 rounded-full transition ">
 
     <span class="font-display text-xl font-bold tracking-tight text-hb-blue-deeper">

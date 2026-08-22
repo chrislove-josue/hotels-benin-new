@@ -23,7 +23,7 @@
         <div>
             <div class="mb-4 flex items-center gap-2.5">
     <img src="<?php echo e(asset('storage/logo-or.png')); ?>" alt="Hôtels Bénin"
-         class="h-11 w-11 rounded-full object-cover">
+         class="h-11 w-11 rounded-full">
     <span class="font-display text-xl font-bold">Hôtels Bénin</span>
 </div>
             <p class="text-sm leading-relaxed text-white/70">
