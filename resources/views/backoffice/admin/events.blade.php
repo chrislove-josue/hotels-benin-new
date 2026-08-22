@@ -11,6 +11,17 @@
     <a href="{{ route('admin.events.create') }}" class="btn-primary"><i class="bi bi-plus-circle"></i> Nouvel événement</a>
 </div>
 
+@include('backoffice.partials.filters', [
+    'action' => route('admin.events'),
+    'fields' => [
+        ['name' => 'q', 'label' => 'Recherche', 'placeholder' => 'Titre, lieu…'],
+        ['name' => 'categorie', 'label' => 'Catégorie', 'type' => 'select',
+         'options' => ['' => 'Toutes les catégories', 'festival' => 'Festival', 'culture' => 'Culture & Arts', 'sport' => 'Sport', 'affaires' => 'Affaires & Conférences', 'religieux' => 'Religieux']],
+        ['name' => 'visibilite', 'label' => 'Visibilité', 'type' => 'select',
+         'options' => ['' => 'Toutes', 'en_ligne' => 'En ligne', 'hors_ligne' => 'Hors ligne']],
+    ],
+])
+
 <div class="card overflow-x-auto">
     <table class="w-full min-w-[760px] text-left text-sm">
         <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
