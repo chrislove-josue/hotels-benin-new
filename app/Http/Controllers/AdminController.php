@@ -33,14 +33,59 @@ class AdminController extends Controller
             'pending_users' => User::where('is_approved', false)->count(),
         ];
 
+        // ---- Chambres : disponibilité en temps réel (occupation d'aujourd'hui) ----
+        // Une unité est occupée si une réservation active chevauche la date du jour :
+        // confirmee toujours ; en_attente tant que son délai de paiement n'a pas expiré.
+        $activeOccupancy = function ($q) {
+            $q->where('status', 'confirmee')
+                ->orWhere(function ($qq) {
+                    $qq->where('status', 'en_attente')
+                        ->where(function ($w) {
+                            $w->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                        });
+                });
+        };
+
+        $today = now()->toDateString();
+
+        $totalUnits = (int) Room::where('is_available', true)->sum('quantity');
+        $roomTypes = (int) Room::where('is_available', true)->count();
+        $occupiedToday = (int) Reservation::where($activeOccupancy)
+            ->whereDate('check_in', '<=', $today)
+            ->whereDate('check_out', '>', $today)
+            ->count();
+        $arrivalsToday = (int) Reservation::where($activeOccupancy)
+            ->whereDate('check_in', '=', $today)
+            ->count();
+        $departuresToday = (int) Reservation::where('status', 'confirmee')
+            ->whereDate('check_out', '=', $today)
+            ->count();
+
+        $stats += [
+            'room_types'      => $roomTypes,
+            'total_units'     => $totalUnits,
+            'available_units' => max(0, $totalUnits - $occupiedToday),
+            'occupied_units'  => min($occupiedToday, $totalUnits),
+            'occupancy_rate'  => $totalUnits > 0 ? (int) round(min($occupiedToday, $totalUnits) / $totalUnits * 100) : 0,
+            'arrivals_today'  => $arrivalsToday,
+            'departures_today'=> $departuresToday,
+        ];
+
+        // ---- Transactions : détail par statut ----
+        $stats += [
+            'tx_reussie'   => ['count' => Transaction::where('status', 'reussie')->count(),   'amount' => (float) Transaction::where('status', 'reussie')->sum('amount')],
+            'tx_en_attente'=> ['count' => Transaction::where('status', 'en_attente')->count(), 'amount' => (float) Transaction::where('status', 'en_attente')->sum('amount')],
+            'tx_echouee'   => ['count' => Transaction::where('status', 'echouee')->count(),   'amount' => (float) Transaction::where('status', 'echouee')->sum('amount')],
+        ];
+
         $latestReservations = Reservation::with(['user', 'establishment'])
             ->latest()
             ->take(8)
             ->get();
 
-        $latestTransactions = Transaction::with('reservation.establishment')
+        $latestTransactions = Transaction::with(['reservation.establishment', 'reservation.user'])
             ->latest()
-            ->take(8)
+            ->take(10)
             ->get();
 
         $pendingEstablishments = Establishment::where('is_available', false)
