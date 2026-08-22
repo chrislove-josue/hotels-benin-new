@@ -159,7 +159,27 @@ $driver = DB::connection()->getDriverName();
 
     public function deleteEstablishment(int $id)
     {
-        Establishment::findOrFail($id)->delete();
+        $establishment = Establishment::findOrFail($id);
+
+        // Un établissement avec historique de réservations ne se supprime pas :
+        // préserver les traces financières et éviter les erreurs de clé étrangère.
+        if ($establishment->reservations()->exists()) {
+            return back()->with('status', 'Suppression impossible : cet établissement a des réservations. Désactivez-le plutôt (bouton « Masquer / Publier »).');
+        }
+
+        DB::transaction(function () use ($establishment) {
+            PendingEstablishmentChange::where('establishment_id', $establishment->id)->delete();
+            PendingRoomChange::where('establishment_id', $establishment->id)->delete();
+
+            foreach ($establishment->rooms as $room) {
+                PendingRoomChange::where('room_id', $room->id)->delete();
+                $room->delete();
+            }
+
+            $establishment->images()->delete();
+            $establishment->amenities()->detach();
+            $establishment->delete();
+        });
 
         return back()->with('status', 'Établissement supprimé.');
     }
@@ -461,19 +481,47 @@ public function markMessageRead(int $id)
 
         $establishment = $change->establishment;
 
-        // Applique les nouvelles valeurs (sauf champs non modifiables)
+        if (! $establishment) {
+            $change->update([
+                'status' => 'rejetee',
+                'reviewed_by' => auth()->id(),
+                'reviewed_at' => now(),
+            ]);
+
+            return back()->with('status', 'L\'établissement lié n\'existe plus : modification rejetée automatiquement.');
+        }
+
+        // Applique les nouvelles valeurs (champs non modifiables et méta-clés exclus)
         $data = collect($change->data)->except([
             'id', 'user_id', 'slug', 'created_at', 'updated_at',
             'rating', 'reviews_count', 'is_featured', 'is_available',
+            'amenities', 'gallery_add',
         ])->toArray();
 
-        $establishment->update($data);
+        DB::transaction(function () use ($establishment, $change, $data) {
+            $establishment->update($data);
 
-        $change->update([
-            'status' => 'approuvee',
-            'reviewed_by' => auth()->id(),
-            'reviewed_at' => now(),
-        ]);
+            // Galerie : ajoute uniquement les chemins absents
+            if (! empty($change->data['gallery_add'])) {
+                $existing = $establishment->images()->pluck('path')->all();
+                $missing = array_values(array_diff($change->data['gallery_add'], $existing));
+                $position = (int) $establishment->images()->max('position') + 1;
+                foreach ($missing as $i => $path) {
+                    $establishment->images()->create(['path' => $path, 'position' => $position + $i]);
+                }
+            }
+
+            // Aménités cochées par l'hôte
+            if (array_key_exists('amenities', $change->data ?? [])) {
+                $establishment->amenities()->sync($change->data['amenities'] ?? []);
+            }
+
+            $change->update([
+                'status' => 'approuvee',
+                'reviewed_by' => auth()->id(),
+                'reviewed_at' => now(),
+            ]);
+        });
 
         return back()->with('status', 'Modification de l\'établissement approuvée et appliquée.');
     }
@@ -505,6 +553,16 @@ public function markMessageRead(int $id)
             return back()->with('status', 'Cette modification a déjà été traitée.');
         }
 
+        if ($change->action !== 'create' && ! $change->room) {
+            $change->update([
+                'status' => 'rejetee',
+                'reviewed_by' => auth()->id(),
+                'reviewed_at' => now(),
+            ]);
+
+            return back()->with('status', 'La chambre liée n\'existe plus : modification rejetée automatiquement.');
+        }
+
         switch ($change->action) {
             case 'create':
             case 'update':
@@ -512,24 +570,41 @@ public function markMessageRead(int $id)
                     'id', 'establishment_id', 'created_at', 'updated_at',
                 ])->toArray();
 
-                if ($change->action === 'create') {
-                    $room = $change->establishment->rooms()->create($data);
-                } else {
-                    $room = $change->room;
-                    $room?->update($data);
+                // Garde-fou surbooking : la quantité ne peut pas passer sous le pic
+                // de chevauchement des réservations actives à venir.
+                $target = $change->action === 'create' ? null : $change->room;
+                $required = $target ? $target->minRequiredQuantity() : 0;
+                if ((int) ($data['quantity'] ?? 1) < $required) {
+                    return back()->with('status', "Refusé : la chambre a {$required} réservation(s) active(s) à venir. Ajustez la quantité (min. {$required}) ou annulez des réservations avant d'approuver.");
                 }
+
+                DB::transaction(function () use ($change, $data) {
+                    if ($change->action === 'create') {
+                        $change->establishment->rooms()->create($data);
+                    } else {
+                        $change->room->update($data);
+                    }
+
+                    $change->update([
+                        'status' => 'approuvee',
+                        'reviewed_by' => auth()->id(),
+                        'reviewed_at' => now(),
+                    ]);
+                });
                 break;
 
             case 'delete':
-                $change->room?->delete();
+                DB::transaction(function () use ($change) {
+                    $change->room?->delete();
+
+                    $change->update([
+                        'status' => 'approuvee',
+                        'reviewed_by' => auth()->id(),
+                        'reviewed_at' => now(),
+                    ]);
+                });
                 break;
         }
-
-        $change->update([
-            'status' => 'approuvee',
-            'reviewed_by' => auth()->id(),
-            'reviewed_at' => now(),
-        ]);
 
         return back()->with('status', 'Modification de la chambre approuvée et appliquée.');
     }
@@ -658,6 +733,13 @@ public function updateRoom(Request $request, int $establishmentId, int $roomId)
         $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);
         if ($cover) {
             $data['cover_image'] = $cover;
+        }
+
+        // Garde-fou surbooking : la quantité ne peut pas passer sous le pic de
+        // chevauchement des réservations actives à venir.
+        if (isset($data['quantity']) && (int) $data['quantity'] < $room->minRequiredQuantity()) {
+            return back()->withInput()
+                ->with('status', "Impossible : la chambre a {$room->minRequiredQuantity()} réservation(s) active(s) à venir. Annulez-les ou attendez leur passage avant de réduire la quantité.");
         }
 
         $room->update($data);
