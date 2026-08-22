@@ -224,7 +224,25 @@
                 @else
 
 <form action="{{ route('reservations.store', $establishment->slug) }}" method="POST" class="space-y-4"
-                      x-data="{ selectedRoom: '', updateNights() { return; } }">
+                      x-data="{
+                          selectedRoom: '',
+                          guests: 2,
+                          get maxGuests() {
+                              const opt = this.$refs.roomSelect?.selectedOptions?.[0];
+                              const cap = opt ? parseInt(opt.dataset.capacity) : NaN;
+                              return Number.isFinite(cap) && cap > 0 ? cap : null;
+                          },
+                          get guestsValid() {
+                              return this.maxGuests !== null && Number.isInteger(this.guests)
+                                  && this.guests >= 1 && this.guests <= this.maxGuests;
+                          },
+                          capGuests() {
+                              if (this.maxGuests === null) return;
+                              if (!Number.isInteger(this.guests) || this.guests < 1) { this.guests = 1; }
+                              else if (this.guests > this.maxGuests) { this.guests = this.maxGuests; }
+                          },
+                          updateNights() { return; }
+                      }">
                     @csrf
 
                     @if($errors->any())
@@ -239,11 +257,11 @@
 
                     <div>
                         <label class="mb-1 block text-xs font-semibold text-gray-500">Chambre / espace</label>
-                        <select name="room_id" x-model="selectedRoom" class="input-field" required>
+                        <select name="room_id" x-model="selectedRoom" x-ref="roomSelect" x-on:change="capGuests()" class="input-field" required>
                             <option value="">Choisir une chambre</option>
                             @foreach($establishment->rooms as $room)
-                                <option value="{{ $room->id }}" data-price="{{ $room->price_per_night }}">
-                                    {{ $room->name }} — {{ number_format($room->price_per_night, 0, ',', ' ') }} FCFA/nuit
+                                <option value="{{ $room->id }}" data-price="{{ $room->price_per_night }}" data-capacity="{{ $room->capacity }}">
+                                    {{ $room->name }} — {{ number_format($room->price_per_night, 0, ',', ' ') }} FCFA/nuit ({{ $room->capacity }} pers. max)
                                 </option>
                             @endforeach
                         </select>
@@ -264,11 +282,21 @@
 
                     <div>
                         <label class="mb-1 block text-xs font-semibold text-gray-500">Voyageurs</label>
-                        <input type="number" name="guests" min="1" max="20" value="2" class="input-field" required>
+                        <input type="number" name="guests" min="1" :max="maxGuests ?? 2000" x-model.number="guests"
+                               x-on:input="capGuests()" class="input-field" required>
+                        <p class="mt-1 text-xs" x-cloak
+                           :class="!guestsValid && maxGuests !== null ? 'font-semibold text-red-600' : 'text-gray-400'">
+                            <span x-show="maxGuests === null">La capacité maximale s'affichera après le choix de la chambre ou de l'espace.</span>
+                            <span x-show="maxGuests !== null">
+                                Capacité définie par l'hôte (lecture seule)&nbsp;:
+                                <strong class="text-hb-blue" x-text="maxGuests"></strong> personne<span x-show="maxGuests > 1">s</span> maximum.
+                                <span x-show="!guestsValid">— Le nombre saisi dépasse cette capacité et a été ajusté automatiquement.</span>
+                            </span>
+                        </p>
                     </div>
 
                     <div>
-                        <button type="submit" class="btn-primary w-full" :disabled="!selectedRoom">
+                        <button type="submit" class="btn-primary w-full" :disabled="!selectedRoom || !guestsValid">
     <i class="bi bi-calendar-check"></i> Réserver et payer
 </button>
 

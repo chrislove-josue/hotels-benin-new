@@ -26,7 +26,14 @@ class ReservationController extends Controller
             'room_id'   => ['required', 'exists:rooms,id'],
             'check_in'  => ['required', 'date', 'after_or_equal:today'],
             'check_out' => ['required', 'date', 'after:check_in'],
-            'guests'    => ['required', 'integer', 'min:1', 'max:20'],
+            // Pas de plafond arbitraire : la capacité réelle de la chambre/espace
+            // (chambre 2-4 pers. comme salle de conférence jusqu'à 300+ pers.)
+            // est vérifiée sous verrou juste après.
+            'guests'    => ['required', 'integer', 'min:1', 'max:2000'],
+        ], [
+            'guests.required' => 'Le nombre de voyageurs est obligatoire.',
+            'guests.integer'  => 'Le nombre de voyageurs doit être un nombre entier.',
+            'guests.min'      => 'Il faut au moins 1 voyageur.',
         ]);
 
         // Vérifie l'existence de la chambre avant le verrou (404 propre).
