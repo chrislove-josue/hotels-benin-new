@@ -8,6 +8,15 @@
     <p class="mt-1 text-sm text-gray-500">Messages reçus via le formulaire de contact.</p>
 </div>
 
+@include('backoffice.partials.filters', [
+    'action' => route('admin.messages'),
+    'fields' => [
+        ['name' => 'q', 'label' => 'Recherche', 'placeholder' => 'Nom, e-mail, sujet, contenu…'],
+        ['name' => 'etat', 'label' => 'État', 'type' => 'select',
+         'options' => ['' => 'Tous', 'non_lu' => 'Non lus', 'lu' => 'Lus']],
+    ],
+])
+
 <div class="space-y-4">
     @forelse($messages as $message)
         <div class="card p-5 {{ !$message->is_read ? 'border-l-4 border-hb-orange' : '' }}">
