@@ -490,6 +490,28 @@ public function transactions(Request $request)
     }
 
     /**
+     * Modifie un avis (modération) et recalcule la note de l'établissement.
+     */
+    public function updateReview(Request $request, int $id)
+    {
+        $review = \App\Models\Review::findOrFail($id);
+
+        $data = $request->validate([
+            'rating'  => 'required|integer|between:1,5',
+            'title'   => 'nullable|string|max:120',
+            'comment' => 'required|string|max:2000',
+        ]);
+
+        $review->update($data);
+        $review->establishment?->update([
+            'rating'        => round($review->establishment->reviews()->avg('rating'), 2),
+            'reviews_count' => $review->establishment->reviews()->count(),
+        ]);
+
+        return back()->with('status', 'Avis modifié.');
+    }
+
+    /**
      * Supprime un avis (modération).
      */
     public function destroyReview(int $id)

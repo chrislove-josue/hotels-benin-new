@@ -89,12 +89,18 @@
                     </td>
                     <td class="px-5 py-3 whitespace-nowrap text-xs text-gray-500">{{ $review->created_at->format('d/m/Y H:i') }}</td>
                     <td class="px-5 py-3">
-                        <form action="{{ route('admin.avis.destroy', $review->id) }}" method="POST"
-                              onsubmit="return confirm('Supprimer cet avis ? Cette action est définitive.');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-danger !px-3 !py-1.5 text-xs"><i class="bi bi-trash"></i> Supprimer</button>
-                        </form>
+                        <div class="flex flex-col gap-2">
+                            <button type="button" class="btn-outline !px-3 !py-1.5 text-xs"
+                                    @click="$dispatch('open-edit', { id: {{ $review->id }}, rating: {{ $review->rating }}, title: {{ \Illuminate\Support\Js::from($review->title) }}, comment: {{ \Illuminate\Support\Js::from($review->comment) }} })">
+                                <i class="bi bi-pencil-square"></i> Modifier
+                            </button>
+                            <form action="{{ route('admin.avis.destroy', $review->id) }}" method="POST"
+                                  onsubmit="return confirm('Supprimer cet avis ? Cette action est définitive.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-danger !px-3 !py-1.5 text-xs"><i class="bi bi-trash"></i> Supprimer</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             @empty
@@ -106,5 +112,51 @@
 
 <div class="mt-6">
     {{ $reviews->links() }}
+</div>
+
+{{-- Modale de modification d'avis --}}
+<div x-data="{ open: false, id: null, rating: 5, title: '', comment: '' }"
+     @open-edit.window="open = true; id = $event.detail.id; rating = $event.detail.rating; title = $event.detail.title ?? ''; comment = $event.detail.comment"
+     x-cloak>
+    <div x-show="open" x-transition.opacity class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" @click="open = false"></div>
+    <div x-show="open" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         @keydown.escape.window="open = false">
+        <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl" @click.stop>
+            <h2 class="font-display text-xl font-bold text-hb-blue"><i class="bi bi-pencil-square text-hb-gold"></i> Modifier l'avis</h2>
+            <p class="mt-1 text-xs text-gray-500">Modification effectuée par l'administration — la note moyenne de l'établissement sera recalculée.</p>
+
+            <form :action="'{{ url('admin/avis') }}/' + id" method="POST" class="mt-5 space-y-4">
+                @csrf
+                @method('PATCH')
+
+                <div>
+                    <label class="mb-1 block text-sm font-semibold text-hb-blue">Note</label>
+                    <select name="rating" x-model="rating" required
+                            class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-hb-gold focus:outline-none">
+                        @for($i = 5; $i >= 1; $i--)
+                            <option value="{{ $i }}">{{ str_repeat('★', $i) }} ({{ $i }}/5)</option>
+                        @endfor
+                    </select>
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-semibold text-hb-blue">Titre <span class="font-normal text-gray-400">(optionnel)</span></label>
+                    <input type="text" name="title" x-model="title" maxlength="120"
+                           class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-hb-gold focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-semibold text-hb-blue">Commentaire</label>
+                    <textarea name="comment" x-model="comment" rows="4" required maxlength="2000"
+                              class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-hb-gold focus:outline-none"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="btn-primary flex-1"><i class="bi bi-check-lg"></i> Enregistrer</button>
+                    <button type="button" class="btn-outline flex-1" @click="open = false">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection
