@@ -11,10 +11,10 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
         $roomTemplates = [
-            ['name' => 'Chambre Standard', 'capacity' => 2, 'factor' => 1.0],
-            ['name' => 'Chambre Confort', 'capacity' => 2, 'factor' => 1.3],
-            ['name' => 'Suite Junior', 'capacity' => 3, 'factor' => 1.8],
-            ['name' => 'Suite Prestige', 'capacity' => 4, 'factor' => 2.4],
+            ['name' => 'Chambre Standard', 'capacity' => 2, 'factor' => 1.0, 'cover' => 'https://images.unsplash.com/photo-1595576508898-0ad5c879a061?w=800&q=80'],
+            ['name' => 'Chambre Confort', 'capacity' => 2, 'factor' => 1.3, 'cover' => 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800&q=80'],
+            ['name' => 'Suite Junior', 'capacity' => 3, 'factor' => 1.8, 'cover' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80'],
+            ['name' => 'Suite Prestige', 'capacity' => 4, 'factor' => 2.4, 'cover' => 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&q=80'],
         ];
 
         Establishment::all()->each(function (Establishment $establishment) use ($roomTemplates) {
@@ -28,6 +28,7 @@ class RoomSeeder extends Seeder
                     'price_per_night' => $establishment->price_from,
                     'quantity' => 1,
                     'is_available' => true,
+                    'cover_image' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&q=80',
                 ]);
 
                 return;
@@ -43,6 +44,7 @@ class RoomSeeder extends Seeder
                     'price_per_night' => round($establishment->price_from * $template['factor'], -2),
                     'quantity' => random_int(2, 8),
                     'is_available' => true,
+                    'cover_image' => $template['cover'],
                 ]);
             }
         });
