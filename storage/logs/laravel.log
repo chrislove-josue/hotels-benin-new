@@ -435,3 +435,8 @@
 #0 C:/Windows/Temp/opencode/test-module-avis.php(39): Illuminate/View/View->__call()
 #1 {main}
 "} 
+[2026-08-22 18:38:33] local.ERROR: Too few arguments to function App\Http\Controllers\AdminController::updateReview(), 1 passed in C:\Windows\Temp\opencode\test-update-avis.php on line 41 and exactly 2 expected {"userId":6,"exception":"[object] (ArgumentCountError(code: 0): Too few arguments to function App\\Http\\Controllers\\AdminController::updateReview(), 1 passed in C:\\Windows\\Temp\\opencode\\test-update-avis.php on line 41 and exactly 2 expected at E:/Projects/hotels-benin-new/app/Http/Controllers/AdminController.php:495)
+[stacktrace]
+#0 C:/Windows/Temp/opencode/test-update-avis.php(41): App/Http/Controllers/AdminController->updateReview()
+#1 {main}
+"} 
