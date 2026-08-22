@@ -197,6 +197,7 @@ Route::get('/messages', [AdminController::class, 'messages'])->name('messages');
 
     // Avis clients (modération)
     Route::get('/avis', [AdminController::class, 'reviews'])->name('avis');
+    Route::patch('/avis/{id}', [AdminController::class, 'updateReview'])->name('avis.update');
     Route::delete('/avis/{id}', [AdminController::class, 'destroyReview'])->name('avis.destroy');
 
     // Gestion des événements
