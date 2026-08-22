@@ -160,3 +160,4 @@
 #5 E:/Projects/hotels-benin-new/artisan(12): Illuminate/Foundation/Application->handleCommand()
 #6 {main}
 "} 
+[2026-08-22 13:42:11] local.ERROR: Erreur création transaction FedaPay {"reservation":"HB-EJWEJECN","error":"La création de la transaction a échoué","http":400,"body":{"message":"La création de la transaction a échoué","errors":{"amount":["Le montant maximum de transactions autorisées est 300000."]},"model":"V1::Transaction"}} 

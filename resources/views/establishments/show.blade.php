@@ -272,18 +272,7 @@
     <i class="bi bi-calendar-check"></i> Réserver et payer
 </button>
 
-<p class="text-center text-xs text-gray-400">
-    <i class="bi bi-shield-check"></i> Vous choisirez votre moyen de paiement à l'étape suivante
-</p>
                     </div>
-
-                    <button type="submit" class="btn-primary w-full" :disabled="!selectedRoom">
-                        <i class="bi bi-calendar-check"></i> Réserver
-                    </button>
-
-                    <p class="text-center text-xs text-gray-400">
-                        <i class="bi bi-shield-check"></i> Paiement sécurisé simulé
-                    </p>
                 </form>
 
                 @endguest
