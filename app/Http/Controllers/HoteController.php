@@ -211,9 +211,10 @@ public function updateEstablishment(Request $request, int $id)
 
         abort_unless($owns, 403);
 
-        $reservation->update([
-            'status' => $request->validate(['status' => 'required|in:en_attente,confirmee,annulee,terminee'])['status'],
-        ]);
+        $newStatus = $request->validate(['status' => 'required|in:en_attente,confirmee,annulee,terminee'])['status'];
+
+        $reservation->update(['status' => $newStatus]);
+        $reservation->syncTransactionWithStatus($newStatus);
 
         return back()->with('status', 'Réservation mise à jour.');
     }

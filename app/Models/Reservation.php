@@ -79,6 +79,32 @@ class Reservation extends Model
         return $overdue->count();
     }
 
+    /**
+     * Synchronise la transaction locale après un changement de statut décidé en
+     * back-office (hôte/admin), pour garder les données et les revenus cohérents.
+     *
+     * - confirmée : paiement reçu hors plateforme (espèces, mobile money sur place)
+     *   => la transaction passe à « reussie » (méthode « sur_place » si absente).
+     * - annulée : la transaction passe à « echouee » si elle n'était pas réussie.
+     */
+    public function syncTransactionWithStatus(string $status): void
+    {
+        $transaction = $this->transaction;
+
+        if (! $transaction || $transaction->status === 'reussie') {
+            return;
+        }
+
+        if ($status === 'confirmee') {
+            $transaction->update([
+                'status' => 'reussie',
+                'method' => $transaction->method ?? 'sur_place',
+            ]);
+        } elseif ($status === 'annulee') {
+            $transaction->update(['status' => 'echouee']);
+        }
+    }
+
     protected function casts(): array
     {
         return [
