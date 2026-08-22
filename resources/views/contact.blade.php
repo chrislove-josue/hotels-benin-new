@@ -56,15 +56,20 @@
             <div class="card space-y-5 p-6 sm:p-8">
 @foreach([
                     ['icon' => 'bi-geo-alt', 'label' => 'Adresse', 'value' => 'Cotonou, Bénin'],
-                    ['icon' => 'bi-telephone', 'label' => 'Téléphone', 'value' => '+229 21 30 00 00'],
-                    ['icon' => 'bi-envelope', 'label' => 'E-mail', 'value' => 'contact@hotels-benin.bj'],
+                    ['icon' => 'bi-telephone', 'label' => 'Téléphone', 'value' => '+229 01 28 59 26 64', 'href' => 'tel:+2290128592664'],
+                    ['icon' => 'bi-whatsapp', 'label' => 'WhatsApp', 'value' => '+229 01 28 59 26 64', 'href' => 'https://wa.me/2290128592664'],
+                    ['icon' => 'bi-envelope', 'label' => 'E-mail', 'value' => 'hotelsbenin229@gmail.com', 'href' => 'mailto:hotelsbenin229@gmail.com'],
                     ['icon' => 'bi-clock', 'label' => 'Horaires', 'value' => 'Lun – Sam : 8h00 – 19h00'],
                 ] as $info)
                     <div class="flex items-start gap-3">
                         <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-hb-gold/10 text-lg text-hb-orange"><i class="bi {{ $info['icon'] }}"></i></span>
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">{{ $info['label'] }}</p>
-                            <p class="text-gray-700">{{ $info['value'] }}</p>
+                            @if (!empty($info['href']))
+                                <a href="{{ $info['href'] }}" {{ str_starts_with($info['href'], 'http') ? 'target=_blank rel=noopener noreferrer' : '' }} class="text-gray-700 transition hover:text-hb-orange">{{ $info['value'] }}</a>
+                            @else
+                                <p class="text-gray-700">{{ $info['value'] }}</p>
+                            @endif
                         </div>
                     </div>
                 @endforeach
