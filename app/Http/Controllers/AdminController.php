@@ -186,36 +186,79 @@ $driver = DB::connection()->getDriverName();
 
 public function users(Request $request)
     {
-        $query = User::withCount('establishments', 'reservations');
+        $search = trim($request->query('search', ''));
+        $status = $request->query('statut');
 
-        // Recherche par nom, e-mail ou téléphone
-        if ($search = trim($request->query('search', ''))) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%");
-            });
-        }
+        // Filtres communs : recherche + statut d'approbation
+        $applyCommonFilters = function ($query) use ($search, $status) {
+            $query->when($search !== '', function ($q) use ($search) {
+                $q->where(function ($w) use ($search) {
+                    $w->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })->when($status === 'approuve', fn ($q) => $q->where('is_approved', true))
+              ->when($status === 'en_attente', fn ($q) => $q->where('is_approved', false));
+        };
 
-        // Filtre par rôle
-        if ($role = $request->query('role')) {
-            $query->where('role', $role);
-        }
+        // ---- Hôtes : classés par revenus encaissés, puis nombre de chambres ----
+        $hosts = User::query()
+            ->where('role', 'hote')
+            ->select('users.*')
+            ->addSelect([
+                'rooms_count' => Room::query()
+                    ->join('establishments', 'establishments.id', '=', 'rooms.establishment_id')
+                    ->whereColumn('establishments.user_id', 'users.id')
+                    ->selectRaw('COUNT(rooms.id)'),
+                'establishments_count' => Establishment::query()
+                    ->whereColumn('establishments.user_id', 'users.id')
+                    ->selectRaw('COUNT(*)'),
+                'host_reservations_count' => Reservation::query()
+                    ->join('establishments as er', 'er.id', '=', 'reservations.establishment_id')
+                    ->whereColumn('er.user_id', 'users.id')
+                    ->selectRaw('COUNT(*)'),
+                'revenue' => Transaction::query()
+                    ->join('reservations as tr', 'tr.id', '=', 'transactions.reservation_id')
+                    ->join('establishments as te', 'te.id', '=', 'tr.establishment_id')
+                    ->whereColumn('te.user_id', 'users.id')
+                    ->where('transactions.status', 'reussie')
+                    ->selectRaw('COALESCE(SUM(transactions.amount), 0)'),
+            ])
+            ->tap($applyCommonFilters)
+            ->orderByDesc('revenue')
+            ->orderByDesc('rooms_count')
+            ->orderByDesc('host_reservations_count')
+            ->get();
 
-        // Filtre par statut : en_attente | approuve | desactive
-        if ($status = $request->query('statut')) {
-            if ($status === 'en_attente') {
-                $query->where('is_approved', false)->where('role', '!=', 'admin');
-            } elseif ($status === 'approuve') {
-                $query->where('is_approved', true);
-            } elseif ($status === 'desactive') {
-                $query->where('is_approved', false)->where('role', '!=', 'admin');
-            }
-        }
+        // ---- Voyageurs : classés par nombre de réservations, puis total dépensé ----
+        $voyageurs = User::query()
+            ->where('role', 'voyageur')
+            ->select('users.*')
+            ->addSelect([
+                'voyageur_reservations_count' => Reservation::query()
+                    ->whereColumn('reservations.user_id', 'users.id')
+                    ->selectRaw('COUNT(*)'),
+                'spent' => Transaction::query()
+                    ->join('reservations as sr', 'sr.id', '=', 'transactions.reservation_id')
+                    ->whereColumn('sr.user_id', 'users.id')
+                    ->where('transactions.status', 'reussie')
+                    ->selectRaw('COALESCE(SUM(transactions.amount), 0)'),
+            ])
+            ->tap($applyCommonFilters)
+            ->orderByDesc('voyageur_reservations_count')
+            ->orderByDesc('spent')
+            ->get();
 
-        $users = $query->latest()->paginate(15)->withQueryString();
+        // ---- Administrateurs : liste simple à part ----
+        $admins = User::query()
+            ->where('role', 'admin')
+            ->tap($applyCommonFilters)
+            ->orderBy('name')
+            ->get();
 
-        return view('backoffice.admin.users', compact('users'));
+        $pendingCount = $hosts->merge($voyageurs)->where('is_approved', false)->count();
+
+        return view('backoffice.admin.users', compact('hosts', 'voyageurs', 'admins', 'pendingCount'));
     }
 
 public function updateUserRole(Request $request, int $id)
