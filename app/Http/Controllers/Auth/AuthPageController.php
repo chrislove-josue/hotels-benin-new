@@ -121,6 +121,7 @@ $user = User::create([
             return route('hote.dashboard');
         }
 
-        return route('home');
+        // Voyageur : directement son tableau de bord.
+        return route('reservations.dashboard');
     }
 }
