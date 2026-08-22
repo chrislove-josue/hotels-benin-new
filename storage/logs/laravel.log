@@ -430,3 +430,8 @@
 [stacktrace]
 #0 {main}
 "} 
+[2026-08-22 18:33:18] local.ERROR: Method Illuminate\View\View::getContent does not exist. {"userId":6,"exception":"[object] (BadMethodCallException(code: 0): Method Illuminate\\View\\View::getContent does not exist. at E:/Projects/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/View.php:478)
+[stacktrace]
+#0 C:/Windows/Temp/opencode/test-module-avis.php(39): Illuminate/View/View->__call()
+#1 {main}
+"} 
