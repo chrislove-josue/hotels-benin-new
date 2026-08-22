@@ -24,6 +24,20 @@ class ReviewController extends Controller
     }
 
     /**
+     * Modifie son propre avis.
+     */
+    public function updateOwn(Request $request, Review $review)
+    {
+        abort_unless($review->user_id === Auth::id(), 403);
+
+        $review->update($this->validated($request));
+
+        $this->refreshEstablishmentRating($review->establishment);
+
+        return back()->with('status', 'Votre avis a bien été modifié.');
+    }
+
+    /**
      * Supprime son propre avis.
      */
     public function destroyOwn(Review $review)

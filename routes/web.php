@@ -103,6 +103,7 @@ Route::prefix('espace-voyageur')->name('reservations.')->middleware(['auth', 'ap
 
     // Mes avis
     Route::get('/mes-avis', [ReviewController::class, 'myReviews'])->name('my_reviews');
+    Route::patch('/mes-avis/{review}', [ReviewController::class, 'updateOwn'])->name('reviews.update');
     Route::delete('/mes-avis/{review}', [ReviewController::class, 'destroyOwn'])->name('reviews.destroy');
     Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
     Route::get('/{reservation}/confirmation', [ReservationController::class, 'confirm'])->name('confirm');
