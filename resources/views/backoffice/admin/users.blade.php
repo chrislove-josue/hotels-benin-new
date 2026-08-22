@@ -112,6 +112,13 @@
 <td class="px-5 py-3">
                         <div class="flex flex-wrap items-center justify-end gap-1.5">
                             @unless($user->isAdmin())
+                                <a href="{{ route('admin.users.impersonate', $user->id) }}"
+                                   class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-purple-100 text-purple-700 transition hover:bg-purple-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
+                                   title="Ouvrir sa session (impersonation)"
+                                   onclick="return confirm('Ouvrir la session de {{ $user->name }} ? Vous pourrez revenir à l\'espace admin à tout moment via le bandeau orange.');">
+                                    <i class="bi bi-box-arrow-in-right text-base"></i>
+                                </a>
+
                                 @if(! $user->is_approved)
                                     <form action="{{ route('admin.users.approve', $user->id) }}" method="POST">
                                         @csrf

@@ -171,6 +171,17 @@
         </header>
 
         <main class="p-4 sm:p-6">
+            @if (session('impersonated_by'))
+                <div class="mb-6 flex flex-col gap-2 rounded-xl bg-hb-orange px-4 py-3 text-sm font-semibold text-white sm:flex-row sm:items-center sm:justify-between">
+                    <span><i class="bi bi-incognito"></i> Session administrateur — vous naviguez en tant que <strong>{{ auth()->user()->name }}</strong> ({{ auth()->user()->isHote() ? 'hôte' : 'voyageur' }}). Les actions effectuées sont réelles.</span>
+                    <form action="{{ route('impersonation.stop') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="rounded-lg bg-white/20 px-3 py-1.5 text-xs font-bold transition hover:bg-white/30">
+                            <i class="bi bi-box-arrow-left"></i> Revenir à l'espace admin
+                        </button>
+                    </form>
+                </div>
+            @endif
             @if (session('status'))
 <div class="mb-6 flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
                     <i class="bi bi-check-circle-fill"></i> {{ session('status') }}

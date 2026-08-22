@@ -50,6 +50,17 @@ Route::post('/deconnexion', [AuthPageController::class, 'logout'])->name('logout
 
 /*
 |--------------------------------------------------------------------------
+| Impersonation — retour à la session administrateur
+|--------------------------------------------------------------------------
+| Accessible avec une simple session "auth" (PAS le middleware admin) :
+// pendant l'impersonation, l'utilisateur connecté est l'hôte/voyageur.
+*/
+Route::post('/impersonation/quitter', [AdminController::class, 'stopImpersonation'])
+    ->middleware(['auth'])
+    ->name('impersonation.stop');
+
+/*
+|--------------------------------------------------------------------------
 | Récupération de compte — mot de passe oublié
 |--------------------------------------------------------------------------
 | Envoi du lien par e-mail puis réinitialisation via le broker Laravel
@@ -166,6 +177,7 @@ Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users');
     Route::patch('/utilisateurs/{id}/role', [AdminController::class, 'updateUserRole'])->name('users.role');
     Route::post('/utilisateurs/{id}/approuver', [AdminController::class, 'approveUser'])->name('users.approve');
     Route::post('/utilisateurs/{id}/rejeter', [AdminController::class, 'rejectUser'])->name('users.reject');
+    Route::get('/utilisateurs/{id}/impersonner', [AdminController::class, 'impersonate'])->name('users.impersonate');
 
     Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations');
     Route::patch('/reservations/{id}', [AdminController::class, 'updateReservation'])->name('reservations.update');

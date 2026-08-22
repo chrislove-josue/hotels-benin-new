@@ -433,6 +433,55 @@ public function markMessageRead(int $id)
     }
 
     /**
+     * Impersonation : l'administrateur ouvre la session d'un hôte ou voyageur
+     * sans connaître son mot de passe (diagnostic de compte, support).
+     *
+     * L'admin d'origine est mémorisé en session ; un bandeau permet de revenir.
+     */
+    public function impersonate(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->isAdmin()) {
+            return back()->with('status', 'Impossible d\'ouvrir la session d\'un autre administrateur.');
+        }
+
+        session(['impersonated_by' => auth()->id()]);
+        auth()->login($user);
+        session()->regenerate();
+
+        $destination = match (true) {
+            $user->isHote() => route('hote.dashboard'),
+            $user->role === 'voyageur' => route('reservations.dashboard'),
+            default => route('home'),
+        };
+
+        return redirect($destination)
+            ->with('status', "Session administrateur : vous naviguez actuellement en tant que {$user->name}. Un bandeau permet de revenir.");
+    }
+
+    /**
+     * Met fin à l'impersonation et restaure la session administrateur.
+     */
+    public function stopImpersonation()
+    {
+        $adminId = session('impersonated_by');
+
+        if (! $adminId) {
+            return redirect()->route('home');
+        }
+
+        $admin = User::findOrFail($adminId);
+
+        auth()->login($admin);
+        session()->forget('impersonated_by');
+        session()->regenerate();
+
+        return redirect()->route('admin.users')
+            ->with('status', "Retour à votre session administrateur ({$admin->name}).");
+    }
+
+    /**
      * Supprime un utilisateur.
      */
     public function destroyUser(int $id)
