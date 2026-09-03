@@ -43,14 +43,18 @@
 </section>
 
 <script src="https://cdn.kkiapay.me/k.js"></script>
+@php
+    $jsAmount = number_format((float) $reservation->amount, 0, '.', '');
+@endphp
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const callbackUrl = @json($callbackUrl);
+        const widgetAmount = {{ $jsAmount }};
         const stateData = { reservation_id: {{ $reservation->id }} };
 
         const openWidget = function () {
             openKkiapayWidget({
-                amount: @json(number_format((float) $reservation->amount, 0, '.', '')),
+                amount: widgetAmount,
                 key: @json($publicKey),
                 sandbox: {{ $sandbox ? 'true' : 'false' }},
                 data: JSON.stringify(stateData),
