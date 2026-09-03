@@ -44,12 +44,12 @@ Les vues utilisent **Tailwind Play CDN + Alpine.js CDN + Bootstrap Icons CDN**, 
 ## Paiement — agrégateurs FedaPay & KKiaPay
 
 - Le voyageur n'a **pas le choix** de l'agrégateur : il passe toujours par celui sélectionné par l'admin (`App\Support\PaymentProvider::defaultProvider()`), dans les paramètres **admin > Paiements** (`/admin/paiements`).
-- L'activation/le choix par défaut sont stockés dans la table `settings` (model `App\Models\Setting`). Clés KKiaPay modifiables via l'UI admin (base) ; clés FedaPay via `.env`.
-- **FedaPay** (redirection serveur) : clés `FEDAPAY_*` dans `config/services.php`/`.env`. Webhook `POST /webhooks/fedapay` exempté de CSRF via `bootstrap/app.php`.
+- L'activation/le choix par défaut sont stockés dans la table `settings` (model `App\Models\Setting`). Clés des **deux** agrégateurs (FedaPay & KKiaPay) modifiables via l'UI admin (base), avec repli `.env`.
+- **FedaPay** (redirection serveur) : clés `fedapay_*` en base (via `PaymentProvider::fedapayKey()`) avec repli `FEDAPAY_*` dans `.env` (`config/services.php`). Webhook `POST /webhooks/fedapay` exempté de CSRF via `bootstrap/app.php`.
 - **KKiaPay** (widget client `https://cdn.kkiapay.me/k.js`) : clés `kkiapay_*` en base avec repli `KKIAPAY_*` dans `.env` (`config/services.php`). Webhook `POST /webhooks/kkiapay` (signé par l'en-tête `X-SECRET-KEY`), aussi exempté de CSRF.
 - Flux KKiaPay : `TransactionController::process()` affiche `reservations/payment-kkiapay` (ouvre le widget en passant `data = {reservation_id}`) → succès redirigé vers `kkiapayCallback()` qui vérifie côté serveur (`POST api.kkiapay.me/api/v1/transactions/status`, headers `X-API-KEY`/`X-PRIVATE-KEY`/`X-SECRET-KEY`) puis confirme.
 - La confirmation finale (montant vérifié) passe par `TransactionController::confirmReservation()` pour les deux agrégateurs. Ne pas court-circuiter cette vérification de montant.
-- Sandbox : `FEDAPAY_ENVIRONMENT=sandbox` et UI `kkiapay_environment=sandbox` ; base API KKiaPay = `api-sandbox.kkiapay.me` vs `api.kkiapay.me`.
+- Sandbox : `fedapay_environment=sandbox`/`kkiapay_environment=sandbox` ; environnements FedaPay acceptés par le SDK : `sandbox|production` (→ `sandbox-api.fedapay.com` vs `api.fedapay.com`) ; base API KKiaPay = `api-sandbox.kkiapay.me` vs `api.kkiapay.me`.
 
 ## Pièges connus
 
