@@ -58,7 +58,7 @@ class TransactionController extends Controller
     }
 
     /**
-     * Traite le paiement : redirige systématiquement vers FedaPay.
+     * Traite le paiement : route vers l'agrégateur actif par défaut (FedaPay ou KKiaPay).
      */
     public function process(Request $request, Reservation $reservation)
     {
