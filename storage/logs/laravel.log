@@ -1004,3 +1004,4 @@ Did you mean one of these?
 #59 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('C://Project//hote...')
 #60 {main}
 "} 
+[2026-09-03 19:06:08] local.ERROR: Erreur vérification transaction KKiaPay {"reservation":"HB-EJTBFAKZ","error":"cURL error 60: SSL certificate OpenSSL verify result: unable to get local issuer certificate (20) (see https://curl.se/libcurl/c/libcurl-errors.html) for https://api-sandbox.kkiapay.me/api/v1/transactions/status"} 
