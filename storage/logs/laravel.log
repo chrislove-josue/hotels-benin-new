@@ -1133,3 +1133,4 @@ Did you mean one of these?
 #58 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('C://Project//hote...')
 #59 {main}
 "} 
+[2026-09-03 20:48:44] local.ERROR: Erreur création transaction FedaPay {"reservation":"HB-T75RHFAH","error":"Erreur d'authentification.","http":401,"body":{"message":"Erreur d'authentification.","errors":[],"model":null}} 
