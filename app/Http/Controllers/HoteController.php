@@ -339,6 +339,14 @@ $data = $request->validate([
         }
 
         // Modification en attente d'approbation admin
+        // Garde anti-doublon : un seul changement (modif/suppression) en attente par chambre.
+        if (PendingRoomChange::where('room_id', $room->id)
+            ->whereIn('action', ['update', 'delete'])
+            ->where('status', 'en_attente')
+            ->exists()) {
+            return back()->with('status', 'Un changement est déjà en attente pour cette chambre / cet espace. Attendez sa revue par un administrateur.');
+        }
+
         PendingRoomChange::create([
             'room_id' => $room->id,
             'establishment_id' => $establishment->id,
@@ -361,6 +369,14 @@ $data = $request->validate([
         // chambre associée).
         if ($room->hasActiveReservations()) {
             return back()->with('status', 'Suppression impossible : cette chambre a des réservations actives à venir. Désactivez-la ou attendez la fin des séjours avant de la supprimer.');
+        }
+
+        // Garde anti-doublon : un seul changement (modif/suppression) en attente par chambre.
+        if (PendingRoomChange::where('room_id', $room->id)
+            ->whereIn('action', ['update', 'delete'])
+            ->where('status', 'en_attente')
+            ->exists()) {
+            return back()->with('status', 'Un changement est déjà en attente pour cette chambre / cet espace. Attendez sa revue par un administrateur.');
         }
 
         // Suppression en attente d'approbation admin

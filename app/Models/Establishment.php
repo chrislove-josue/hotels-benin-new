@@ -84,8 +84,10 @@ public function reviews()
      *
      * `price_from` représente le « prix à partir de » affiché dans les listings
      * et utilisé pour le tri / le filtrage par fourchette de prix. On le
-     * synchronise donc sur le coût le plus bas des chambres (source de vérité),
-     * ou on le laisse à null s'il n'y a plus de chambre.
+     * synchronise donc sur le coût le plus bas des chambres (source de vérité).
+     *
+     * La colonne étant NOT NULL, on laisse la valeur existante (celle saisie
+     * par l'hôte) inchangée s'il ne reste plus aucune chambre.
      *
      * Appelé à l'approbation d'une création/modification/suppression de chambre.
      */
@@ -93,9 +95,11 @@ public function reviews()
     {
         $min = $this->rooms()->min('price_per_night');
 
-        $this->update([
-            'price_from' => $min !== null ? (float) $min : null,
-        ]);
+        if ($min !== null) {
+            $this->update([
+                'price_from' => (float) $min,
+            ]);
+        }
     }
 
     /**
