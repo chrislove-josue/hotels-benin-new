@@ -1140,8 +1140,10 @@ $data = $this->validatedEventData($request);
             'enabled'        => \App\Support\PaymentProvider::enabledProviders(),
             'default'        => \App\Support\PaymentProvider::defaultProvider(),
             'fedapay'        => [
-                'public_key'  => config('services.fedapay.public_key'),
-                'environment' => config('services.fedapay.environment'),
+                'public_key'     => \App\Support\PaymentProvider::fedapayKey('public_key'),
+                'secret_key'     => \App\Support\PaymentProvider::fedapayKey('secret_key'),
+                'webhook_secret' => \App\Support\PaymentProvider::fedapayKey('webhook_secret'),
+                'environment'    => \App\Support\PaymentProvider::fedapayEnvironment(),
             ],
             'kkiapay'        => [
                 'public_key'  => \App\Models\Setting::get('kkiapay_public_key'),

@@ -58,6 +58,31 @@ class PaymentProvider
     }
 
     /**
+     * Clés FedaPay : valeur en base (modifiable par l'admin) ou repli .env.
+     * `webhook_secret` suit la même règle pour la signature des webhooks.
+     */
+    public static function fedapayKey(string $key): ?string
+    {
+        $value = Setting::get('fedapay_' . $key);
+
+        if ($value) {
+            return (string) $value;
+        }
+
+        return config('services.fedapay.' . $key);
+    }
+
+    /**
+     * Environnement FedaPay : "sandbox" ou "production".
+     */
+    public static function fedapayEnvironment(): string
+    {
+        $env = strtolower((string) Setting::get('fedapay_environment', config('services.fedapay.environment', 'sandbox')));
+
+        return in_array($env, ['production', 'live'], true) ? 'production' : 'sandbox';
+    }
+
+    /**
      * Clés KKiaPay : valeur en base (modifiable par l'admin) ou repli .env.
      */
     public static function kkiapayKey(string $key): ?string

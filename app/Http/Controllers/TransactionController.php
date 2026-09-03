@@ -18,8 +18,8 @@ class TransactionController extends Controller
 {
     public function __construct()
     {
-        FedaPay::setApiKey(config('services.fedapay.secret_key'));
-        FedaPay::setEnvironment(config('services.fedapay.environment'));
+        FedaPay::setApiKey(PaymentProvider::fedapayKey('secret_key'));
+        FedaPay::setEnvironment(PaymentProvider::fedapayEnvironment());
     }
 
     /**
@@ -391,7 +391,7 @@ class TransactionController extends Controller
     {
         $payload = $request->getContent();
         $sigHeader = $request->header('X-FEDAPAY-SIGNATURE');
-        $secret = config('services.fedapay.webhook_secret');
+        $secret = PaymentProvider::fedapayKey('webhook_secret');
 
         try {
             $event = FedaPayWebhook::constructEvent($payload, $sigHeader, $secret);
