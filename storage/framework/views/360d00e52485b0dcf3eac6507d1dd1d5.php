@@ -33,7 +33,7 @@
                         <span class="font-semibold text-hb-blue">FedaPay</span>
                         <span class="block text-xs text-gray-500">
                             Environnement : <strong><?php echo e(strtoupper($fedapay['environment'] ?? 'sandbox')); ?></strong>
-                            <?php if(!$fedapay['public_key']): ?> · <span class="text-red-500">clé publique absente (.env)</span><?php endif; ?>
+                            <?php if(!$fedapay['public_key']): ?> · <span class="text-red-500">clé publique absente</span><?php endif; ?>
                         </span>
                     </span>
                 </label>
@@ -56,6 +56,33 @@
                 <option value="kkiapay" <?php if($default === 'kkiapay'): echo 'selected'; endif; ?>>KKiaPay</option>
             </select>
             <p class="mt-1 text-xs text-gray-400">Doit correspondre à un agrégateur activé ci-dessus.</p>
+        </div>
+
+        
+        <div class="rounded-xl border border-gray-100 bg-hb-cream p-4">
+            <span class="mb-3 block text-xs font-semibold text-gray-500">Clés API FedaPay <span class="font-normal">(laisser vide pour conserver)</span></span>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-500">Clé publique</label>
+                    <input type="text" name="fedapay_public_key" value="<?php echo e(old('fedapay_public_key')); ?>" class="input-field" placeholder="<?php echo e($fedapay['public_key'] ? '•••• (déjà configurée)' : 'Clé publique FedaPay'); ?>">
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-500">Clé secrète</label>
+                    <input type="text" name="fedapay_secret_key" value="<?php echo e(old('fedapay_secret_key')); ?>" class="input-field" placeholder="<?php echo e($fedapay['secret_key'] ? '•••• (déjà configurée)' : 'Clé secrète FedaPay'); ?>">
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-500">Secret de webhook</label>
+                    <input type="text" name="fedapay_webhook_secret" value="<?php echo e(old('fedapay_webhook_secret')); ?>" class="input-field" placeholder="<?php echo e($fedapay['webhook_secret'] ? '•••• (déjà configuré)' : 'Secret de webhook FedaPay'); ?>">
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-500">Environnement</label>
+                    <select name="fedapay_environment" class="input-field">
+                        <option value="sandbox" <?php if(($fedapay['environment'] ?? 'sandbox') === 'sandbox'): echo 'selected'; endif; ?>>Sandbox (test)</option>
+                        <option value="production" <?php if(($fedapay['environment'] ?? 'sandbox') === 'production'): echo 'selected'; endif; ?>>Production</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         
