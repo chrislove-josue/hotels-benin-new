@@ -538,3 +538,7 @@ Did you mean one of these?
 #5 C:/Project/hotels-benin-new/artisan(12): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
 #6 {main}
 "} 
+[2026-09-03 18:37:20] local.ERROR: Declaration of App\Models\Setting::all(): Illuminate\Support\Collection must be compatible with Illuminate\Database\Eloquent\Model::all($columns = [...]) {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Declaration of App\\Models\\Setting::all(): Illuminate\\Support\\Collection must be compatible with Illuminate\\Database\\Eloquent\\Model::all($columns = [...]) at C:/Project/hotels-benin-new/app/Models/Setting.php:54)
+[stacktrace]
+#0 {main}
+"} 

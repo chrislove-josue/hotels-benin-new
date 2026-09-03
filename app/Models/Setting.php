@@ -20,7 +20,7 @@ class Setting extends Model
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        $value = static::all()->get($key);
+        $value = static::allSettings()->get($key);
 
         if (is_null($value)) {
             return $default;
@@ -51,7 +51,7 @@ class Setting extends Model
     /**
      * Tous les paramètres clé => valeur (chargés une seule fois pour la requête/cache).
      */
-    public static function all(): \Illuminate\Support\Collection
+    public static function allSettings(): \Illuminate\Support\Collection
     {
         return Cache::rememberForever(static::CACHE_KEY, function () {
             return static::pluck('value', 'key');
