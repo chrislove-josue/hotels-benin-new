@@ -52,6 +52,18 @@
         const widgetAmount = {{ $jsAmount }};
         const stateData = { reservation_id: {{ $reservation->id }} };
 
+        @if (empty($publicKey))
+            // Configuration KKiaPay manquante : on informe le voyageur au lieu d'échouer en silence.
+            const missing = document.createElement('div');
+            missing.className = 'mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700';
+            missing.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' +
+                'Le paiement en ligne est temporairement indisponible. Réessayez dans quelques instants ' +
+                'ou contactez l\'établissement.';
+            document.querySelector('.card')?.prepend(missing);
+            document.getElementById('kkiapay-pay')?.remove();
+            return;
+        @endif
+
         const openWidget = function () {
             openKkiapayWidget({
                 amount: widgetAmount,
