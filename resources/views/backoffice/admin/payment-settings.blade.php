@@ -35,7 +35,7 @@
                         <span class="font-semibold text-hb-blue">FedaPay</span>
                         <span class="block text-xs text-gray-500">
                             Environnement : <strong>{{ strtoupper($fedapay['environment'] ?? 'sandbox') }}</strong>
-                            @if(!$fedapay['public_key']) · <span class="text-red-500">clé publique absente (.env)</span>@endif
+                            @if(!$fedapay['public_key']) · <span class="text-red-500">clé publique absente</span>@endif
                         </span>
                     </span>
                 </label>
@@ -58,6 +58,33 @@
                 <option value="kkiapay" @selected($default === 'kkiapay')>KKiaPay</option>
             </select>
             <p class="mt-1 text-xs text-gray-400">Doit correspondre à un agrégateur activé ci-dessus.</p>
+        </div>
+
+        {{-- Clés FedaPay --}}
+        <div class="rounded-xl border border-gray-100 bg-hb-cream p-4">
+            <span class="mb-3 block text-xs font-semibold text-gray-500">Clés API FedaPay <span class="font-normal">(laisser vide pour conserver)</span></span>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-500">Clé publique</label>
+                    <input type="text" name="fedapay_public_key" value="{{ old('fedapay_public_key') }}" class="input-field" placeholder="{{ $fedapay['public_key'] ? '•••• (déjà configurée)' : 'Clé publique FedaPay' }}">
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-500">Clé secrète</label>
+                    <input type="text" name="fedapay_secret_key" value="{{ old('fedapay_secret_key') }}" class="input-field" placeholder="{{ $fedapay['secret_key'] ? '•••• (déjà configurée)' : 'Clé secrète FedaPay' }}">
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-500">Secret de webhook</label>
+                    <input type="text" name="fedapay_webhook_secret" value="{{ old('fedapay_webhook_secret') }}" class="input-field" placeholder="{{ $fedapay['webhook_secret'] ? '•••• (déjà configuré)' : 'Secret de webhook FedaPay' }}">
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium text-gray-500">Environnement</label>
+                    <select name="fedapay_environment" class="input-field">
+                        <option value="sandbox" @selected(($fedapay['environment'] ?? 'sandbox') === 'sandbox')>Sandbox (test)</option>
+                        <option value="production" @selected(($fedapay['environment'] ?? 'sandbox') === 'production')>Production</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         {{-- Clés KKiaPay --}}
