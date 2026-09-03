@@ -75,7 +75,10 @@ class TransactionController extends Controller
             return $this->cancelUnavailable($reservation);
         }
 
-        return $this->payWithFedaPay($reservation);
+        return match (PaymentProvider::defaultProvider()) {
+            PaymentProvider::KKIAPAY => $this->payWithKkiaPay($reservation),
+            default => $this->payWithFedaPay($reservation),
+        };
     }
 
     /**
