@@ -42,11 +42,12 @@ Les vues utilisent **Tailwind Play CDN + Alpine.js CDN + Bootstrap Icons CDN**, 
 
 ## Paiement FedaPay
 
-- Clés via `config/services.php` : variables `FEDAPAY_PUBLIC_KEY`, `FEDAPAY_SECRET_KEY`, `FEDAPAY_ENVIRONMENT` (`sandbox` par défaut), `FEDAPAY_WEBHOOK_SECRET`. ⚠️ Absentes de `.env.example` : les ajouter manuellement.
-- Webhook `POST /webhooks/fedapay` : exempté de CSRF dans `bootstrap/app.php` — ne pas casser cette exclusion.
+- Clés via `config/services.php` : variables `FEDAPAY_PUBLIC_KEY`, `FEDAPAY_SECRET_KEY`, `FEDAPAY_ENVIRONMENT`, `FEDAPAY_WEBHOOK_SECRET`. La config par défaut est `sandbox`, mais `.env.example` met `FEDAPAY_ENVIRONMENT=live` avec des clés placeholder — passer en `sandbox` pour les tests.
+- Webhook `POST /webhooks/fedapay` : exempté de CSRF dans `bootstrap/app.php` (avec la route `/up` de health check) — ne pas casser cette exclusion.
+- Impersonation : un admin peut se connecter en tant qu'utilisateur (`/admin/utilisateurs/{id}/impersonner`), le retour se fait par `POST /impersonation/quitter` sous simple middleware `auth`.
 
 ## Pièges connus
 
-- **Carbon 3** : `diffInDays()` retourne une valeur signée. `Reservation::nightsBetween()` utilise volontairement `$in->diffInDays($out)` (ordre inverse = négatif). Ne pas « corriger » cet ordre ni reformuler avec `max()` sur une valeur signée.
+- **Carbon 3** : `diffInDays()` retourne une valeur signée. Dans Carbon 3 la bonne formule de nuits est `$in->diffInDays($out)` (positif) enveloppée dans `max(1, ...)` pour respecter le minimum d'une nuit — c'est l'état actuel correct de `Reservation::nightsBetween()`. Ne pas inverser l'ordre des arguments (ça donnerait un négatif) ni appliquer `max()` sur une valeur signée (`max(1, -4) = 1`).
 - Disponibilité des chambres : vérifiée via `Room::availableUnitsFor($checkIn, $checkOut, ?$excludeReservationId)` à la création de réservation ET au checkout/paiement (`TransactionController`). Toute nouvelle voie de réservation doit refaire ces vérifications.
 - Images : trait `App\Traits\UploadsImages` — upload stocké dans `storage/app/public/uploads` (URL `/storage/uploads/...`), prioritaire sur le champ URL externe. Utiliser ce trait pour tout nouveau champ image.
