@@ -80,6 +80,25 @@ public function reviews()
     }
 
     /**
+     * Recalcule `price_from` à partir du prix minimum réel des chambres.
+     *
+     * `price_from` représente le « prix à partir de » affiché dans les listings
+     * et utilisé pour le tri / le filtrage par fourchette de prix. On le
+     * synchronise donc sur le coût le plus bas des chambres (source de vérité),
+     * ou on le laisse à null s'il n'y a plus de chambre.
+     *
+     * Appelé à l'approbation d'une création/modification/suppression de chambre.
+     */
+    public function refreshPriceFrom(): void
+    {
+        $min = $this->rooms()->min('price_per_night');
+
+        $this->update([
+            'price_from' => $min !== null ? (float) $min : null,
+        ]);
+    }
+
+    /**
      * Portée de recherche utilisée par le moteur de recherche simplifié
      * de la page d'accueil et la liste des établissements.
      */

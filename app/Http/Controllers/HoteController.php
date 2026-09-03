@@ -155,6 +155,13 @@ public function updateEstablishment(Request $request, int $id)
         }
 
         // Emettre une modification en attente d'approbation admin au lieu d'appliquer directement
+        // Garde anti-doublon : un seul changement en attente par établissement.
+        if (PendingEstablishmentChange::where('establishment_id', $establishment->id)
+            ->where('status', 'en_attente')
+            ->exists()) {
+            return back()->with('status', 'Vous avez déjà une modification en attente pour cet établissement. Attendez sa revue par un administrateur.');
+        }
+
         PendingEstablishmentChange::create([
             'establishment_id' => $establishment->id,
             'user_id' => Auth::id(),
@@ -290,6 +297,15 @@ $data = $request->validate([
         }
 
         // Création en attente d'approbation admin
+        // Garde anti-doublon : un seul ajout de chambre en attente par établissement.
+        if (PendingRoomChange::where('establishment_id', $establishment->id)
+            ->whereNull('room_id')
+            ->where('action', 'create')
+            ->where('status', 'en_attente')
+            ->exists()) {
+            return back()->with('status', 'Un ajout de chambre / espace est déjà en attente pour cet établissement. Attendez sa revue par un administrateur.');
+        }
+
         PendingRoomChange::create([
             'establishment_id' => $establishment->id,
             'user_id' => Auth::id(),

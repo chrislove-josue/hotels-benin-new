@@ -814,6 +814,9 @@ public function transactions(Request $request)
                         $change->room->update($data);
                     }
 
+                    // Le prix minimum de l'établissement suit le coût réel des chambres.
+                    $change->establishment->refreshPriceFrom();
+
                     $change->update([
                         'status' => 'approuvee',
                         'reviewed_by' => auth()->id(),
@@ -831,6 +834,9 @@ public function transactions(Request $request)
 
                 DB::transaction(function () use ($change) {
                     $change->room?->delete();
+
+                    // Recalcule le prix minimum après suppression.
+                    $change->establishment->refreshPriceFrom();
 
                     $change->update([
                         'status' => 'approuvee',
