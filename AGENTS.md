@@ -39,12 +39,17 @@ Les vues utilisent **Tailwind Play CDN + Alpine.js CDN + Bootstrap Icons CDN**, 
 - Rôles stockés sur `users.role` : `admin`, `hote`, `voyageur`. Aliases middleware définis dans `bootstrap/app.php` : `admin`, `hote`, `approved` (+ `auth` standard).
 - Un compte hôte doit être approuvé par un admin (`users.is_approved`) avant d'accéder à son espace.
 - Les modifications d'établissements/chambres par un hôte ne s'écrivent pas directement : elles créent des lignes dans `pending_establishment_changes` / `pending_room_changes`, approuvées/rejetées par l'admin (`AdminController::pendingChanges`). Respecter ce flux.
-
-## Paiement FedaPay
-
-- Clés via `config/services.php` : variables `FEDAPAY_PUBLIC_KEY`, `FEDAPAY_SECRET_KEY`, `FEDAPAY_ENVIRONMENT`, `FEDAPAY_WEBHOOK_SECRET`. La config par défaut est `sandbox`, mais `.env.example` met `FEDAPAY_ENVIRONMENT=live` avec des clés placeholder — passer en `sandbox` pour les tests.
-- Webhook `POST /webhooks/fedapay` : exempté de CSRF dans `bootstrap/app.php` (avec la route `/up` de health check) — ne pas casser cette exclusion.
 - Impersonation : un admin peut se connecter en tant qu'utilisateur (`/admin/utilisateurs/{id}/impersonner`), le retour se fait par `POST /impersonation/quitter` sous simple middleware `auth`.
+
+## Paiement — agrégateurs FedaPay & KKiaPay
+
+- Le voyageur n'a **pas le choix** de l'agrégateur : il passe toujours par celui sélectionné par l'admin (`App\Support\PaymentProvider::defaultProvider()`), dans les paramètres **admin > Paiements** (`/admin/paiements`).
+- L'activation/le choix par défaut sont stockés dans la table `settings` (model `App\Models\Setting`). Clés KKiaPay modifiables via l'UI admin (base) ; clés FedaPay via `.env`.
+- **FedaPay** (redirection serveur) : clés `FEDAPAY_*` dans `config/services.php`/`.env`. Webhook `POST /webhooks/fedapay` exempté de CSRF via `bootstrap/app.php`.
+- **KKiaPay** (widget client `https://cdn.kkiapay.me/k.js`) : clés `kkiapay_*` en base avec repli `KKIAPAY_*` dans `.env` (`config/services.php`). Webhook `POST /webhooks/kkiapay` (signé par l'en-tête `X-SECRET-KEY`), aussi exempté de CSRF.
+- Flux KKiaPay : `TransactionController::process()` affiche `reservations/payment-kkiapay` (ouvre le widget en passant `data = {reservation_id}`) → succès redirigé vers `kkiapayCallback()` qui vérifie côté serveur (`POST api.kkiapay.me/api/v1/transactions/status`, headers `X-API-KEY`/`X-PRIVATE-KEY`/`X-SECRET-KEY`) puis confirme.
+- La confirmation finale (montant vérifié) passe par `TransactionController::confirmReservation()` pour les deux agrégateurs. Ne pas court-circuiter cette vérification de montant.
+- Sandbox : `FEDAPAY_ENVIRONMENT=sandbox` et UI `kkiapay_environment=sandbox` ; base API KKiaPay = `api-sandbox.kkiapay.me` vs `api.kkiapay.me`.
 
 ## Pièges connus
 
