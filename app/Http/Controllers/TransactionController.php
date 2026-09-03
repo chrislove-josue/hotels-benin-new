@@ -169,10 +169,11 @@ class TransactionController extends Controller
 
         $transaction = $reservation->transaction ?? new Transaction(['reservation_id' => $reservation->id]);
         $transaction->fill([
-            'amount'     => $reservation->amount,
-            'commission' => $reservation->commission,
-            'method'     => 'kkiapay',
-            'status'     => 'en_attente',
+            'amount'                 => $reservation->amount,
+            'commission'             => $reservation->commission,
+            'method'                 => 'kkiapay',
+            'status'                 => 'en_attente',
+            'provider_transaction_id' => null,
         ])->save();
 
         $reservation->update(['payment_method' => 'kkiapay']);
