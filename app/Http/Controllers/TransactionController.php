@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Reservation;
 use App\Models\Transaction;
+use App\Support\PaymentProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use FedaPay\FedaPay;

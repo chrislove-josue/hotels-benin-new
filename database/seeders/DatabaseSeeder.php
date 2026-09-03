@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             RoomSeeder::class,
             ReviewSeeder::class,
             EventSeeder::class,
+            SettingSeeder::class,
         ]);
     }
 }
