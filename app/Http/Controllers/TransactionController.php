@@ -52,7 +52,9 @@ class TransactionController extends Controller
             )
             : 0;
 
-        return view('reservations.checkout', compact('reservation', 'availableUnits'));
+        $paymentProvider = PaymentProvider::defaultProvider();
+
+        return view('reservations.checkout', compact('reservation', 'availableUnits', 'paymentProvider'));
     }
 
     /**

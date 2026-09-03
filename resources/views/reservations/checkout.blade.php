@@ -53,7 +53,13 @@
 
         {{-- Formulaire de paiement --}}
         <div class="card p-6">
-           
+            @php
+                $providerLabel = ($paymentProvider ?? 'fedapay') === 'kkiapay' ? 'KKiaPay (mobile money / carte)' : 'FedaPay';
+            @endphp
+            <p class="mb-4 flex items-center gap-2 text-sm text-gray-500">
+                <i class="bi bi-shield-check text-hb-blue"></i>
+                Paiement sécurisé via <span class="font-semibold text-hb-blue">{{ $providerLabel }}</span>.
+            </p>
 
             <form action="{{ route('reservations.process', $reservation) }}" method="POST" class="space-y-4">
                 @csrf
