@@ -340,6 +340,13 @@ $data = $request->validate([
         $establishment = Establishment::where('user_id', Auth::id())->findOrFail($establishmentId);
         $room = $establishment->rooms()->findOrFail($roomId);
 
+        // Garde-fou : ne pas permettre la suppression si des réservations
+        // actives à venir sont liées à cette chambre (elles perdraient leur
+        // chambre associée).
+        if ($room->hasActiveReservations()) {
+            return back()->with('status', 'Suppression impossible : cette chambre a des réservations actives à venir. Désactivez-la ou attendez la fin des séjours avant de la supprimer.');
+        }
+
         // Suppression en attente d'approbation admin
         PendingRoomChange::create([
             'room_id' => $room->id,

@@ -127,4 +127,27 @@ protected $fillable = [
 
         return $peak;
     }
+
+    /**
+     * La chambre a-t-elle des réservations actives à venir ?
+     *
+     * Vrai s'il existe une réservation confirmée, ou en attente non expirée, dont
+     * le check_out est futur. Une suppression dans ce cas laisserait ces
+     * réservations sans chambre associée.
+     */
+    public function hasActiveReservations(): bool
+    {
+        return $this->reservations()
+            ->where(function ($q) {
+                $q->where('status', 'confirmee')
+                    ->orWhere(function ($qq) {
+                        $qq->where('status', 'en_attente')
+                            ->where(function ($w) {
+                                $w->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                            });
+                    });
+            })
+            ->whereDate('check_out', '>', now()->toDateString())
+            ->exists();
+    }
 }

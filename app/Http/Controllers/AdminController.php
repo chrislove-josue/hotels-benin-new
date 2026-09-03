@@ -823,6 +823,12 @@ public function transactions(Request $request)
                 break;
 
             case 'delete':
+                // Garde-fou : une chambre avec réservations actives à venir ne
+                // se supprime pas (elles perdraient leur chambre associée).
+                if ($change->room && $change->room->hasActiveReservations()) {
+                    return back()->with('status', 'Refusé : cette chambre a des réservations actives à venir. Désactivez-la ou attendez la fin des séjours avant de la supprimer.');
+                }
+
                 DB::transaction(function () use ($change) {
                     $change->room?->delete();
 
