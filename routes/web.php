@@ -112,6 +112,7 @@ Route::prefix('espace-voyageur')->name('reservations.')->middleware(['auth', 'ap
     Route::get('/{reservation}/paiement', [TransactionController::class, 'checkout'])->name('checkout');
     Route::post('/{reservation}/paiement', [TransactionController::class, 'process'])->name('process');
     Route::get('/{reservation}/paiement/fedapay/retour', [TransactionController::class, 'fedapayCallback'])->name('fedapay.callback');
+    Route::get('/{reservation}/paiement/kkiapay/retour', [TransactionController::class, 'kkiapayCallback'])->name('kkiapay.callback');
 });
 
 
@@ -123,6 +124,9 @@ Route::prefix('espace-voyageur')->name('reservations.')->middleware(['auth', 'ap
 */
 Route::post('/webhooks/fedapay', [TransactionController::class, 'fedapayWebhook'])
     ->name('webhooks.fedapay');
+
+Route::post('/webhooks/kkiapay', [TransactionController::class, 'kkiapayWebhook'])
+    ->name('webhooks.kkiapay');
 
 /*
 |--------------------------------------------------------------------------
@@ -192,6 +196,10 @@ Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users');
 
     Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions');
     Route::patch('/transactions/{id}', [AdminController::class, 'updateTransaction'])->name('transactions.update');
+
+    // Paramètres de paiement (agrégateurs)
+    Route::get('/paiements', [AdminController::class, 'paymentSettings'])->name('payments.settings');
+    Route::post('/paiements', [AdminController::class, 'updatePaymentSettings'])->name('payments.settings.update');
 
 Route::get('/messages', [AdminController::class, 'messages'])->name('messages');
     Route::post('/messages/{id}/read', [AdminController::class, 'markMessageRead'])->name('messages.read');

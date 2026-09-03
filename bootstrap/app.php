@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
     $middleware->validateCsrfTokens(except: [
         'webhooks/fedapay',
+        'webhooks/kkiapay',
     ]);
 })
     ->withExceptions(function (Exceptions $exceptions) {

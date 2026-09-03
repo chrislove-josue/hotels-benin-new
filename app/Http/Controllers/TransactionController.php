@@ -151,6 +151,208 @@ class TransactionController extends Controller
         return $fallback;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | KKiaPay (widget client)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Initialise un paiement KKiaPay : enregistre la transaction locale puis
+     * affiche la page embarquant le widget KKiaPay (côté client).
+     */
+    private function payWithKkiaPay(Reservation $reservation)
+    {
+        $user = Auth::user();
+
+        $transaction = $reservation->transaction ?? new Transaction(['reservation_id' => $reservation->id]);
+        $transaction->fill([
+            'amount'                 => $reservation->amount,
+            'commission'             => $reservation->commission,
+            'method'                 => 'kkiapay',
+            'status'                 => 'en_attente',
+            'provider_transaction_id' => $transaction->provider_transaction_id,
+        ])->save();
+
+        $reservation->update(['payment_method' => 'kkiapay']);
+
+        return view('reservations.payment-kkiapay', [
+            'reservation' => $reservation->load(['establishment', 'room']),
+            'sandbox'     => PaymentProvider::kkiapaySandbox(),
+            'publicKey'   => PaymentProvider::kkiapayKey('public_key'),
+            'callbackUrl' => route('reservations.kkiapay.callback', $reservation),
+        ]);
+    }
+
+    /**
+     * Retour du client après paiement KKiaPay (callback du widget).
+     * Vérifie la transaction côté serveur avant de confirmer.
+     */
+    public function kkiapayCallback(Request $request, Reservation $reservation)
+    {
+        abort_unless($reservation->user_id === Auth::id(), 403);
+
+        $transactionId = trim((string) $request->query('transactionId', ''));
+
+        if ($transactionId === '') {
+            return redirect()->route('reservations.show', $reservation)
+                ->with('status', 'Statut de paiement inconnu, veuillez vérifier votre réservation.');
+        }
+
+        $this->applyKkiaPayStatus($reservation, $transactionId);
+
+        return redirect()->route('reservations.show', $reservation)
+            ->with('status', 'Merci de vérifier ci-dessous le statut de votre paiement.');
+    }
+
+    /**
+     * Webhook KKiaPay : confirmation asynchrone signée par X-SECRET-KEY.
+     * Source de vérité lorsque le navigateur du client n'a pas atteint le callback.
+     */
+    public function kkiapayWebhook(Request $request)
+    {
+        $secretHeader = $request->header('X-SECRET-KEY');
+
+        if ($secretHeader !== PaymentProvider::kkiapayKey('secret')) {
+            return response('Signature invalide', 400);
+        }
+
+        $transactionId = $request->input('transactionId');
+
+        if (! $transactionId) {
+            return response('OK', 200);
+        }
+
+        // Le « state » passé au widget porte la référence interne (l'id de la
+        // réservation), ce qui permet de rapprocher le webhook de la bonne
+        // réservation sans dépendre du callback navigateur.
+        $reservationId = $this->extractReservationIdFromState($request->input('state'));
+
+        $transaction = Transaction::query()
+            ->when($reservationId, fn ($q) => $q->where('reservation_id', $reservationId))
+            ->where('method', 'kkiapay')
+            ->where('status', '!=', 'reussie')
+            ->whereHas('reservation')
+            ->latest()
+            ->first();
+
+        if ($transaction?->reservation) {
+            $this->applyKkiaPayStatus($transaction->reservation, $transactionId, $reservationId);
+        }
+
+        return response('OK', 200);
+    }
+
+    /**
+     * Vérifie côté serveur une transaction KKiaPay et lui applique son statut.
+     */
+    private function applyKkiaPayStatus(Reservation $reservation, string $transactionId, ?int $reservationId = null): void
+    {
+        try {
+            $verified = $this->verifyKkiaPayTransaction($transactionId);
+        } catch (\Throwable $e) {
+            Log::error('Erreur vérification transaction KKiaPay', [
+                'reservation' => $reservation->reference,
+                'error'       => $e->getMessage(),
+            ]);
+            return;
+        }
+
+        $status = strtoupper((string) ($verified['status'] ?? ''));
+
+        if ($status === 'SUCCESS') {
+            $this->confirmReservation($reservation, [
+                'provider_transaction_id' => $transactionId,
+                'paid_amount'             => (int) ($verified['amount'] ?? 0),
+            ], 'kkiapay');
+        } elseif (in_array($status, ['FAILED', 'CANCELED'], true)) {
+            $transaction = $reservation->transaction;
+            if ($transaction && $transaction->status !== 'reussie') {
+                $transaction->update(['status' => 'echouee']);
+            }
+            // La réservation reste en_attente : paiement relançable.
+        }
+    }
+
+    /**
+     * Le « state » envoyé au widget est un objet JSON ; on y cherche une clé
+     * `reservation_id` pour rapprocher la transaction d'une réservation.
+     */
+    private function extractReservationIdFromState(mixed $state): ?int
+    {
+        if (is_numeric($state)) {
+            return (int) $state;
+        }
+
+        if (is_string($state) && str_starts_with($state, '{')) {
+            $decoded = json_decode($state, true);
+            if (is_array($decoded)) {
+                $state = $decoded;
+            }
+        }
+
+        if (is_array($state)) {
+            return isset($state['reservation_id']) ? (int) $state['reservation_id'] : null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Appel HTTP à l'API KKiaPay pour connaître le statut d'une transaction.
+     */
+    private function verifyKkiaPayTransaction(string $transactionId): array
+    {
+        $response = Http::timeout(15)
+            ->withHeaders([
+                'Accept'        => 'application/json',
+                'X-API-KEY'     => PaymentProvider::kkiapayKey('public_key'),
+                'X-PRIVATE-KEY' => PaymentProvider::kkiapayKey('private_key'),
+                'X-SECRET-KEY'  => PaymentProvider::kkiapayKey('secret'),
+            ])
+            ->post(PaymentProvider::kkiapayApiBase() . '/api/v1/transactions/status', [
+                'transactionId' => $transactionId,
+            ]);
+
+        if (! $response->successful()) {
+            throw new \RuntimeException('KKiaPay API status error: HTTP ' . $response->status());
+        }
+
+        return $response->json() ?? [];
+    }
+
+    /**
+     * Confirme une réservation après un paiement vérifié (partagé FedaPay/KKiaPay).
+     */
+    private function confirmReservation(Reservation $reservation, array $paid, string $provider): void
+    {
+        $transaction = $reservation->transaction;
+        if (! $transaction || $transaction->status === 'reussie') {
+            return;
+        }
+
+        $expectedAmount = (int) round((float) $reservation->amount);
+        $paidAmount = $paid['paid_amount'] > 0 ? $paid['paid_amount'] : $expectedAmount;
+
+        if ($paidAmount < $expectedAmount) {
+            Log::warning('Montant ' . $provider . ' inférieur au montant attendu', [
+                'reservation' => $reservation->reference,
+                'attendu'     => $expectedAmount,
+                'payé'        => $paidAmount,
+            ]);
+            $transaction->update(['status' => 'echouee']);
+            return;
+        }
+
+        $transaction->update([
+            'status'                  => 'reussie',
+            'method'                  => $provider,
+            'provider_transaction_id' => $paid['provider_transaction_id'] ?? $transaction->provider_transaction_id,
+        ]);
+        $reservation->update(['status' => 'confirmee']);
+        $this->sendConfirmationEmail($reservation);
+    }
+
     /**
      * Retour du client après paiement FedaPay (callback_url).
      *
@@ -235,22 +437,10 @@ class TransactionController extends Controller
         }
 
         if ($status === 'approved') {
-            $expectedAmount = (int) round((float) $reservation->amount);
-            $paidAmount = isset($fedapayTransaction->amount) ? (int) $fedapayTransaction->amount : $expectedAmount;
-
-            if ($paidAmount < $expectedAmount) {
-                Log::warning('Montant FedaPay inférieur au montant attendu', [
-                    'reservation' => $reservation->reference,
-                    'attendu'     => $expectedAmount,
-                    'payé'        => $paidAmount,
-                ]);
-                $transaction->update(['status' => 'echouee']);
-                return;
-            }
-
-            $transaction->update(['status' => 'reussie']);
-            $reservation->update(['status' => 'confirmee']);
-            $this->sendConfirmationEmail($reservation);
+            $this->confirmReservation($reservation, [
+                'provider_transaction_id' => $transaction->provider_transaction_id,
+                'paid_amount'             => isset($fedapayTransaction->amount) ? (int) $fedapayTransaction->amount : 0,
+            ], 'fedapay');
         } elseif (in_array($status, ['canceled', 'declined'], true)) {
             $transaction->update(['status' => 'echouee']);
             // La réservation reste en_attente : paiement relançable depuis la fiche.

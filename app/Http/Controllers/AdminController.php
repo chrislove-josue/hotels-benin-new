@@ -1124,4 +1124,77 @@ $data = $this->validatedEventData($request);
             'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paramètres de paiement (agrégateurs FedaPay / KKiaPay)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Formulaire des paramètres de paiement.
+     */
+    public function paymentSettings()
+    {
+        return view('backoffice.admin.payment-settings', [
+            'enabled'        => \App\Support\PaymentProvider::enabledProviders(),
+            'default'        => \App\Support\PaymentProvider::defaultProvider(),
+            'fedapay'        => [
+                'public_key'  => config('services.fedapay.public_key'),
+                'environment' => config('services.fedapay.environment'),
+            ],
+            'kkiapay'        => [
+                'public_key'  => \App\Models\Setting::get('kkiapay_public_key'),
+                'private_key' => \App\Models\Setting::get('kkiapay_private_key'),
+                'secret'      => \App\Models\Setting::get('kkiapay_secret'),
+                'environment' => \App\Models\Setting::get('kkiapay_environment', config('services.kkiapay.environment', 'sandbox')),
+            ],
+        ]);
+    }
+
+    /**
+     * Enregistre les paramètres de paiement.
+     */
+    public function updatePaymentSettings(Request $request)
+    {
+        $data = $request->validate([
+            'providers'            => ['required', 'array', 'min:1'],
+            'providers.*'          => ['required', 'in:fedapay,kkiapay'],
+            'default_provider'     => ['required', 'in:fedapay,kkiapay'],
+            'kkiapay_public_key'   => ['nullable', 'string', 'max:255'],
+            'kkiapay_private_key'  => ['nullable', 'string', 'max:255'],
+            'kkiapay_secret'       => ['nullable', 'string', 'max:255'],
+            'kkiapay_environment'  => ['required', 'in:sandbox,production'],
+        ], [], [
+            'providers'           => 'agrégateurs',
+            'default_provider'    => 'agrégateur par défaut',
+            'kkiapay_public_key'  => 'clé publique KKiaPay',
+            'kkiapay_private_key' => 'clé privée KKiaPay',
+            'kkiapay_secret'      => 'secrète KKiaPay',
+            'kkiapay_environment' => 'environnement KKiaPay',
+        ]);
+
+        $providers = array_values(array_unique($data['providers']));
+
+        // L'agrégateur par défaut doit faire partie des activés.
+        $default = in_array($data['default_provider'], $providers, true)
+            ? $data['default_provider']
+            : $providers[0];
+
+        \App\Models\Setting::set('payment_providers_enabled', $providers);
+        \App\Models\Setting::set('payment_provider_default', $default);
+
+        if (! empty($data['kkiapay_public_key'])) {
+            \App\Models\Setting::set('kkiapay_public_key', $data['kkiapay_public_key']);
+        }
+        if (! empty($data['kkiapay_private_key'])) {
+            \App\Models\Setting::set('kkiapay_private_key', $data['kkiapay_private_key']);
+        }
+        if (! empty($data['kkiapay_secret'])) {
+            \App\Models\Setting::set('kkiapay_secret', $data['kkiapay_secret']);
+        }
+        \App\Models\Setting::set('kkiapay_environment', $data['kkiapay_environment']);
+
+        return back()->with('status', 'Paramètres de paiement mis à jour.');
+    }
 }
