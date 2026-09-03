@@ -165,21 +165,20 @@ class TransactionController extends Controller
      */
     private function payWithKkiaPay(Reservation $reservation)
     {
-        $user = Auth::user();
+        $reservation->loadMissing(['user']);
 
         $transaction = $reservation->transaction ?? new Transaction(['reservation_id' => $reservation->id]);
         $transaction->fill([
-            'amount'                 => $reservation->amount,
-            'commission'             => $reservation->commission,
-            'method'                 => 'kkiapay',
-            'status'                 => 'en_attente',
-            'provider_transaction_id' => $transaction->provider_transaction_id,
+            'amount'     => $reservation->amount,
+            'commission' => $reservation->commission,
+            'method'     => 'kkiapay',
+            'status'     => 'en_attente',
         ])->save();
 
         $reservation->update(['payment_method' => 'kkiapay']);
 
         return view('reservations.payment-kkiapay', [
-            'reservation' => $reservation->load(['establishment', 'room']),
+            'reservation' => $reservation->load(['establishment', 'room', 'user']),
             'sandbox'     => PaymentProvider::kkiapaySandbox(),
             'publicKey'   => PaymentProvider::kkiapayKey('public_key'),
             'callbackUrl' => route('reservations.kkiapay.callback', $reservation),
