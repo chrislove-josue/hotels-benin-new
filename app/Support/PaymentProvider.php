@@ -58,12 +58,15 @@ class PaymentProvider
     }
 
     /**
-     * Clés FedaPay : valeur en base (modifiable par l'admin) ou repli .env.
-     * `webhook_secret` suit la même règle pour la signature des webhooks.
+     * Clés FedaPay pour un environnement donné ("sandbox" ou "production").
+     * Les clés sont stockées séparément par environnement (modifiables par
+     * l'admin) avec repli .env.
      */
-    public static function fedapayKey(string $key): ?string
+    public static function fedapayKey(string $key, ?string $env = null): ?string
     {
-        $value = Setting::get('fedapay_' . $key);
+        $env = $env ?? static::fedapayEnvironment();
+
+        $value = Setting::get('fedapay_' . $key . '_' . $env);
 
         if ($value) {
             return (string) $value;
@@ -83,11 +86,13 @@ class PaymentProvider
     }
 
     /**
-     * Clés KKiaPay : valeur en base (modifiable par l'admin) ou repli .env.
+     * Clés KKiaPay pour un environnement donné ("sandbox" ou "production").
      */
-    public static function kkiapayKey(string $key): ?string
+    public static function kkiapayKey(string $key, ?string $env = null): ?string
     {
-        $value = Setting::get('kkiapay_' . $key);
+        $env = $env ?? static::kkiapayEnvironment();
+
+        $value = Setting::get('kkiapay_' . $key . '_' . $env);
 
         if ($value) {
             return (string) $value;
@@ -99,11 +104,19 @@ class PaymentProvider
     /**
      * Environnement KKiaPay : "sandbox" ou "production".
      */
-    public static function kkiapaySandbox(): bool
+    public static function kkiapayEnvironment(): string
     {
         $env = strtolower((string) Setting::get('kkiapay_environment', config('services.kkiapay.environment', 'sandbox')));
 
-        return $env === 'sandbox';
+        return in_array($env, ['production', 'live'], true) ? 'production' : 'sandbox';
+    }
+
+    /**
+     * Environnement KKiaPay en booléen "sandbox ?".
+     */
+    public static function kkiapaySandbox(): bool
+    {
+        return static::kkiapayEnvironment() === 'sandbox';
     }
 
     /**

@@ -1148,20 +1148,36 @@ $data = $this->validatedEventData($request);
      */
     public function paymentSettings()
     {
+        $fed = \App\Support\PaymentProvider::class;
+
         return view('backoffice.admin.payment-settings', [
             'enabled'        => \App\Support\PaymentProvider::enabledProviders(),
             'default'        => \App\Support\PaymentProvider::defaultProvider(),
             'fedapay'        => [
-                'public_key'     => \App\Support\PaymentProvider::fedapayKey('public_key'),
-                'secret_key'     => \App\Support\PaymentProvider::fedapayKey('secret_key'),
-                'webhook_secret' => \App\Support\PaymentProvider::fedapayKey('webhook_secret'),
-                'environment'    => \App\Support\PaymentProvider::fedapayEnvironment(),
+                'environment' => $fed::fedapayEnvironment(),
+                'sandbox'     => [
+                    'public_key'     => $fed::fedapayKey('public_key', 'sandbox'),
+                    'secret_key'     => $fed::fedapayKey('secret_key', 'sandbox'),
+                    'webhook_secret' => $fed::fedapayKey('webhook_secret', 'sandbox'),
+                ],
+                'production'  => [
+                    'public_key'     => $fed::fedapayKey('public_key', 'production'),
+                    'secret_key'     => $fed::fedapayKey('secret_key', 'production'),
+                    'webhook_secret' => $fed::fedapayKey('webhook_secret', 'production'),
+                ],
             ],
             'kkiapay'        => [
-                'public_key'  => \App\Models\Setting::get('kkiapay_public_key'),
-                'private_key' => \App\Models\Setting::get('kkiapay_private_key'),
-                'secret'      => \App\Models\Setting::get('kkiapay_secret'),
-                'environment' => \App\Models\Setting::get('kkiapay_environment', config('services.kkiapay.environment', 'sandbox')),
+                'environment' => $fed::kkiapayEnvironment(),
+                'sandbox'     => [
+                    'public_key'  => $fed::kkiapayKey('public_key', 'sandbox'),
+                    'private_key' => $fed::kkiapayKey('private_key', 'sandbox'),
+                    'secret'      => $fed::kkiapayKey('secret', 'sandbox'),
+                ],
+                'production'  => [
+                    'public_key'  => $fed::kkiapayKey('public_key', 'production'),
+                    'private_key' => $fed::kkiapayKey('private_key', 'production'),
+                    'secret'      => $fed::kkiapayKey('secret', 'production'),
+                ],
             ],
         ]);
     }
@@ -1172,28 +1188,40 @@ $data = $this->validatedEventData($request);
     public function updatePaymentSettings(Request $request)
     {
         $data = $request->validate([
-            'providers'               => ['required', 'array', 'min:1'],
-            'providers.*'             => ['required', 'in:fedapay,kkiapay'],
-            'default_provider'        => ['required', 'in:fedapay,kkiapay'],
-            'fedapay_public_key'      => ['nullable', 'string', 'max:255'],
-            'fedapay_secret_key'      => ['nullable', 'string', 'max:255'],
-            'fedapay_webhook_secret'  => ['nullable', 'string', 'max:255'],
-            'fedapay_environment'     => ['required', 'in:sandbox,production'],
-            'kkiapay_public_key'      => ['nullable', 'string', 'max:255'],
-            'kkiapay_private_key'     => ['nullable', 'string', 'max:255'],
-            'kkiapay_secret'          => ['nullable', 'string', 'max:255'],
-            'kkiapay_environment'     => ['required', 'in:sandbox,production'],
+            'providers'                                  => ['required', 'array', 'min:1'],
+            'providers.*'                                => ['required', 'in:fedapay,kkiapay'],
+            'default_provider'                           => ['required', 'in:fedapay,kkiapay'],
+            'fedapay_environment'                        => ['required', 'in:sandbox,production'],
+            'kkiapay_environment'                        => ['required', 'in:sandbox,production'],
+            'fedapay_public_key_sandbox'                 => ['nullable', 'string', 'max:255'],
+            'fedapay_secret_key_sandbox'                 => ['nullable', 'string', 'max:255'],
+            'fedapay_webhook_secret_sandbox'             => ['nullable', 'string', 'max:255'],
+            'fedapay_public_key_production'              => ['nullable', 'string', 'max:255'],
+            'fedapay_secret_key_production'              => ['nullable', 'string', 'max:255'],
+            'fedapay_webhook_secret_production'          => ['nullable', 'string', 'max:255'],
+            'kkiapay_public_key_sandbox'                 => ['nullable', 'string', 'max:255'],
+            'kkiapay_private_key_sandbox'                => ['nullable', 'string', 'max:255'],
+            'kkiapay_secret_sandbox'                     => ['nullable', 'string', 'max:255'],
+            'kkiapay_public_key_production'              => ['nullable', 'string', 'max:255'],
+            'kkiapay_private_key_production'             => ['nullable', 'string', 'max:255'],
+            'kkiapay_secret_production'                  => ['nullable', 'string', 'max:255'],
         ], [], [
-            'providers'               => 'agrégateurs',
-            'default_provider'        => 'agrégateur par défaut',
-            'fedapay_public_key'      => 'clé publique FedaPay',
-            'fedapay_secret_key'      => 'clé secrète FedaPay',
-            'fedapay_webhook_secret'  => 'secret de webhook FedaPay',
-            'fedapay_environment'     => 'environnement FedaPay',
-            'kkiapay_public_key'      => 'clé publique KKiaPay',
-            'kkiapay_private_key'     => 'clé privée KKiaPay',
-            'kkiapay_secret'          => 'secrète KKiaPay',
-            'kkiapay_environment'     => 'environnement KKiaPay',
+            'providers'                                  => 'agrégateurs',
+            'default_provider'                           => 'agrégateur par défaut',
+            'fedapay_environment'                        => 'environnement FedaPay',
+            'kkiapay_environment'                        => 'environnement KKiaPay',
+            'fedapay_public_key_sandbox'                 => 'clé publique FedaPay (sandbox)',
+            'fedapay_secret_key_sandbox'                 => 'clé secrète FedaPay (sandbox)',
+            'fedapay_webhook_secret_sandbox'             => 'secret de webhook FedaPay (sandbox)',
+            'fedapay_public_key_production'              => 'clé publique FedaPay (production)',
+            'fedapay_secret_key_production'              => 'clé secrète FedaPay (production)',
+            'fedapay_webhook_secret_production'          => 'secret de webhook FedaPay (production)',
+            'kkiapay_public_key_sandbox'                 => 'clé publique KKiaPay (sandbox)',
+            'kkiapay_private_key_sandbox'                => 'clé privée KKiaPay (sandbox)',
+            'kkiapay_secret_sandbox'                     => 'secrète KKiaPay (sandbox)',
+            'kkiapay_public_key_production'              => 'clé publique KKiaPay (production)',
+            'kkiapay_private_key_production'             => 'clé privée KKiaPay (production)',
+            'kkiapay_secret_production'                  => 'secrète KKiaPay (production)',
         ]);
 
         $providers = array_values(array_unique($data['providers']));
