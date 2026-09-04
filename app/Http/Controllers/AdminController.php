@@ -1234,25 +1234,25 @@ $data = $this->validatedEventData($request);
         \App\Models\Setting::set('payment_providers_enabled', $providers);
         \App\Models\Setting::set('payment_provider_default', $default);
 
-        if (! empty($data['fedapay_public_key'])) {
-            \App\Models\Setting::set('fedapay_public_key', $data['fedapay_public_key']);
-        }
-        if (! empty($data['fedapay_secret_key'])) {
-            \App\Models\Setting::set('fedapay_secret_key', $data['fedapay_secret_key']);
-        }
-        if (! empty($data['fedapay_webhook_secret'])) {
-            \App\Models\Setting::set('fedapay_webhook_secret', $data['fedapay_webhook_secret']);
+        $fedKeys = ['public_key', 'secret_key', 'webhook_secret'];
+        foreach (['sandbox', 'production'] as $env) {
+            foreach ($fedKeys as $key) {
+                $field = "fedapay_{$key}_{$env}";
+                if (! empty($data[$field])) {
+                    \App\Models\Setting::set("fedapay_{$key}_{$env}", $data[$field]);
+                }
+            }
         }
         \App\Models\Setting::set('fedapay_environment', $data['fedapay_environment']);
 
-        if (! empty($data['kkiapay_public_key'])) {
-            \App\Models\Setting::set('kkiapay_public_key', $data['kkiapay_public_key']);
-        }
-        if (! empty($data['kkiapay_private_key'])) {
-            \App\Models\Setting::set('kkiapay_private_key', $data['kkiapay_private_key']);
-        }
-        if (! empty($data['kkiapay_secret'])) {
-            \App\Models\Setting::set('kkiapay_secret', $data['kkiapay_secret']);
+        $kkiaKeys = ['public_key', 'private_key', 'secret'];
+        foreach (['sandbox', 'production'] as $env) {
+            foreach ($kkiaKeys as $key) {
+                $field = "kkiapay_{$key}_{$env}";
+                if (! empty($data[$field])) {
+                    \App\Models\Setting::set("kkiapay_{$key}_{$env}", $data[$field]);
+                }
+            }
         }
         \App\Models\Setting::set('kkiapay_environment', $data['kkiapay_environment']);
 

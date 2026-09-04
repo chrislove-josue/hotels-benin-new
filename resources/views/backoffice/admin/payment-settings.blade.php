@@ -34,8 +34,7 @@
                     <span class="text-sm text-gray-700">
                         <span class="font-semibold text-hb-blue">FedaPay</span>
                         <span class="block text-xs text-gray-500">
-                            Environnement : <strong>{{ strtoupper($fedapay['environment'] ?? 'sandbox') }}</strong>
-                            @if(!$fedapay['public_key']) · <span class="text-red-500">clé publique absente</span>@endif
+                            Environnement actif : <strong>{{ strtoupper($fedapay['environment'] ?? 'sandbox') }}</strong>
                         </span>
                     </span>
                 </label>
@@ -44,7 +43,9 @@
                     <input type="checkbox" name="providers[]" value="kkiapay" class="h-5 w-5 accent-hb-blue" @checked(in_array('kkiapay', $enabled, true))>
                     <span class="text-sm text-gray-700">
                         <span class="font-semibold text-hb-blue">KKiaPay</span>
-                        <span class="block text-xs text-gray-500">Paiement par mobile money et carte bancaire.</span>
+                        <span class="block text-xs text-gray-500">
+                            Environnement actif : <strong>{{ strtoupper($kkiapay['environment'] ?? 'sandbox') }}</strong>
+                        </span>
                     </span>
                 </label>
             </div>
@@ -62,56 +63,70 @@
 
         {{-- Clés FedaPay --}}
         <div class="rounded-xl border border-gray-100 bg-hb-cream p-4">
-            <span class="mb-3 block text-xs font-semibold text-gray-500">Clés API FedaPay <span class="font-normal">(laisser vide pour conserver)</span></span>
-
-            <div class="space-y-3">
-                <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500">Clé publique</label>
-                    <input type="text" name="fedapay_public_key" value="{{ old('fedapay_public_key') }}" class="input-field" placeholder="{{ $fedapay['public_key'] ? '•••• (déjà configurée)' : 'Clé publique FedaPay' }}">
-                </div>
-                <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500">Clé secrète</label>
-                    <input type="text" name="fedapay_secret_key" value="{{ old('fedapay_secret_key') }}" class="input-field" placeholder="{{ $fedapay['secret_key'] ? '•••• (déjà configurée)' : 'Clé secrète FedaPay' }}">
-                </div>
-                <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500">Secret de webhook</label>
-                    <input type="text" name="fedapay_webhook_secret" value="{{ old('fedapay_webhook_secret') }}" class="input-field" placeholder="{{ $fedapay['webhook_secret'] ? '•••• (déjà configuré)' : 'Secret de webhook FedaPay' }}">
-                </div>
-                <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500">Environnement</label>
-                    <select name="fedapay_environment" class="input-field">
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs font-semibold text-gray-500">Clés API FedaPay <span class="font-normal">(laisser vide pour conserver)</span></span>
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                    <span class="font-medium">Environnement actif</span>
+                    <select name="fedapay_environment" class="input-field w-auto">
                         <option value="sandbox" @selected(($fedapay['environment'] ?? 'sandbox') === 'sandbox')>Sandbox (test)</option>
                         <option value="production" @selected(($fedapay['environment'] ?? 'sandbox') === 'production')>Production</option>
                     </select>
                 </div>
             </div>
+
+            @foreach(['sandbox' => 'Sandbox (test)', 'production' => 'Production'] as $envKey => $envLabel)
+                <div class="mb-4 rounded-lg border border-dashed border-gray-200 bg-white p-3">
+                    <span class="mb-2 block text-xs font-semibold text-hb-blue">{{ $envLabel }}</span>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-500">Clé publique</label>
+                            <input type="text" name="fedapay_public_key_{{ $envKey }}" value="{{ old('fedapay_public_key_'.$envKey) }}" class="input-field" placeholder="{{ $fedapay[$envKey]['public_key'] ? '•••• (déjà configurée)' : 'Clé publique FedaPay '.$envKey }}">
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-500">Clé secrète</label>
+                            <input type="text" name="fedapay_secret_key_{{ $envKey }}" value="{{ old('fedapay_secret_key_'.$envKey) }}" class="input-field" placeholder="{{ $fedapay[$envKey]['secret_key'] ? '•••• (déjà configurée)' : 'Clé secrète FedaPay '.$envKey }}">
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-500">Secret de webhook</label>
+                            <input type="text" name="fedapay_webhook_secret_{{ $envKey }}" value="{{ old('fedapay_webhook_secret_'.$envKey) }}" class="input-field" placeholder="{{ $fedapay[$envKey]['webhook_secret'] ? '•••• (déjà configuré)' : 'Secret de webhook FedaPay '.$envKey }}">
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
 
         {{-- Clés KKiaPay --}}
         <div class="rounded-xl border border-gray-100 bg-hb-cream p-4">
-            <span class="mb-3 block text-xs font-semibold text-gray-500">Clés API KKiaPay <span class="font-normal">(laisser vide pour conserver)</span></span>
-
-            <div class="space-y-3">
-                <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500">Clé publique</label>
-                    <input type="text" name="kkiapay_public_key" value="{{ old('kkiapay_public_key') }}" class="input-field" placeholder="{{ $kkiapay['public_key'] ? '•••• (déjà configurée)' : 'Clé publique KKiaPay' }}">
-                </div>
-                <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500">Clé privée</label>
-                    <input type="text" name="kkiapay_private_key" value="{{ old('kkiapay_private_key') }}" class="input-field" placeholder="{{ $kkiapay['private_key'] ? '•••• (déjà configurée)' : 'Clé privée KKiaPay' }}">
-                </div>
-                <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500">Secrète</label>
-                    <input type="text" name="kkiapay_secret" value="{{ old('kkiapay_secret') }}" class="input-field" placeholder="{{ $kkiapay['secret'] ? '•••• (déjà configurée)' : 'Secrète KKiaPay' }}">
-                </div>
-                <div>
-                    <label class="mb-1 block text-xs font-medium text-gray-500">Environnement</label>
-                    <select name="kkiapay_environment" class="input-field">
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs font-semibold text-gray-500">Clés API KKiaPay <span class="font-normal">(laisser vide pour conserver)</span></span>
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                    <span class="font-medium">Environnement actif</span>
+                    <select name="kkiapay_environment" class="input-field w-auto">
                         <option value="sandbox" @selected(($kkiapay['environment'] ?? 'sandbox') === 'sandbox')>Sandbox (test)</option>
                         <option value="production" @selected(($kkiapay['environment'] ?? 'sandbox') === 'production')>Production</option>
                     </select>
                 </div>
             </div>
+
+            @foreach(['sandbox' => 'Sandbox (test)', 'production' => 'Production'] as $envKey => $envLabel)
+                <div class="mb-4 rounded-lg border border-dashed border-gray-200 bg-white p-3">
+                    <span class="mb-2 block text-xs font-semibold text-hb-blue">{{ $envLabel }}</span>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-500">Clé publique</label>
+                            <input type="text" name="kkiapay_public_key_{{ $envKey }}" value="{{ old('kkiapay_public_key_'.$envKey) }}" class="input-field" placeholder="{{ $kkiapay[$envKey]['public_key'] ? '•••• (déjà configurée)' : 'Clé publique KKiaPay '.$envKey }}">
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-500">Clé privée</label>
+                            <input type="text" name="kkiapay_private_key_{{ $envKey }}" value="{{ old('kkiapay_private_key_'.$envKey) }}" class="input-field" placeholder="{{ $kkiapay[$envKey]['private_key'] ? '•••• (déjà configurée)' : 'Clé privée KKiaPay '.$envKey }}">
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-gray-500">Secrète</label>
+                            <input type="text" name="kkiapay_secret_{{ $envKey }}" value="{{ old('kkiapay_secret_'.$envKey) }}" class="input-field" placeholder="{{ $kkiapay[$envKey]['secret'] ? '•••• (déjà configurée)' : 'Secrète KKiaPay '.$envKey }}">
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
 
         <div class="flex flex-col gap-3 pt-2 sm:flex-row">
