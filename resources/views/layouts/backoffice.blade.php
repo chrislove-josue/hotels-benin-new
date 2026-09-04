@@ -89,77 +89,54 @@
     $isHote = auth()->user()?->isHote();
 @endphp
 
-<div x-data="{ sidebarOpen: false }" class="min-h-screen lg:flex">
+<div x-data="{ sidebarOpen: false, collapsed: false }" class="min-h-screen lg:flex">
 
     {{-- SIDEBAR --}}
-    <aside class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full transform bg-hb-blue-deeper text-white transition lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 {{ $isAdmin ? 'lg:flex' : 'lg:flex' }}" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-        <div class="flex h-full flex-col">
-            <a href="{{ route('home') }}" class="flex items-center gap-2.5 border-b border-white/10 px-6 py-5">
-<img src="{{ asset('storage/logo-or.png') }}" alt="Hôtels Bénin"
-         class="h-16 w-16 rounded-full ">
-                <div>
-                    <p class="font-display text-lg font-bold leading-none">Hôtels Bénin</p>
-                    <p class="mt-1 text-[11px] uppercase tracking-wider text-hb-gold">{{ $isAdmin ? 'Administration' : 'Espace hôte' }}</p>
-                </div>
-            </a>
+    <aside class="fixed inset-y-0 left-0 z-40 flex -translate-x-full transform bg-hb-blue-deeper text-white transition-all duration-300 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0" :class="(sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0') + (collapsed ? ' w-20' : ' w-72')">
+        <div class="flex h-full flex-col overflow-hidden">
+            <div class="flex items-center gap-2.5 border-b border-white/10 transition-all" :class="collapsed ? 'justify-center px-2 py-5' : 'justify-between px-6 py-5'">
+                <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-2.5">
+                    <img src="{{ asset('storage/logo-or.png') }}" alt="Hôtels Bénin"
+                         class="rounded-full transition-all" :class="collapsed ? 'h-10 w-10' : 'h-16 w-16'">
+                    <div x-show="!collapsed" class="min-w-0">
+                        <p class="font-display text-lg font-bold leading-none">Hôtels Bénin</p>
+                        <p class="mt-1 text-[11px] uppercase tracking-wider text-hb-gold">{{ $isAdmin ? 'Administration' : 'Espace hôte' }}</p>
+                    </div>
+                </a>
+                <button @click="collapsed = !collapsed" class="hidden shrink-0 items-center justify-center rounded-lg p-1.5 text-hb-gold hover:bg-white/10 lg:inline-flex" :title="collapsed ? 'Déplier le menu' : 'Replier le menu'" aria-label="Replier ou déplier le menu">
+                    <i class="bi text-lg" :class="collapsed ? 'bi-chevron-double-right' : 'bi-chevron-double-left'"></i>
+                </button>
+            </div>
 
-<nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-thin navig-scroll">
+            <nav class="navig-scroll flex-1 space-y-1 overflow-y-auto px-3 py-4">
                 @if($isAdmin)
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.dashboard') ? 'bg-hb-gold w-64 text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-speedometer2 text-lg"></i> Tableau de bord
-                    </a>
-                    <a href="{{ route('admin.establishments') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.establishments') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-building text-lg"></i> Établissements
-                    </a>
-                    <a href="{{ route('admin.users') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.users') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-people text-lg"></i> Utilisateurs
-                    </a>
-                    <a href="{{ route('admin.reservations') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.reservations') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-calendar-check text-lg"></i> Réservations
-                    </a>
-                    <a href="{{ route('admin.transactions') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.transactions') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-credit-card text-lg"></i> Transactions
-                    </a>
-                    <a href="{{ route('admin.payments.settings') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.payments.settings') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-wallet2 text-lg"></i> Paiements
-                    </a>
-<a href="{{ route('admin.messages') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.messages') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-envelope text-lg"></i> Messages
-                    </a>
-                    <a href="{{ route('admin.avis') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.avis*') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-star text-lg"></i> Avis
-                    </a>
-                    <a href="{{ route('admin.pending') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.pending') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-clipboard-check text-lg"></i> Modifications
-                    </a>
-                    <a href="{{ route('admin.events') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.events*') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-calendar-event text-lg"></i> Événements
-                    </a>
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.dashboard'), 'icon' => 'bi-speedometer2', 'label' => 'Tableau de bord', 'active' => request()->routeIs('admin.dashboard')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.establishments'), 'icon' => 'bi-building', 'label' => 'Établissements', 'active' => request()->routeIs('admin.establishments')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.users'), 'icon' => 'bi-people', 'label' => 'Utilisateurs', 'active' => request()->routeIs('admin.users')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.reservations'), 'icon' => 'bi-calendar-check', 'label' => 'Réservations', 'active' => request()->routeIs('admin.reservations')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.transactions'), 'icon' => 'bi-credit-card', 'label' => 'Transactions', 'active' => request()->routeIs('admin.transactions')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.payments.settings'), 'icon' => 'bi-wallet2', 'label' => 'Paiements', 'active' => request()->routeIs('admin.payments.settings')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.messages'), 'icon' => 'bi-envelope', 'label' => 'Messages', 'active' => request()->routeIs('admin.messages')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.avis'), 'icon' => 'bi-star', 'label' => 'Avis', 'active' => request()->routeIs('admin.avis*')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.pending'), 'icon' => 'bi-clipboard-check', 'label' => 'Modifications', 'active' => request()->routeIs('admin.pending')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('admin.events'), 'icon' => 'bi-calendar-event', 'label' => 'Événements', 'active' => request()->routeIs('admin.events*')])
                 @else
-                    <a href="{{ route('hote.dashboard') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('hote.dashboard') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-speedometer2 text-lg"></i> Tableau de bord
-                    </a>
-                    <a href="{{ route('hote.establishments.create') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition hover:bg-white/10">
-                        <i class="bi bi-plus-circle text-lg"></i> Nouvel établissement
-                    </a>
-                    <a href="{{ route('hote.reservations') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('hote.reservations') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-calendar-check text-lg"></i> Réservations
-                    </a>
-                    <a href="{{ route('hote.avis') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('hote.avis') ? 'bg-hb-gold text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
-                        <i class="bi bi-star text-lg"></i> Avis
-                    </a>
+                    @include('layouts.partials.sidebar-link', ['href' => route('hote.dashboard'), 'icon' => 'bi-speedometer2', 'label' => 'Tableau de bord', 'active' => request()->routeIs('hote.dashboard')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('hote.establishments.create'), 'icon' => 'bi-plus-circle', 'label' => 'Nouvel établissement', 'active' => false])
+                    @include('layouts.partials.sidebar-link', ['href' => route('hote.reservations'), 'icon' => 'bi-calendar-check', 'label' => 'Réservations', 'active' => request()->routeIs('hote.reservations')])
+                    @include('layouts.partials.sidebar-link', ['href' => route('hote.avis'), 'icon' => 'bi-star', 'label' => 'Avis', 'active' => request()->routeIs('hote.avis')])
                 @endif
             </nav>
 
             <div class="border-t border-white/10 p-4">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-hb-gold font-bold text-hb-blue-deeper">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
-                    <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-3" :class="collapsed ? 'justify-center' : 'justify-start'">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-hb-gold font-bold text-hb-blue-deeper">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                    <div x-show="!collapsed" class="min-w-0 flex-1">
                         <p class="truncate text-sm font-semibold">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-white/50">{{ auth()->user()->email }}</p>
+                        <p class="truncate text-xs text-white/50">{{ auth()->user()->email }}</p>
                     </div>
                 </div>
-                <a href="{{ route('home') }}" class="mt-3 flex items-center justify-center gap-1 text-center text-xs font-semibold text-hb-gold hover:underline"><i class="bi bi-arrow-left"></i> Retour au site</a>
+                <a href="{{ route('home') }}" x-show="!collapsed" class="mt-3 flex items-center justify-center gap-1 text-center text-xs font-semibold text-hb-gold hover:underline"><i class="bi bi-arrow-left"></i> Retour au site</a>
             </div>
         </div>
     </aside>
