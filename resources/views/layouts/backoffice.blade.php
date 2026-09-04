@@ -99,7 +99,7 @@
                 </div>
             </a>
 
-<nav class="flex-1 space-y-1 px-3 py-4">
+<nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-thin navig-scroll">
                 @if($isAdmin)
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition {{ request()->routeIs('admin.dashboard') ? 'bg-hb-gold w-64 text-hb-blue-deeper font-semibold' : 'text-white/80 hover:bg-white/10' }}">
                         <i class="bi bi-speedometer2 text-lg"></i> Tableau de bord
