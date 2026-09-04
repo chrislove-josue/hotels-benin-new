@@ -186,6 +186,7 @@ Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users');
     Route::get('/utilisateurs/{id}/modifier', [AdminController::class, 'editUser'])->name('users.edit');
     Route::put('/utilisateurs/{id}', [AdminController::class, 'updateUser'])->name('users.update');
     Route::delete('/utilisateurs/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+    Route::post('/utilisateurs/suppression-groupee', [AdminController::class, 'destroyUsersBulk'])->name('users.destroy.bulk');
     Route::patch('/utilisateurs/{id}/role', [AdminController::class, 'updateUserRole'])->name('users.role');
     Route::post('/utilisateurs/{id}/approuver', [AdminController::class, 'approveUser'])->name('users.approve');
     Route::post('/utilisateurs/{id}/rejeter', [AdminController::class, 'rejectUser'])->name('users.reject');

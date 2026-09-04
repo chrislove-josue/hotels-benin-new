@@ -680,6 +680,32 @@ public function transactions(Request $request)
     }
 
     /**
+     * Supprime plusieurs utilisateurs en une seule opération.
+     */
+    public function destroyUsersBulk(Request $request)
+    {
+        $raw = (string) $request->input('ids', '');
+
+        $ids = collect(explode(',', $raw))
+            ->map(fn ($v) => trim($v))
+            ->filter(fn ($v) => is_numeric($v))
+            ->map(fn ($v) => (int) $v)
+            ->unique()
+            ->values()
+            ->reject(fn ($id) => $id === auth()->id())
+            ->all();
+
+        if (empty($ids)) {
+            return back()->with('status', 'Aucun utilisateur sélectionné à supprimer.');
+        }
+
+        $count = User::whereIn('id', $ids)->count();
+        User::whereIn('id', $ids)->delete();
+
+        return back()->with('status', "{$count} utilisateur(s) supprimé(s).");
+    }
+
+    /**
      * Liste des modifications en attente d'approbation (hôtels + chambres).
      */
     public function pendingChanges()
