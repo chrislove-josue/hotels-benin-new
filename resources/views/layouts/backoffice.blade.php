@@ -72,6 +72,10 @@
             .badge-pill { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold; }
             .divider-gold { @apply mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-hb-gold to-hb-orange; }
             .animation-fade-up { animation: fadeUp 0.7s ease-out both; }
+            .navig-scroll::-webkit-scrollbar { width: 6px; }
+            .navig-scroll::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.4); border-radius: 9999px; }
+            .navig-scroll::-webkit-scrollbar-track { background: transparent; }
+            .navig-scroll { scrollbar-width: thin; scrollbar-color: rgba(212, 175, 55, 0.4) transparent; }
         }
     </style>
 
