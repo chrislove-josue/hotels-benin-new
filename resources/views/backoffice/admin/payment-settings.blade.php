@@ -62,9 +62,9 @@
         </div>
 
         {{-- Clés FedaPay --}}
-        <div class="rounded-xl border border-gray-100 bg-hb-cream p-4">
+        <div class="rounded-xl border border-gray-100 bg-hb-cream p-4" x-data="{ editing: false }">
             <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <span class="text-xs font-semibold text-gray-500">Clés API FedaPay <span class="font-normal">(laisser vide pour conserver)</span></span>
+                <span class="text-xs font-semibold text-gray-500">Clés API FedaPay</span>
                 <div class="flex items-center gap-2 text-xs text-gray-500">
                     <span class="font-medium">Environnement actif</span>
                     <select name="fedapay_environment" class="input-field w-auto">
@@ -74,31 +74,47 @@
                 </div>
             </div>
 
+            <div class="mb-3 text-right">
+                <button type="button" @click="editing = !editing"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-hb-blue px-3 py-1.5 text-xs font-semibold text-hb-blue transition hover:bg-hb-blue hover:text-white">
+                    <i class="bi" :class="editing ? 'bi-x-lg' : 'bi-pencil-square'"></i>
+                    <span x-text="editing ? 'Fermer l\'édition' : 'Activer la modification'"></span>
+                </button>
+            </div>
+
             @foreach(['sandbox' => 'Sandbox (test)', 'production' => 'Production'] as $envKey => $envLabel)
                 <div class="mb-4 rounded-lg border border-dashed border-gray-200 bg-white p-3">
                     <span class="mb-2 block text-xs font-semibold text-hb-blue">{{ $envLabel }}</span>
                     <div class="space-y-3">
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-500">Clé publique</label>
-                            <input type="text" name="fedapay_public_key_{{ $envKey }}" value="{{ old('fedapay_public_key_'.$envKey) }}" class="input-field" placeholder="{{ $fedapay[$envKey]['public_key'] ? '•••• (déjà configurée)' : 'Clé publique FedaPay '.$envKey }}">
+                            <input type="text" name="fedapay_public_key_{{ $envKey }}" value="{{ old('fedapay_public_key_'.$envKey, $fedapay[$envKey]['public_key'] ?? '') }}"
+                                class="input-field font-mono" :readonly="!editing"
+                                :class="editing ? '' : 'opacity-75 cursor-not-allowed'">
                         </div>
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-500">Clé secrète</label>
-                            <input type="text" name="fedapay_secret_key_{{ $envKey }}" value="{{ old('fedapay_secret_key_'.$envKey) }}" class="input-field" placeholder="{{ $fedapay[$envKey]['secret_key'] ? '•••• (déjà configurée)' : 'Clé secrète FedaPay '.$envKey }}">
+                            <input type="text" name="fedapay_secret_key_{{ $envKey }}" value="{{ old('fedapay_secret_key_'.$envKey, $fedapay[$envKey]['secret_key'] ?? '') }}"
+                                class="input-field font-mono" :readonly="!editing"
+                                :class="editing ? '' : 'opacity-75 cursor-not-allowed'">
                         </div>
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-500">Secret de webhook</label>
-                            <input type="text" name="fedapay_webhook_secret_{{ $envKey }}" value="{{ old('fedapay_webhook_secret_'.$envKey) }}" class="input-field" placeholder="{{ $fedapay[$envKey]['webhook_secret'] ? '•••• (déjà configuré)' : 'Secret de webhook FedaPay '.$envKey }}">
+                            <input type="text" name="fedapay_webhook_secret_{{ $envKey }}" value="{{ old('fedapay_webhook_secret_'.$envKey, $fedapay[$envKey]['webhook_secret'] ?? '') }}"
+                                class="input-field font-mono" :readonly="!editing"
+                                :class="editing ? '' : 'opacity-75 cursor-not-allowed'">
                         </div>
                     </div>
                 </div>
             @endforeach
+
+            <p class="text-xs text-gray-400">Les champs sont en lecture seule par défaut. Cliquez sur « Activer la modification » pour éditer les clés.</p>
         </div>
 
         {{-- Clés KKiaPay --}}
-        <div class="rounded-xl border border-gray-100 bg-hb-cream p-4">
+        <div class="rounded-xl border border-gray-100 bg-hb-cream p-4" x-data="{ editing: false }">
             <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <span class="text-xs font-semibold text-gray-500">Clés API KKiaPay <span class="font-normal">(laisser vide pour conserver)</span></span>
+                <span class="text-xs font-semibold text-gray-500">Clés API KKiaPay</span>
                 <div class="flex items-center gap-2 text-xs text-gray-500">
                     <span class="font-medium">Environnement actif</span>
                     <select name="kkiapay_environment" class="input-field w-auto">
@@ -108,25 +124,41 @@
                 </div>
             </div>
 
+            <div class="mb-3 text-right">
+                <button type="button" @click="editing = !editing"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-hb-blue px-3 py-1.5 text-xs font-semibold text-hb-blue transition hover:bg-hb-blue hover:text-white">
+                    <i class="bi" :class="editing ? 'bi-x-lg' : 'bi-pencil-square'"></i>
+                    <span x-text="editing ? 'Fermer l\'édition' : 'Activer la modification'"></span>
+                </button>
+            </div>
+
             @foreach(['sandbox' => 'Sandbox (test)', 'production' => 'Production'] as $envKey => $envLabel)
                 <div class="mb-4 rounded-lg border border-dashed border-gray-200 bg-white p-3">
                     <span class="mb-2 block text-xs font-semibold text-hb-blue">{{ $envLabel }}</span>
                     <div class="space-y-3">
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-500">Clé publique</label>
-                            <input type="text" name="kkiapay_public_key_{{ $envKey }}" value="{{ old('kkiapay_public_key_'.$envKey) }}" class="input-field" placeholder="{{ $kkiapay[$envKey]['public_key'] ? '•••• (déjà configurée)' : 'Clé publique KKiaPay '.$envKey }}">
+                            <input type="text" name="kkiapay_public_key_{{ $envKey }}" value="{{ old('kkiapay_public_key_'.$envKey, $kkiapay[$envKey]['public_key'] ?? '') }}"
+                                class="input-field font-mono" :readonly="!editing"
+                                :class="editing ? '' : 'opacity-75 cursor-not-allowed'">
                         </div>
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-500">Clé privée</label>
-                            <input type="text" name="kkiapay_private_key_{{ $envKey }}" value="{{ old('kkiapay_private_key_'.$envKey) }}" class="input-field" placeholder="{{ $kkiapay[$envKey]['private_key'] ? '•••• (déjà configurée)' : 'Clé privée KKiaPay '.$envKey }}">
+                            <input type="text" name="kkiapay_private_key_{{ $envKey }}" value="{{ old('kkiapay_private_key_'.$envKey, $kkiapay[$envKey]['private_key'] ?? '') }}"
+                                class="input-field font-mono" :readonly="!editing"
+                                :class="editing ? '' : 'opacity-75 cursor-not-allowed'">
                         </div>
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-500">Secrète</label>
-                            <input type="text" name="kkiapay_secret_{{ $envKey }}" value="{{ old('kkiapay_secret_'.$envKey) }}" class="input-field" placeholder="{{ $kkiapay[$envKey]['secret'] ? '•••• (déjà configurée)' : 'Secrète KKiaPay '.$envKey }}">
+                            <input type="text" name="kkiapay_secret_{{ $envKey }}" value="{{ old('kkiapay_secret_'.$envKey, $kkiapay[$envKey]['secret'] ?? '') }}"
+                                class="input-field font-mono" :readonly="!editing"
+                                :class="editing ? '' : 'opacity-75 cursor-not-allowed'">
                         </div>
                     </div>
                 </div>
             @endforeach
+
+            <p class="text-xs text-gray-400">Les clés sont affichées en clair dans les champs, en lecture seule par défaut.</p>
         </div>
 
         <div class="flex flex-col gap-3 pt-2 sm:flex-row">

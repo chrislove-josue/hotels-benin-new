@@ -1148,35 +1148,35 @@ $data = $this->validatedEventData($request);
      */
     public function paymentSettings()
     {
-        $fed = \App\Support\PaymentProvider::class;
+        $set = \App\Models\Setting::class;
 
         return view('backoffice.admin.payment-settings', [
             'enabled'        => \App\Support\PaymentProvider::enabledProviders(),
             'default'        => \App\Support\PaymentProvider::defaultProvider(),
             'fedapay'        => [
-                'environment' => $fed::fedapayEnvironment(),
+                'environment' => \App\Support\PaymentProvider::fedapayEnvironment(),
                 'sandbox'     => [
-                    'public_key'     => $fed::fedapayKey('public_key', 'sandbox'),
-                    'secret_key'     => $fed::fedapayKey('secret_key', 'sandbox'),
-                    'webhook_secret' => $fed::fedapayKey('webhook_secret', 'sandbox'),
+                    'public_key'     => $set::get('fedapay_public_key_sandbox'),
+                    'secret_key'     => $set::get('fedapay_secret_key_sandbox'),
+                    'webhook_secret' => $set::get('fedapay_webhook_secret_sandbox'),
                 ],
                 'production'  => [
-                    'public_key'     => $fed::fedapayKey('public_key', 'production'),
-                    'secret_key'     => $fed::fedapayKey('secret_key', 'production'),
-                    'webhook_secret' => $fed::fedapayKey('webhook_secret', 'production'),
+                    'public_key'     => $set::get('fedapay_public_key_production'),
+                    'secret_key'     => $set::get('fedapay_secret_key_production'),
+                    'webhook_secret' => $set::get('fedapay_webhook_secret_production'),
                 ],
             ],
             'kkiapay'        => [
-                'environment' => $fed::kkiapayEnvironment(),
+                'environment' => \App\Support\PaymentProvider::kkiapayEnvironment(),
                 'sandbox'     => [
-                    'public_key'  => $fed::kkiapayKey('public_key', 'sandbox'),
-                    'private_key' => $fed::kkiapayKey('private_key', 'sandbox'),
-                    'secret'      => $fed::kkiapayKey('secret', 'sandbox'),
+                    'public_key'  => $set::get('kkiapay_public_key_sandbox'),
+                    'private_key' => $set::get('kkiapay_private_key_sandbox'),
+                    'secret'      => $set::get('kkiapay_secret_sandbox'),
                 ],
                 'production'  => [
-                    'public_key'  => $fed::kkiapayKey('public_key', 'production'),
-                    'private_key' => $fed::kkiapayKey('private_key', 'production'),
-                    'secret'      => $fed::kkiapayKey('secret', 'production'),
+                    'public_key'  => $set::get('kkiapay_public_key_production'),
+                    'private_key' => $set::get('kkiapay_private_key_production'),
+                    'secret'      => $set::get('kkiapay_secret_production'),
                 ],
             ],
         ]);
