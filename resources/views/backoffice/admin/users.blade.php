@@ -49,9 +49,38 @@
 
 @php
     $initialTab = request('role') === 'voyageur' ? 'voyageurs' : (request('role') === 'admin' ? 'admins' : 'hotes');
+    $hostIds = $hosts->pluck('id')->values();
+    $voyageurIds = $voyageurs->pluck('id')->values();
+    $adminIds = $admins->pluck('id')->reject(fn ($id) => $id === auth()->id())->values();
 @endphp
 
-<div x-data="{ tab: '{{ $initialTab }}' }">
+<div x-data="{
+    tab: '{{ $initialTab }}',
+    selected: [],
+
+    toggleAll(ids, checked) {
+        ids = Array.from(new Set(ids.map(Number)));
+        if (checked) {
+            this.selected = Array.from(new Set([...this.selected, ...ids]));
+        } else {
+            this.selected = this.selected.filter(id => !ids.includes(id));
+        }
+    },
+
+    isAllChecked(ids) {
+        ids = Array.from(new Set(ids.map(Number)));
+        return ids.length > 0 && ids.every(id => this.selected.includes(id));
+    },
+
+    submitBulk() {
+        let ids = Array.from(new Set(this.selected.map(Number))).filter(id => id > 0);
+        if (ids.length === 0) return;
+        if (!confirm('Supprimer définitivement ' + ids.length + ' utilisateur(s) sélectionné(s) ?')) return;
+        document.getElementById('bulk-ids').value = ids.join(',');
+        document.getElementById('bulk-delete-form').submit();
+    }
+}">
+
     {{-- Onglets --}}
     <div class="mb-4 flex flex-wrap gap-2">
         <button type="button" x-on:click="tab = 'hotes'"
@@ -71,12 +100,31 @@
         </button>
     </div>
 
+    {{-- Barre de suppression groupée --}}
+    <div x-show="selected.length > 0" x-cloak
+         class="mb-4 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm font-semibold text-red-700">
+            <i class="bi bi-check2-square"></i> <span x-text="selected.length"></span> utilisateur(s) sélectionné(s)
+        </p>
+        <div class="flex items-center gap-2">
+            <button type="button" @click="selected = []" class="btn-outline !px-4 !py-2 text-xs">Annuler la sélection</button>
+            <button type="button" @click="submitBulk()" class="btn-danger !px-4 !py-2 text-xs">
+                <i class="bi bi-trash"></i> Supprimer la sélection
+            </button>
+        </div>
+    </div>
+
     {{-- ======== TABLEAU DES HÔTES ======== --}}
     <div x-show="tab === 'hotes'" x-cloak>
         <div class="card overflow-x-auto">
             <table class="w-full min-w-[1000px] text-left text-sm">
                 <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
                     <tr>
+                        <th class="px-5 py-3">
+                            <input type="checkbox" class="h-4 w-4 accent-hb-blue"
+                                   :checked="isAllChecked({{ $hostIds->toJson() }})"
+                                   @change="toggleAll({{ $hostIds->toJson() }}, $event.target.checked)">
+                        </th>
                         <th class="px-5 py-3">Rang</th>
                         <th class="px-5 py-3">Hôte</th>
                         <th class="px-5 py-3">Téléphone</th>
@@ -91,6 +139,9 @@
                 <tbody class="divide-y divide-gray-50">
                     @forelse($hosts as $user)
                         <tr class="hover:bg-hb-cream/50">
+                            <td class="px-5 py-3">
+                                <input type="checkbox" class="h-4 w-4 accent-hb-blue" value="{{ $user->id }}" x-model="selected">
+                            </td>
                             <td class="px-5 py-3">
                                 @if($loop->index === 0)
                                     <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-hb-gold to-hb-orange text-sm text-white"><i class="bi bi-trophy"></i></span>
@@ -130,7 +181,7 @@
                             <td class="px-5 py-3">@include('backoffice.admin.partials.user-actions', ['user' => $user])</td>
                         </tr>
                     @empty
-                        <tr><td colspan="9" class="px-5 py-8 text-center text-gray-400">Aucun hôte.</td></tr>
+                        <tr><td colspan="10" class="px-5 py-8 text-center text-gray-400">Aucun hôte.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -143,6 +194,11 @@
             <table class="w-full min-w-[900px] text-left text-sm">
                 <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
                     <tr>
+                        <th class="px-5 py-3">
+                            <input type="checkbox" class="h-4 w-4 accent-hb-blue"
+                                   :checked="isAllChecked({{ $voyageurIds->toJson() }})"
+                                   @change="toggleAll({{ $voyageurIds->toJson() }}, $event.target.checked)">
+                        </th>
                         <th class="px-5 py-3">Rang</th>
                         <th class="px-5 py-3">Voyageur</th>
                         <th class="px-5 py-3">Téléphone</th>
@@ -155,6 +211,9 @@
                 <tbody class="divide-y divide-gray-50">
                     @forelse($voyageurs as $user)
                         <tr class="hover:bg-hb-cream/50">
+                            <td class="px-5 py-3">
+                                <input type="checkbox" class="h-4 w-4 accent-hb-blue" value="{{ $user->id }}" x-model="selected">
+                            </td>
                             <td class="px-5 py-3">
                                 @if($loop->index === 0)
                                     <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-hb-gold to-hb-orange text-sm text-white"><i class="bi bi-trophy"></i></span>
@@ -198,7 +257,7 @@
                             <td class="px-5 py-3">@include('backoffice.admin.partials.user-actions', ['user' => $user])</td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="px-5 py-8 text-center text-gray-400">Aucun voyageur.</td></tr>
+                        <tr><td colspan="8" class="px-5 py-8 text-center text-gray-400">Aucun voyageur.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -211,6 +270,11 @@
             <table class="w-full min-w-[700px] text-left text-sm">
                 <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
                     <tr>
+                        <th class="px-5 py-3">
+                            <input type="checkbox" class="h-4 w-4 accent-hb-blue"
+                                   :checked="isAllChecked({{ $adminIds->toJson() }})"
+                                   @change="toggleAll({{ $adminIds->toJson() }}, $event.target.checked)">
+                        </th>
                         <th class="px-5 py-3">Administrateur</th>
                         <th class="px-5 py-3">Téléphone</th>
                         <th class="px-5 py-3">Inscrit le</th>
@@ -220,6 +284,13 @@
                 <tbody class="divide-y divide-gray-50">
                     @forelse($admins as $user)
                         <tr class="hover:bg-hb-cream/50">
+                            <td class="px-5 py-3">
+                                @if($user->id !== auth()->id())
+                                    <input type="checkbox" class="h-4 w-4 accent-hb-blue" value="{{ $user->id }}" x-model="selected">
+                                @else
+                                    <span class="inline-block h-4 w-4"></span>
+                                @endif
+                            </td>
                             <td class="px-5 py-3">
                                 <div class="flex items-center gap-3">
                                     <div class="flex h-9 w-9 items-center justify-center rounded-full bg-hb-gold/20 text-sm font-bold text-hb-blue">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
@@ -244,11 +315,17 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="px-5 py-8 text-center text-gray-400">Aucun administrateur.</td></tr>
+                        <tr><td colspan="5" class="px-5 py-8 text-center text-gray-400">Aucun administrateur.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+{{-- Formulaire caché de soumission pour la suppression groupée --}}
+<form id="bulk-delete-form" method="POST" action="{{ route('admin.users.destroy.bulk') }}" class="hidden">
+    @csrf
+    <input type="hidden" id="bulk-ids" name="ids">
+</form>
 @endsection

@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Utilisateurs — Administration'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -49,9 +47,38 @@
 
 <?php
     $initialTab = request('role') === 'voyageur' ? 'voyageurs' : (request('role') === 'admin' ? 'admins' : 'hotes');
+    $hostIds = $hosts->pluck('id')->values();
+    $voyageurIds = $voyageurs->pluck('id')->values();
+    $adminIds = $admins->pluck('id')->reject(fn ($id) => $id === auth()->id())->values();
 ?>
 
-<div x-data="{ tab: '<?php echo e($initialTab); ?>' }">
+<div x-data="{
+    tab: '<?php echo e($initialTab); ?>',
+    selected: [],
+
+    toggleAll(ids, checked) {
+        ids = Array.from(new Set(ids.map(Number)));
+        if (checked) {
+            this.selected = Array.from(new Set([...this.selected, ...ids]));
+        } else {
+            this.selected = this.selected.filter(id => !ids.includes(id));
+        }
+    },
+
+    isAllChecked(ids) {
+        ids = Array.from(new Set(ids.map(Number)));
+        return ids.length > 0 && ids.every(id => this.selected.includes(id));
+    },
+
+    submitBulk() {
+        let ids = Array.from(new Set(this.selected.map(Number))).filter(id => id > 0);
+        if (ids.length === 0) return;
+        if (!confirm('Supprimer définitivement ' + ids.length + ' utilisateur(s) sélectionné(s) ?')) return;
+        document.getElementById('bulk-ids').value = ids.join(',');
+        document.getElementById('bulk-delete-form').submit();
+    }
+}">
+
     
     <div class="mb-4 flex flex-wrap gap-2">
         <button type="button" x-on:click="tab = 'hotes'"
@@ -72,11 +99,30 @@
     </div>
 
     
+    <div x-show="selected.length > 0" x-cloak
+         class="mb-4 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm font-semibold text-red-700">
+            <i class="bi bi-check2-square"></i> <span x-text="selected.length"></span> utilisateur(s) sélectionné(s)
+        </p>
+        <div class="flex items-center gap-2">
+            <button type="button" @click="selected = []" class="btn-outline !px-4 !py-2 text-xs">Annuler la sélection</button>
+            <button type="button" @click="submitBulk()" class="btn-danger !px-4 !py-2 text-xs">
+                <i class="bi bi-trash"></i> Supprimer la sélection
+            </button>
+        </div>
+    </div>
+
+    
     <div x-show="tab === 'hotes'" x-cloak>
         <div class="card overflow-x-auto">
             <table class="w-full min-w-[1000px] text-left text-sm">
                 <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
                     <tr>
+                        <th class="px-5 py-3">
+                            <input type="checkbox" class="h-4 w-4 accent-hb-blue"
+                                   :checked="isAllChecked(<?php echo e($hostIds->toJson()); ?>)"
+                                   @change="toggleAll(<?php echo e($hostIds->toJson()); ?>, $event.target.checked)">
+                        </th>
                         <th class="px-5 py-3">Rang</th>
                         <th class="px-5 py-3">Hôte</th>
                         <th class="px-5 py-3">Téléphone</th>
@@ -91,6 +137,9 @@
                 <tbody class="divide-y divide-gray-50">
                     <?php $__empty_1 = true; $__currentLoopData = $hosts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-hb-cream/50">
+                            <td class="px-5 py-3">
+                                <input type="checkbox" class="h-4 w-4 accent-hb-blue" value="<?php echo e($user->id); ?>" x-model="selected">
+                            </td>
                             <td class="px-5 py-3">
                                 <?php if($loop->index === 0): ?>
                                     <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-hb-gold to-hb-orange text-sm text-white"><i class="bi bi-trophy"></i></span>
@@ -130,7 +179,7 @@
                             <td class="px-5 py-3"><?php echo $__env->make('backoffice.admin.partials.user-actions', ['user' => $user], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?></td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                        <tr><td colspan="9" class="px-5 py-8 text-center text-gray-400">Aucun hôte.</td></tr>
+                        <tr><td colspan="10" class="px-5 py-8 text-center text-gray-400">Aucun hôte.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -143,6 +192,11 @@
             <table class="w-full min-w-[900px] text-left text-sm">
                 <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
                     <tr>
+                        <th class="px-5 py-3">
+                            <input type="checkbox" class="h-4 w-4 accent-hb-blue"
+                                   :checked="isAllChecked(<?php echo e($voyageurIds->toJson()); ?>)"
+                                   @change="toggleAll(<?php echo e($voyageurIds->toJson()); ?>, $event.target.checked)">
+                        </th>
                         <th class="px-5 py-3">Rang</th>
                         <th class="px-5 py-3">Voyageur</th>
                         <th class="px-5 py-3">Téléphone</th>
@@ -155,6 +209,9 @@
                 <tbody class="divide-y divide-gray-50">
                     <?php $__empty_1 = true; $__currentLoopData = $voyageurs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-hb-cream/50">
+                            <td class="px-5 py-3">
+                                <input type="checkbox" class="h-4 w-4 accent-hb-blue" value="<?php echo e($user->id); ?>" x-model="selected">
+                            </td>
                             <td class="px-5 py-3">
                                 <?php if($loop->index === 0): ?>
                                     <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-hb-gold to-hb-orange text-sm text-white"><i class="bi bi-trophy"></i></span>
@@ -199,7 +256,7 @@
                             <td class="px-5 py-3"><?php echo $__env->make('backoffice.admin.partials.user-actions', ['user' => $user], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?></td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                        <tr><td colspan="7" class="px-5 py-8 text-center text-gray-400">Aucun voyageur.</td></tr>
+                        <tr><td colspan="8" class="px-5 py-8 text-center text-gray-400">Aucun voyageur.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -212,6 +269,11 @@
             <table class="w-full min-w-[700px] text-left text-sm">
                 <thead class="border-b border-gray-100 bg-hb-cream text-xs uppercase tracking-wide text-gray-500">
                     <tr>
+                        <th class="px-5 py-3">
+                            <input type="checkbox" class="h-4 w-4 accent-hb-blue"
+                                   :checked="isAllChecked(<?php echo e($adminIds->toJson()); ?>)"
+                                   @change="toggleAll(<?php echo e($adminIds->toJson()); ?>, $event.target.checked)">
+                        </th>
                         <th class="px-5 py-3">Administrateur</th>
                         <th class="px-5 py-3">Téléphone</th>
                         <th class="px-5 py-3">Inscrit le</th>
@@ -221,6 +283,13 @@
                 <tbody class="divide-y divide-gray-50">
                     <?php $__empty_1 = true; $__currentLoopData = $admins; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-hb-cream/50">
+                            <td class="px-5 py-3">
+                                <?php if($user->id !== auth()->id()): ?>
+                                    <input type="checkbox" class="h-4 w-4 accent-hb-blue" value="<?php echo e($user->id); ?>" x-model="selected">
+                                <?php else: ?>
+                                    <span class="inline-block h-4 w-4"></span>
+                                <?php endif; ?>
+                            </td>
                             <td class="px-5 py-3">
                                 <div class="flex items-center gap-3">
                                     <div class="flex h-9 w-9 items-center justify-center rounded-full bg-hb-gold/20 text-sm font-bold text-hb-blue"><?php echo e(strtoupper(substr($user->name, 0, 1))); ?></div>
@@ -246,13 +315,19 @@
                             </td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                        <tr><td colspan="4" class="px-5 py-8 text-center text-gray-400">Aucun administrateur.</td></tr>
+                        <tr><td colspan="5" class="px-5 py-8 text-center text-gray-400">Aucun administrateur.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+
+<form id="bulk-delete-form" method="POST" action="<?php echo e(route('admin.users.destroy.bulk')); ?>" class="hidden">
+    <?php echo csrf_field(); ?>
+    <input type="hidden" id="bulk-ids" name="ids">
+</form>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.backoffice', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Project\hotels-benin-new\resources\views/backoffice/admin/users.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.backoffice', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Project\hotels-benin-new\resources\views\backoffice\admin\users.blade.php ENDPATH**/ ?>

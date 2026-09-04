@@ -7,4 +7,4 @@
     <i class="bi <?php echo e($icon); ?> text-lg"></i>
     <span class="whitespace-nowrap" x-show="!collapsed"><?php echo e($label); ?></span>
 </a>
-<?php /**PATH C:\Project\hotels-benin-new\resources\views/layouts/partials/sidebar-link.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Project\hotels-benin-new\resources\views\layouts\partials\sidebar-link.blade.php ENDPATH**/ ?>

@@ -40,4 +40,4 @@
         </form>
     <?php endif; ?>
 </div>
-<?php /**PATH C:\Project\hotels-benin-new\resources\views/backoffice/admin/partials/user-actions.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Project\hotels-benin-new\resources\views\backoffice\admin\partials\user-actions.blade.php ENDPATH**/ ?>
