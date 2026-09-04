@@ -1243,3 +1243,4 @@ Did you mean one of these?
 #50 {main}
 "} 
 [2026-09-04 08:09:16] local.ERROR: Erreur création transaction FedaPay {"reservation":"HB-T75RHFAH","error":"La création de la transaction a échoué","http":400,"body":{"message":"La création de la transaction a échoué","errors":{"amount":["Le montant maximum de transactions autorisées est 5000."]},"model":"V1::Transaction"}} 
+[2026-09-04 08:13:44] local.ERROR: Erreur création transaction FedaPay {"reservation":"HB-T75RHFAH","error":"La création de la transaction a échoué","http":400,"body":{"message":"La création de la transaction a échoué","errors":{"amount":["Le montant maximum de transactions autorisées est 300000."]},"model":"V1::Transaction"}} 
