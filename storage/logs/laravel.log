@@ -1758,3 +1758,127 @@ Did you mean one of these?
 #49 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('C://Project//hote...')
 #50 {main}
 "} 
+[2026-09-05 11:20:18] local.DEBUG: From: =?utf-8?Q?H=C3=B4tels_B=C3=A9nin?= <nestor@trueline-system.com>
+To: test-magic@example.com
+Subject: Bienvenue sur =?utf-8?Q?H=C3=B4tels_B=C3=A9nin_=E2=80=94?= vos
+ identifiants de connexion
+MIME-Version: 1.0
+Date: Sat, 05 Sep 2026 11:20:17 +0100
+Message-ID: <cc031d03ab058f652c0588614771e852@trueline-system.com>
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Vos identifiants de connexion</title>
+</head>
+<body style="font-family: Arial, sans-serif; color:#1A3A6B; background:#FBF8F1; padding:24px;">
+    <div style="max-width:520px; margin:0 auto; background:#ffffff; border-radius:12px; padding:32px; border:1px solid #eee2c9;">
+        <h2 style="color:#1A3A6B; margin-top:0;">Bonjour Test Magic,</h2>
+
+        <p>Votre compte <strong>Hôtels Bénin</strong> a bien été créé. Voici vos informations de connexion :</p>
+
+        <table style="width:100%; border-collapse:collapse; margin:20px 0; font-size:14px;">
+            <tr>
+                <td style="padding:8px 12px; border:1px solid #eee2c9; color:#888; width:40%;">Nom complet</td>
+                <td style="padding:8px 12px; border:1px solid #eee2c9; font-weight:bold;">Test Magic</td>
+            </tr>
+            <tr>
+                <td style="padding:8px 12px; border:1px solid #eee2c9; color:#888;">Profil</td>
+                <td style="padding:8px 12px; border:1px solid #eee2c9;">
+                    Voyageur
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:8px 12px; border:1px solid #eee2c9; color:#888;">Adresse e-mail</td>
+                <td style="padding:8px 12px; border:1px solid #eee2c9; font-weight:bold;">test-magic@example.com</td>
+            </tr>
+            <tr>
+                <td style="padding:8px 12px; border:1px solid #eee2c9; color:#888;">Téléphone</td>
+                <td style="padding:8px 12px; border:1px solid #eee2c9;">—</td>
+            </tr>
+            <tr>
+                <td style="padding:8px 12px; border:1px solid #eee2c9; color:#888;">Mot de passe</td>
+                <td style="padding:8px 12px; border:1px solid #eee2c9; font-weight:bold;">P@ssw0rd-T3st</td>
+            </tr>
+        </table>
+
+        <p>Cliquez sur le bouton ci-dessous pour <strong>valider votre compte</strong> et accéder directement à votre espace.
+        Ce lien est valable <strong>24 heures</strong> et ne peut être utilisé qu'une seule fois.</p>
+
+        <p style="text-align:center; margin:28px 0;">
+            <a href="http://localhost:8000/compte/valider/rrRVhbply5xg16yv8vkaVOLXIwlu1qKeRhbTGZwcpctYwqKI"
+               style="display:inline-block; background:#1A3A6B; color:#D4AF37; text-decoration:none;
+                      font-weight:bold; padding:14px 28px; border-radius:10px;">
+                Valider mon compte et me connecter
+            </a>
+        </p>
+
+        <p>Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :</p>
+        <p style="word-break:break-all;"><a href="http://localhost:8000/compte/valider/rrRVhbply5xg16yv8vkaVOLXIwlu1qKeRhbTGZwcpctYwqKI" style="color:#F59A23;">http://localhost:8000/compte/valider/rrRVhbply5xg16yv8vkaVOLXIwlu1qKeRhbTGZwcpctYwqKI</a></p>
+
+        <p style="margin-bottom:0;">Vous pourrez ensuite vous connecter avec votre adresse e-mail et le mot de passe ci-dessus.</p>
+
+        <p style="margin-bottom:0; font-size:13px; color:#888; margin-top:16px;">
+            L'équipe Hôtels Bénin
+        </p>
+    </div>
+</body>
+</html>
+  
+[2026-09-05 11:21:02] local.ERROR: Route [login] not defined. {"exception":"[object] (Symfony\\Component\\Routing\\Exception\\RouteNotFoundException(code: 0): Route [login] not defined. at C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:542)
+[stacktrace]
+#0 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php(870): Illuminate/Routing/UrlGenerator->route('login', Array, true)
+#1 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Configuration/ApplicationBuilder.php(291): route('login')
+#2 [internal function]: Illuminate/Foundation/Configuration/ApplicationBuilder->{closure:{closure:Illuminate/Foundation/Configuration/ApplicationBuilder::withMiddleware():289}:291}(Object(Illuminate/Http/Request))
+#3 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(117): call_user_func(Object(Closure), Object(Illuminate/Http/Request))
+#4 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(104): Illuminate/Auth/Middleware/Authenticate->redirectTo(Object(Illuminate/Http/Request))
+#5 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(87): Illuminate/Auth/Middleware/Authenticate->unauthenticated(Object(Illuminate/Http/Request), Array)
+#6 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(61): Illuminate/Auth/Middleware/Authenticate->authenticate(Object(Illuminate/Http/Request), Array)
+#7 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Auth/Middleware/Authenticate->handle(Object(Illuminate/Http/Request), Object(Closure))
+#8 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php(104): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#9 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/PreventRequestForgery->handle(Object(Illuminate/Http/Request), Object(Closure))
+#10 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(48): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#11 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/View/Middleware/ShareErrorsFromSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#12 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(120): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#13 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(63): Illuminate/Session/Middleware/StartSession->handleStatefulRequest(Object(Illuminate/Http/Request), Object(Illuminate/Session/Store), Object(Closure))
+#14 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Session/Middleware/StartSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#15 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(36): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#16 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse->handle(Object(Illuminate/Http/Request), Object(Closure))
+#17 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(74): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#18 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Cookie/Middleware/EncryptCookies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#19 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#20 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#21 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate/Routing/Router->runRouteWithinStack(Object(Illuminate/Routing/Route), Object(Illuminate/Http/Request))
+#22 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate/Routing/Router->runRoute(Object(Illuminate/Http/Request), Object(Illuminate/Routing/Route))
+#23 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate/Routing/Router->dispatchToRoute(Object(Illuminate/Http/Request))
+#24 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate/Routing/Router->dispatch(Object(Illuminate/Http/Request))
+#25 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate/Foundation/Http/Kernel->{closure:Illuminate/Foundation/Http/Kernel::dispatchToRouter():197}(Object(Illuminate/Http/Request))
+#26 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->{closure:Illuminate/Pipeline/Pipeline::prepareDestination():178}(Object(Illuminate/Http/Request))
+#27 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#28 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull->handle(Object(Illuminate/Http/Request), Object(Closure))
+#29 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#30 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#31 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/TrimStrings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#32 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#33 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/ValidatePostSize->handle(Object(Illuminate/Http/Request), Object(Closure))
+#34 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#35 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance->handle(Object(Illuminate/Http/Request), Object(Closure))
+#36 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#37 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/HandleCors->handle(Object(Illuminate/Http/Request), Object(Closure))
+#38 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#39 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/TrustProxies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#40 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#41 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks->handle(Object(Illuminate/Http/Request), Object(Closure))
+#42 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#43 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate/Http/Middleware/ValidatePathEncoding->handle(Object(Illuminate/Http/Request), Object(Closure))
+#44 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate/Pipeline/Pipeline->{closure:{closure:Illuminate/Pipeline/Pipeline::carry():194}:195}(Object(Illuminate/Http/Request))
+#45 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#46 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate/Foundation/Http/Kernel->sendRequestThroughRouter(Object(Illuminate/Http/Request))
+#47 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1227): Illuminate/Foundation/Http/Kernel->handle(Object(Illuminate/Http/Request))
+#48 C:/Project/hotels-benin-new/public/index.php(15): Illuminate/Foundation/Application->handleRequest(Object(Illuminate/Http/Request))
+#49 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('C://Project//hote...')
+#50 {main}
+"} 
