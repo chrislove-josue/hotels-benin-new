@@ -3,6 +3,7 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthPageController;
+use App\Http\Controllers\Auth\AccountValidationController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EstablishmentController;
