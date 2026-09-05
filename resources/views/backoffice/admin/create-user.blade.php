@@ -41,14 +41,16 @@
             <input type="text" name="phone" value="{{ old('phone') }}" class="input-field" placeholder="+229 01 00 00 00 00">
         </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-                <label class="mb-1 block text-xs font-semibold text-gray-500">Mot de passe</label>
-                <input type="password" name="password" class="input-field" required minlength="8" placeholder="••••••••">
-            </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold text-gray-500">Confirmation</label>
-                <input type="password" name="password_confirmation" class="input-field" required minlength="8" placeholder="••••••••">
+        <div class="rounded-xl border border-hb-gold/30 bg-hb-cream p-4 text-sm text-gray-700">
+            <div class="flex items-start gap-3">
+                <i class="bi bi-key mt-0.5 text-hb-orange"></i>
+                <div>
+                    <p class="font-semibold text-hb-blue">Mot de passe généré automatiquement</p>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Le mot de passe sera créé automatiquement et envoyé par e-mail à l'utilisateur
+                        avec un lien sécurisé pour valider son compte et se connecter directement.
+                    </p>
+                </div>
             </div>
         </div>
 

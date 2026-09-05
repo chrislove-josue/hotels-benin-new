@@ -539,28 +539,32 @@ public function transactions(Request $request)
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:180', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:30', 'regex:/^\+?[0-9\s\-\.]{8,30}$/'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:voyageur,hote,admin'],
             'is_approved' => ['sometimes', 'boolean'],
         ], [], [
             'name' => 'nom',
             'email' => 'e-mail',
             'phone' => 'numéro de téléphone / WhatsApp',
-            'password' => 'mot de passe',
             'role' => 'profil',
         ]);
 
-        User::create([
+        // Mot de passe généré automatiquement : l'admin ne le connaît pas,
+        // il est transmis à l'utilisateur par e-mail avec un lien de connexion directe.
+        $password = \Illuminate\Support\Str::password(12);
+
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
-            'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+            'password' => \Illuminate\Support\Facades\Hash::make($password),
             'role' => $data['role'],
             'is_approved' => $request->boolean('is_approved'),
         ]);
 
+        $user->sendAccountCreatedNotification($password);
+
         return redirect()->route('admin.users')
-            ->with('status', 'Utilisateur créé avec succès.');
+            ->with('status', 'Utilisateur créé avec succès. Ses identifiants lui ont été envoyés par e-mail.');
     }
 
     /**
