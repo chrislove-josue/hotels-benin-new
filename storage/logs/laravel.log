@@ -1882,3 +1882,8 @@ Content-Transfer-Encoding: quoted-printable
 #49 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('C://Project//hote...')
 #50 {main}
 "} 
+[2026-09-05 11:24:12] local.ERROR: 7 arguments are required, 6 given {"exception":"[object] (ArgumentCountError(code: 0): 7 arguments are required, 6 given at C:/Project/hotels-benin-new/diagnose_tokens.php:31)
+[stacktrace]
+#0 C:/Project/hotels-benin-new/diagnose_tokens.php(31): sprintf('%s (%d) role=%s...', 'natchougo@techn...', 36, 'hote', false, 0)
+#1 {main}
+"} 
