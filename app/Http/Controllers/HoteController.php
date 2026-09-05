@@ -222,14 +222,10 @@ public function updateEstablishment(Request $request, int $id)
 
     public function updateReservation(Request $request, int $id)
     {
+        // Seul un administrateur de la plateforme peut modifier le statut d'une réservation.
+        abort_unless(Auth::user()->isAdmin(), 403);
+
         $reservation = Reservation::findOrFail($id);
-
-        // Vérifier que la réservation appartient à un établissement de l'hôte
-        $owns = Establishment::where('user_id', Auth::id())
-            ->where('id', $reservation->establishment_id)
-            ->exists();
-
-        abort_unless($owns, 403);
 
         $newStatus = $request->validate(['status' => 'required|in:en_attente,confirmee,annulee,terminee'])['status'];
 
