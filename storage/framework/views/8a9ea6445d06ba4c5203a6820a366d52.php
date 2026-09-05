@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Compte en attente — Hôtels Bénin'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -13,20 +11,26 @@
                 <i class="bi bi-envelope-check text-3xl"></i>
             </span>
             <h1 class="font-display text-2xl font-bold text-hb-blue-deeper">Vérifiez votre boîte e-mail</h1>
-            <p class="mt-3 text-sm leading-relaxed text-gray-600">
-                Votre compte a bien été créé. Un e-mail vient de vous être envoyé avec vos
-                identifiants de connexion et un lien sécurisé pour <strong>valider votre compte</strong>
-                et accéder à votre espace.
-                
-            </p>
+
+            <?php if(session('mail_sent') === false): ?>
+                <p class="mt-3 text-sm leading-relaxed text-gray-600">
+                    Votre compte a bien été créé. L'e-mail d'accueil avec vos identifiants
+                    et le lien sécurisé n'a pas pu être envoyé : le serveur de messagerie l'a refusé.
+                </p>
+            <?php else: ?>
+                <p class="mt-3 text-sm leading-relaxed text-gray-600">
+                    Votre compte a bien été créé. Un e-mail vous a été envoyé avec vos
+                    identifiants de connexion et un lien sécurisé pour <strong>valider votre compte</strong>
+                    et accéder à votre espace.
+                </p>
+            <?php endif; ?>
 
             <?php if(session('mail_sent') === false): ?>
                 <div class="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-left text-sm text-red-700">
                     <p class="font-semibold flex items-center gap-2"><i class="bi bi-exclamation-triangle-fill"></i> L'e-mail n'a pas pu être envoyé</p>
                     <p class="mt-1 leading-relaxed">
-                        Votre compte est créé, mais le serveur de messagerie a refusé l'envoi de vos identifiants
-                        vers cette adresse. Contactez l'administration de l'Hôtels Bénin via
-                        <a href="https://wa.me/2290128592664" target="_blank" rel="noopener noreferrer" class="pl-2 font-semibold text-green-600 underline decoration-green-300 underline-offset-2 hover:text-green-700"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                        Contactez l'administration de l'Hôtels Bénin via
+                        <a href="https://wa.me/2290128592664" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 font-semibold text-green-600 underline decoration-green-300 underline-offset-2 hover:text-green-700"><i class="bi bi-whatsapp"></i> WhatsApp</a>
                         pour une prise en charge.
                     </p>
                 </div>
@@ -41,7 +45,7 @@
                         <?php if(session('mail_sent') === false): ?>
                             <i class="bi bi-x-circle-fill text-red-500"></i> E-mail avec vos identifiants <strong class="text-red-600">non envoyé</strong>
                         <?php else: ?>
-                            <i class="bi bi-envelope text-hb-blue"></i> E-mail avec vos identifiants envoyé <span> Vérifiez vos spams si vous ne recevez pas l'e-mail</span>
+                            <i class="bi bi-envelope text-hb-blue"></i> E-mail avec vos identifiants envoyé
                         <?php endif; ?>
                     </li>
                     <li class="flex items-center gap-2">
@@ -50,15 +54,15 @@
                     <li class="flex items-center gap-2">
                         <i class="bi bi-clock-history text-gray-400"></i> Le lien est valable 24 heures et ne peut être utilisé qu'une seule fois
                     </li>
-                <li class="flex items-center gap-2">
-                    <i class="bi bi-whatsapp text-green-600"></i> Contactez l'administration via <a href="https://wa.me/2290128592664" target="_blank" rel="noopener noreferrer" class="font-semibold text-green-600 underline decoration-green-300 underline-offset-2 hover:text-green-700"><i class="bi bi-whatsapp"></i> WhatsApp</a> pour une prise en charge   
+                    <li class="flex items-center gap-2">
+                        <i class="bi bi-whatsapp text-green-600"></i> Besoin d'aide ? Contactez l'administration via
+                        <a href="https://wa.me/2290128592664" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 font-semibold text-green-600 underline decoration-green-300 underline-offset-2 hover:text-green-700"><i class="bi bi-whatsapp"></i> WhatsApp</a>
                     </li>
                 </ul>
             </div>
 
             <p class="text-xs text-gray-400">
-                Le lien est valable 24 heures et ne peut être utilisé qu'une seule fois.
-                Pensez à vérifier vos spams.
+                Pensez à vérifier vos spams si l'e-mail n'apparaît pas rapidement.
             </p>
 
             <div class="mt-6 flex flex-col gap-3">
@@ -69,6 +73,4 @@
     </div>
 </section>
 <?php $__env->stopSection(); ?>
-
-
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Project\hotels-benin-new\resources\views/auth/pending.blade.php ENDPATH**/ ?>
