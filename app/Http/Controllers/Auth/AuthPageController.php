@@ -69,7 +69,7 @@ $credentials = $request->validate([
     {
 $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:180', 'unique:users,email'],
+            'email' => ['required', 'email', 'max:180', 'unique:users,email', new \App\Rules\ValidRealEmail],
             'phone' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9\s\-\.]{8,30}$/'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:voyageur,hote'],
