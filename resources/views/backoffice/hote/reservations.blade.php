@@ -46,16 +46,22 @@
                         </span>
                     </td>
                     <td class="px-5 py-3">
-                        <form action="{{ route('hote.reservations.update', $reservation->id) }}" method="POST" class="flex justify-end gap-2">
-                            @csrf
-                            @method('PATCH')
-                            <select name="status" class="input-field !w-36 !py-1.5 text-xs">
-                                @foreach(['en_attente', 'confirmee', 'annulee', 'terminee'] as $status)
-                                    <option value="{{ $status }}" @selected($reservation->status === $status)>{{ $status }}</option>
-                                @endforeach
-                            </select>
+                        @if(auth()->user()->isAdmin())
+                            <form action="{{ route('hote.reservations.update', $reservation->id) }}" method="POST" class="flex justify-end gap-2">
+                                @csrf
+                                @method('PATCH')
+                                <select name="status" class="input-field !w-36 !py-1.5 text-xs">
+                                    @foreach(['en_attente', 'confirmee', 'annulee', 'terminee'] as $status)
+                                        <option value="{{ $status }}" @selected($reservation->status === $status)>{{ $status }}</option>
+                                    @endforeach
+                                </select>
 <button type="submit" class="btn-outline !px-3 !py-1.5 text-xs"><i class="bi bi-arrow-repeat"></i> MAJ</button>
-                        </form>
+                            </form>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400" title="La modification du statut est réservée à l'administration de la plateforme.">
+                                <i class="bi bi-lock"></i> Réservé à l'admin
+                            </span>
+                        @endif
                     </td>
                 </tr>
             @empty
