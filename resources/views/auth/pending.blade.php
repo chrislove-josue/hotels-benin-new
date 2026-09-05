@@ -2,6 +2,7 @@
 
 @section('title', 'Compte en attente — Hôtels Bénin')
 
+
 @section('content')
 <section class="relative flex min-h-[75vh] items-center overflow-hidden bg-gradient-to-br from-hb-blue to-hb-blue-deeper px-4 py-16 sm:px-6">
     <div class="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-hb-gold/20 blur-3xl"></div>
