@@ -17,6 +17,7 @@
                 Votre compte a bien été créé. Un e-mail vient de vous être envoyé avec vos
                 identifiants de connexion et un lien sécurisé pour <strong>valider votre compte</strong>
                 et accéder à votre espace.
+                
             </p>
 
             <?php if(session('mail_sent') === false): ?>
@@ -24,8 +25,8 @@
                     <p class="font-semibold flex items-center gap-2"><i class="bi bi-exclamation-triangle-fill"></i> L'e-mail n'a pas pu être envoyé</p>
                     <p class="mt-1 leading-relaxed">
                         Votre compte est créé, mais le serveur de messagerie a refusé l'envoi de vos identifiants
-                        vers cette adresse. Contactez l'administration de l'Hôtels Bénin via WhatsApp
-                        <a href="https://wa.me/2290128592664" target="_blank" rel="noopener noreferrer" class="font-semibold text-green-600 underline decoration-green-300 underline-offset-2 hover:text-green-700"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                        vers cette adresse. Contactez l'administration de l'Hôtels Bénin via
+                        <a href="https://wa.me/2290128592664" target="_blank" rel="noopener noreferrer" class="pl-2 font-semibold text-green-600 underline decoration-green-300 underline-offset-2 hover:text-green-700"><i class="bi bi-whatsapp"></i> WhatsApp</a>
                         pour une prise en charge.
                     </p>
                 </div>
@@ -40,11 +41,17 @@
                         <?php if(session('mail_sent') === false): ?>
                             <i class="bi bi-x-circle-fill text-red-500"></i> E-mail avec vos identifiants <strong class="text-red-600">non envoyé</strong>
                         <?php else: ?>
-                            <i class="bi bi-envelope text-hb-blue"></i> E-mail avec vos identifiants envoyé
+                            <i class="bi bi-envelope text-hb-blue"></i> E-mail avec vos identifiants envoyé <span> Vérifiez vos spams si vous ne recevez pas l'e-mail</span>
                         <?php endif; ?>
                     </li>
                     <li class="flex items-center gap-2">
                         <i class="bi bi-link-45deg text-hb-orange"></i> Cliquez sur le lien pour vous connecter et valider votre compte
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <i class="bi bi-clock-history text-gray-400"></i> Le lien est valable 24 heures et ne peut être utilisé qu'une seule fois
+                    </li>
+                <li class="flex items-center gap-2">
+                    <i class="bi bi-whatsapp text-green-600"></i> Contactez l'administration via <a href="https://wa.me/2290128592664" target="_blank" rel="noopener noreferrer" class="font-semibold text-green-600 underline decoration-green-300 underline-offset-2 hover:text-green-700"><i class="bi bi-whatsapp"></i> WhatsApp</a> pour une prise en charge   
                     </li>
                 </ul>
             </div>
