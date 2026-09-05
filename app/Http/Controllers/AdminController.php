@@ -561,10 +561,15 @@ public function transactions(Request $request)
             'is_approved' => $request->boolean('is_approved'),
         ]);
 
-        $user->sendAccountCreatedNotification($password);
+        $sent = $user->sendAccountCreatedNotification($password);
 
-        return redirect()->route('admin.users')
-            ->with('status', 'Utilisateur créé avec succès. Ses identifiants lui ont été envoyés par e-mail.');
+        $status = 'Utilisateur créé avec succès. Ses identifiants lui ont été envoyés par e-mail.';
+
+        if (! $sent) {
+            $status = 'Utilisateur créé avec succès. ATTENTION : l\'e-mail d\'accueil n\'a pas pu être envoyé (serveur SMTP injoignable). L\'utilisateur ne pourra pas valider son compte tant que le lien ne lui est pas transmis.';
+        }
+
+        return redirect()->route('admin.users')->with('status', $status);
     }
 
     /**

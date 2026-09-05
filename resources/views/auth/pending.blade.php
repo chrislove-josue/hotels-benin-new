@@ -19,13 +19,28 @@
                 et accéder à votre espace.
             </p>
 
+            @if (session('mail_sent') === false)
+                <div class="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-left text-sm text-red-700">
+                    <p class="font-semibold flex items-center gap-2"><i class="bi bi-exclamation-triangle-fill"></i> L'e-mail n'a pas pu être envoyé</p>
+                    <p class="mt-1 leading-relaxed">
+                        Votre compte est créé, mais le serveur de messagerie a refusé l'envoi de vos identifiants
+                        vers cette adresse. Contactez l'administration de l'Hôtels Bénin afin qu'un lien de connexion
+                        vous soit transmis manuellement.
+                    </p>
+                </div>
+            @endif
+
             <div class="my-6 rounded-xl bg-hb-cream p-4 text-left text-sm text-gray-600">
                 <ul class="space-y-2">
                     <li class="flex items-center gap-2">
                         <i class="bi bi-check-circle-fill text-green-500"></i> Compte enregistré
                     </li>
                     <li class="flex items-center gap-2">
-                        <i class="bi bi-envelope text-hb-blue"></i> E-mail avec vos identifiants envoyé
+                        @if (session('mail_sent') === false)
+                            <i class="bi bi-x-circle-fill text-red-500"></i> E-mail avec vos identifiants <strong class="text-red-600">non envoyé</strong>
+                        @else
+                            <i class="bi bi-envelope text-hb-blue"></i> E-mail avec vos identifiants envoyé
+                        @endif
                     </li>
                     <li class="flex items-center gap-2">
                         <i class="bi bi-link-45deg text-hb-orange"></i> Cliquez sur le lien pour vous connecter et valider votre compte
@@ -40,7 +55,7 @@
 
             <div class="mt-6 flex flex-col gap-3">
                 <a href="{{ route('home') }}" class="btn-primary w-full"><i class="bi bi-house"></i> Retour à l'accueil</a>
-                <a href="{{ route('login.show') }}" class="btn-outline w-full">Aller à la connexion</a>
+                <a href="{{ route('login.show') }}" class="btn-outline text-green-600 w-full">Aller à la connexion</a>
             </div>
         </div>
     </div>

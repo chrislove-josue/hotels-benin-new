@@ -101,7 +101,7 @@ public function reviews()
      * Envoie un e-mail d'accueil avec les identifiants du compte et un lien
      * de validation/connexion directe (token à usage unique, valable 24 h).
      */
-    public function sendAccountCreatedNotification(string $plainPassword): void
+    public function sendAccountCreatedNotification(string $plainPassword): bool
     {
         // Purge uniquement les liens expirés : on ne supprime JAMAIS un lien encore
         // valide, sinon une éventuelle double soumission invaliderait le lien déjà
@@ -119,6 +119,19 @@ public function reviews()
 
         $magicUrl = route('account.validate', ['token' => $plain]);
 
-        $this->notify(new AccountCreatedNotification($plainPassword, $magicUrl));
+        try {
+            $this->notify(new AccountCreatedNotification($plainPassword, $magicUrl));
+
+            return true;
+        } catch (\Throwable $e) {
+            // L'échec d'envoi ne doit jamais faire planter la création de compte :
+            // le compte existe déjà, seul le lien d'accès n'est pas parvenu.
+            \Illuminate\Support\Facades\Log::warning(
+                'Échec envoi e-mail d\'accueil',
+                ['user_id' => $this->id, 'email' => $this->email, 'error' => $e->getMessage()]
+            );
+
+            return false;
+        }
     }
 }

@@ -92,10 +92,10 @@ $user = User::create([
         ]);
 
         // E-mail d'accueil avec les identifiants et le lien de validation/connexion directe.
-        $user->sendAccountCreatedNotification($data['password']);
+        $sent = $user->sendAccountCreatedNotification($data['password']);
 
         // On ne connecte pas automatiquement : l'utilisateur valide son compte via le lien reçu par e-mail.
-        return redirect()->route('register.pending');
+        return redirect()->route('register.pending')->with('mail_sent', $sent);
     }
 
     /**
