@@ -20,7 +20,7 @@ $newUsers = User::whereDate('created_at', '>=', now()->subDays(3))->get();
 echo PHP_EOL.'Users created last 3 days: '.$newUsers->count().PHP_EOL;
 foreach ($newUsers as $u) {
     $tokenCount = LoginToken::where('user_id', $u->id)->count();
-    echo sprintf('%s (%d) role=%s approved=%d tokens=%d%n', $u->email, $u->id, $u->role, $u->is_approved, $tokenCount);
+    echo $u->email . ' (' . $u->id . ') role=' . $u->role . ' approved=' . $u->is_approved . ' tokens=' . $tokenCount . PHP_EOL;
 }
 
 echo 'DONE'.PHP_EOL;

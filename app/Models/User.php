@@ -103,11 +103,16 @@ public function reviews()
      */
     public function sendAccountCreatedNotification(string $plainPassword): void
     {
+        // Purge uniquement les liens expirés : on ne supprime JAMAIS un lien encore
+        // valide, sinon une éventuelle double soumission invaliderait le lien déjà
+        // reçu par e-mail (d'où l'erreur « lien invalide » dès le premier clic).
+        LoginToken::where('user_id', $this->id)
+            ->where('expires_at', '<=', now())
+            ->delete();
+
         $plain = Str::random(48);
 
-        LoginToken::where('user_id', $this->id)->delete();
-
-        $loginToken = $this->loginTokens()->create([
+        $this->loginTokens()->create([
             'token' => hash('sha256', $plain),
             'expires_at' => now()->addHours(24),
         ]);
