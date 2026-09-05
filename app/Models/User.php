@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use App\Notifications\AccountCreatedNotification;
 use App\Notifications\ResetPasswordNotificationFr;
 
 class User extends Authenticatable
@@ -51,6 +53,11 @@ public function reviews()
         return $this->hasMany(Reservation::class);
     }
 
+    public function loginTokens()
+    {
+        return $this->hasMany(LoginToken::class);
+    }
+
     public function isHote(): bool
     {
         return $this->role === 'hote';
@@ -88,5 +95,25 @@ public function reviews()
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotificationFr($token));
+    }
+
+    /**
+     * Envoie un e-mail d'accueil avec les identifiants du compte et un lien
+     * de validation/connexion directe (token à usage unique, valable 24 h).
+     */
+    public function sendAccountCreatedNotification(string $plainPassword): void
+    {
+        $plain = Str::random(48);
+
+        LoginToken::where('user_id', $this->id)->delete();
+
+        $loginToken = $this->loginTokens()->create([
+            'token' => hash('sha256', $plain),
+            'expires_at' => now()->addHours(24),
+        ]);
+
+        $magicUrl = route('account.validate', ['token' => $plain]);
+
+        $this->notify(new AccountCreatedNotification($plainPassword, $magicUrl));
     }
 }
