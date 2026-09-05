@@ -1962,3 +1962,5 @@ Content-Transfer-Encoding: quoted-printable
 #67 {main}
 "} 
 [2026-09-05 11:59:42] local.WARNING: Échec envoi e-mail d'accueil {"user_id":43,"email":"test@example.com","error":"Expected response code \"250/251/252\" but got code \"550\", with message \"550 L-RF3 Invalid recipient domain\"."} 
+[2026-09-05 12:03:47] local.WARNING: Échec envoi e-mail d'accueil {"user_id":44,"email":"tesst@example.com","error":"Expected response code \"250/251/252\" but got code \"550\", with message \"550 L-RF3 Invalid recipient domain\"."} 
+[2026-09-05 12:05:01] local.WARNING: Échec envoi e-mail d'accueil {"user_id":45,"email":"tst@example.com","error":"Expected response code \"250/251/252\" but got code \"550\", with message \"550 L-RF3 Invalid recipient domain\"."} 

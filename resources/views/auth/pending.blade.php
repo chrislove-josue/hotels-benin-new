@@ -24,7 +24,9 @@
                     <p class="font-semibold flex items-center gap-2"><i class="bi bi-exclamation-triangle-fill"></i> L'e-mail n'a pas pu être envoyé</p>
                     <p class="mt-1 leading-relaxed">
                         Votre compte est créé, mais le serveur de messagerie a refusé l'envoi de vos identifiants
-                        vers cette adresse. Contactez l'administration de l'Hôtels Bénin pour une prise en charge.
+                        vers cette adresse. Contactez l'administration de l'Hôtels Bénin via
+                        <a href="https://wa.me/2290128592664" target="_blank" rel="noopener noreferrer" class="pl-2 font-semibold text-green-600 underline decoration-green-300 underline-offset-2 hover:text-green-700"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                        pour une prise en charge.
                     </p>
                 </div>
             @endif
