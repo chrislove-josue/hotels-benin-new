@@ -1961,3 +1961,4 @@ Content-Transfer-Encoding: quoted-printable
 #66 C:/Project/hotels-benin-new/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('C://Project//hote...')
 #67 {main}
 "} 
+[2026-09-05 11:59:42] local.WARNING: Échec envoi e-mail d'accueil {"user_id":43,"email":"test@example.com","error":"Expected response code \"250/251/252\" but got code \"550\", with message \"550 L-RF3 Invalid recipient domain\"."} 
