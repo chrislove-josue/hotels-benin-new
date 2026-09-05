@@ -29,10 +29,6 @@
                 <td style="padding:8px 12px; border:1px solid #eee2c9; color:#888;">Téléphone</td>
                 <td style="padding:8px 12px; border:1px solid #eee2c9;">{{ $user->phone ?? '—' }}</td>
             </tr>
-            <tr>
-                <td style="padding:8px 12px; border:1px solid #eee2c9; color:#888;">Mot de passe</td>
-                <td style="padding:8px 12px; border:1px solid #eee2c9; font-weight:bold;">{{ $password }}</td>
-            </tr>
         </table>
 
         <p>Cliquez sur le bouton ci-dessous pour <strong>valider votre compte</strong> et accéder directement à votre espace.
