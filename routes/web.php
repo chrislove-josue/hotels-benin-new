@@ -47,6 +47,8 @@ Route::prefix('inscription')->name('register.')->group(function () {
     Route::get('/compte-en-attente', [AuthPageController::class, 'pending'])->name('pending');
 });
 
+Route::get('/compte/valider/{token}', [AccountValidationController::class, 'validate'])->name('account.validate');
+
 Route::post('/deconnexion', [AuthPageController::class, 'logout'])->name('logout');
 
 /*

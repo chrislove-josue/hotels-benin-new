@@ -91,7 +91,10 @@ $user = User::create([
             'is_approved' => false,
         ]);
 
-        // On ne connecte pas automatiquement : le compte doit être approuvé d'abord.
+        // E-mail d'accueil avec les identifiants et le lien de validation/connexion directe.
+        $user->sendAccountCreatedNotification($data['password']);
+
+        // On ne connecte pas automatiquement : l'utilisateur valide son compte via le lien reçu par e-mail.
         return redirect()->route('register.pending');
     }
 
