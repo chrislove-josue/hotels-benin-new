@@ -537,7 +537,7 @@ public function transactions(Request $request)
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:180', 'unique:users,email'],
+            'email' => ['required', 'email', 'max:180', 'unique:users,email', new \App\Rules\ValidRealEmail],
             'phone' => ['nullable', 'string', 'max:30', 'regex:/^\+?[0-9\s\-\.]{8,30}$/'],
             'role' => ['required', 'in:voyageur,hote,admin'],
             'is_approved' => ['sometimes', 'boolean'],
@@ -586,7 +586,7 @@ public function transactions(Request $request)
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:180', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'email', 'max:180', 'unique:users,email,' . $user->id, new \App\Rules\ValidRealEmail],
             'phone' => ['nullable', 'string', 'max:30', 'regex:/^\+?[0-9\s\-\.]{8,30}$/'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:voyageur,hote,admin'],
