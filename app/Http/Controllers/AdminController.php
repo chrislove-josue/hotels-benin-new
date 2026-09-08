@@ -941,6 +941,12 @@ public function updateEstablishment(Request $request, int $id)
             'description' => ['required', 'string'],
             'price_from' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1'],
+            'commission_pct' => ['nullable', 'numeric', 'min:20', 'max:30'],
+            'latitude' => ['nullable', 'regex:/^-?\d{1,3}(\.\d+)?$/'],
+            'longitude' => ['nullable', 'regex:/^-?\d{1,3}(\.\d+)?$/'],
+            'transfer_available' => ['sometimes', 'boolean'],
+            'transfer_fee' => ['nullable', 'numeric', 'min:0'],
+            'transfer_description' => ['nullable', 'string', 'max:255'],
             'cover_image' => ['nullable', 'url'],
             'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'images' => ['array'],
@@ -960,6 +966,12 @@ public function updateEstablishment(Request $request, int $id)
         $establishment->update(array_merge($data, [
             'is_available' => $request->boolean('is_available'),
             'is_featured' => $request->boolean('is_featured'),
+            'transfer_available' => $request->boolean('transfer_available'),
+            'latitude' => $data['latitude'] ?? null,
+            'longitude' => $data['longitude'] ?? null,
+            'transfer_fee' => $data['transfer_fee'] ?? null,
+            'transfer_description' => $data['transfer_description'] ?? null,
+            'commission_pct' => $data['commission_pct'] ?? 25,
         ]));
 
         $establishment->amenities()->sync($data['amenities'] ?? []);

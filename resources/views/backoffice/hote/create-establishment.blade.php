@@ -58,6 +58,20 @@
                 <label class="label">Capacité (pers.) *</label>
                 <input type="number" name="capacity" value="{{ old('capacity', 2) }}" class="input-field" min="1" required>
             </div>
+            <div>
+                <label class="label">Commission plateforme (%)</label>
+                <input type="number" name="commission_pct" value="{{ old('commission_pct', 25) }}" class="input-field" min="20" max="30" step="0.5">
+                <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation (entre 20 et 30 %). Défaut : 25 %.</p>
+            </div>
+            <div>
+                <label class="label">Latitude</label>
+                <input type="text" name="latitude" value="{{ old('latitude') }}" class="input-field" placeholder="ex: 6.4969">
+            </div>
+            <div>
+                <label class="label">Longitude</label>
+                <input type="text" name="longitude" value="{{ old('longitude') }}" class="input-field" placeholder="ex: 2.6289">
+                <p class="mt-1 text-xs text-gray-400">Sert à afficher la localisation sur la carte. Trouvez les coordonnées sur <a href="https://www.google.com/maps" target="_blank" class="text-hb-blue underline">Google Maps</a> (clic droit → « Les coordonnées »).</p>
+            </div>
 </div>
     </div>
 
@@ -92,6 +106,27 @@
                 <label class="label">Description complète *</label>
                 <textarea name="description" rows="6" class="input-field" required>{{ old('description') }}</textarea>
             </div>
+        </div>
+    </div>
+
+    <div class="card p-6" x-data="{ transferOn: {{ old('transfer_available') ? 'true' : 'false' }} }">
+        <h2 class="mb-4 font-display text-lg font-bold text-hb-blue"><i class="bi bi-car-front"></i> Service automobile (transfert aéroport / navette)</h2>
+        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 transition hover:border-hb-blue">
+            <input type="checkbox" name="transfer_available" value="1" class="h-4 w-4 rounded text-hb-orange focus:ring-hb-orange" x-model="transferOn">
+            <span class="text-sm font-semibold text-gray-700">Je propose un service d'accueil / transfert pour les voyageurs</span>
+        </label>
+        <div class="mt-4 space-y-4" x-show="transferOn" x-transition>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="label">Prix du transfert (FCFA)</label>
+                    <input type="number" name="transfer_fee" value="{{ old('transfer_fee') }}" class="input-field" min="0" placeholder="ex: 10000">
+                </div>
+                <div>
+                    <label class="label">Description du trajet</label>
+                    <input type="text" name="transfer_description" value="{{ old('transfer_description') }}" class="input-field" maxlength="255" placeholder="ex: Aéroport Cadjèhoun → établissement, Climate 2000">
+                </div>
+            </div>
+            <p class="text-xs text-gray-400">Le voyageur verra cette information sur la fiche et pourra vous contacter directement via WhatsApp.</p>
         </div>
     </div>
 

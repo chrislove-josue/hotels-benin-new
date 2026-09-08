@@ -19,6 +19,10 @@ class Establishment extends Model
         'description',
         'short_description',
         'price_from',
+        'commission_pct',
+        'transfer_available',
+        'transfer_fee',
+        'transfer_description',
         'capacity',
         'cover_image',
         'rating',
@@ -34,7 +38,10 @@ class Establishment extends Model
         return [
             'is_featured' => 'boolean',
             'is_available' => 'boolean',
+            'transfer_available' => 'boolean',
             'price_from' => 'decimal:2',
+            'commission_pct' => 'decimal:2',
+            'transfer_fee' => 'decimal:2',
             'rating' => 'decimal:2',
         ];
     }

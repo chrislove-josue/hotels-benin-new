@@ -64,7 +64,12 @@ class ReservationController extends Controller
 
             $nights = Reservation::nightsBetween($data['check_in'], $data['check_out']);
             $amount = $nights * (float) $room->price_per_night;
-            $commission = round($amount * 0.10, 2); // 10% commission plateforme
+            // Commission plateforme : taux propre à l'établissement (20-30 %).
+            $pct = (float) $establishment->commission_pct;
+            if ($pct <= 0) {
+                $pct = 25.00;
+            }
+            $commission = round($amount * ($pct / 100), 2);
 
             $reservation = Reservation::create([
                 'user_id'          => Auth::id(),

@@ -72,6 +72,12 @@ public function storeEstablishment(Request $request)
             'description' => ['required', 'string'],
             'price_from' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1'],
+            'commission_pct' => ['nullable', 'numeric', 'min:20', 'max:30'],
+            'transfer_available' => ['sometimes', 'boolean'],
+            'transfer_fee' => ['nullable', 'numeric', 'min:0'],
+            'transfer_description' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'regex:/^-?\d{1,3}(\.\d+)?$/'],
+            'longitude' => ['nullable', 'regex:/^-?\d{1,3}(\.\d+)?$/'],
             'cover_image' => ['nullable', 'url'],
             'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'images' => ['array'],
@@ -93,6 +99,12 @@ public function storeEstablishment(Request $request)
             'short_description' => $data['short_description'],
             'description' => $data['description'],
             'price_from' => $data['price_from'],
+            'commission_pct' => $data['commission_pct'] ?? 25,
+            'transfer_available' => $request->boolean('transfer_available'),
+            'transfer_fee' => $data['transfer_fee'] ?? null,
+            'transfer_description' => $data['transfer_description'] ?? null,
+            'latitude' => $data['latitude'] ?? null,
+            'longitude' => $data['longitude'] ?? null,
             'capacity' => $data['capacity'],
             'cover_image' => $cover,
             'is_available' => false, // en attente de validation par l'admin
@@ -133,6 +145,12 @@ public function updateEstablishment(Request $request, int $id)
             'description' => ['required', 'string'],
             'price_from' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1'],
+            'commission_pct' => ['nullable', 'numeric', 'min:20', 'max:30'],
+            'transfer_available' => ['sometimes', 'boolean'],
+            'transfer_fee' => ['nullable', 'numeric', 'min:0'],
+            'transfer_description' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'regex:/^-?\d{1,3}(\.\d+)?$/'],
+            'longitude' => ['nullable', 'regex:/^-?\d{1,3}(\.\d+)?$/'],
             'cover_image' => ['nullable', 'url'],
             'cover_image_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'images' => ['array'],
@@ -140,6 +158,11 @@ public function updateEstablishment(Request $request, int $id)
             'amenities' => ['array'],
             'amenities.*' => ['exists:amenities,id'],
         ]);
+
+        $data['transfer_available'] = $request->boolean('transfer_available');
+        if (isset($data['commission_pct']) && is_numeric($data['commission_pct'])) {
+            $data['commission_pct'] = (float) $data['commission_pct'];
+        }
 
         // Upload de la couverture (fichier prioritaire sur l'URL)
         $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);

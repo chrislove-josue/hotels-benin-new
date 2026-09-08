@@ -62,6 +62,21 @@
             <input type="number" name="capacity" value="{{ old('capacity', $establishment->capacity) }}" class="input-field" min="1" required>
         </div>
     </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+            <label class="label">Commission plateforme (%)</label>
+            <input type="number" name="commission_pct" value="{{ old('commission_pct', $establishment->commission_pct) }}" class="input-field" min="20" max="30" step="0.5">
+            <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation (20-30 %).</p>
+        </div>
+        <div>
+            <label class="label">Localisation</label>
+            <div class="grid grid-cols-2 gap-2">
+                <input type="text" name="latitude" value="{{ old('latitude', $establishment->latitude) }}" class="input-field" placeholder="Latitude">
+                <input type="text" name="longitude" value="{{ old('longitude', $establishment->longitude) }}" class="input-field" placeholder="Longitude">
+            </div>
+            <p class="mt-1 text-xs text-gray-400">Google Maps → clic droit → « Les coordonnées ».</p>
+        </div>
+    </div>
 <div>
         <label class="label">Image de couverture (fichier)</label>
         @if($establishment->cover_image)
@@ -95,6 +110,24 @@
     <div>
         <label class="label">Description *</label>
         <textarea name="description" rows="5" class="input-field" required>{{ old('description', $establishment->description) }}</textarea>
+    </div>
+
+    <div x-data="{ transferOn: {{ $establishment->transfer_available ? 'true' : 'false' }} }">
+        <h3 class="mb-3 font-display text-sm font-bold text-hb-blue"><i class="bi bi-car-front"></i> Service automobile (transfert)</h3>
+        <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 transition hover:border-hb-blue">
+            <input type="checkbox" name="transfer_available" value="1" class="h-4 w-4 rounded text-hb-orange focus:ring-hb-orange" x-model="transferOn" @checked($establishment->transfer_available)>
+            <span class="text-sm font-semibold text-gray-700">Service de transfert / accueil disponible</span>
+        </label>
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2" x-show="transferOn" x-transition>
+            <div>
+                <label class="label">Prix du transfert (FCFA)</label>
+                <input type="number" name="transfer_fee" value="{{ old('transfer_fee', $establishment->transfer_fee) }}" class="input-field" min="0">
+            </div>
+            <div>
+                <label class="label">Description du trajet</label>
+                <input type="text" name="transfer_description" value="{{ old('transfer_description', $establishment->transfer_description) }}" class="input-field" maxlength="255" placeholder="ex: Aéroport Cadjèhoun → établissement">
+            </div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

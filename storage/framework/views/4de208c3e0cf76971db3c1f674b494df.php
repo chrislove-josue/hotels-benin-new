@@ -7,6 +7,9 @@
 <?php
     $galleryImages = collect([$establishment->cover_image])->merge($establishment->images->pluck('path'))->values();
 ?>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
 <div x-data="{ lightbox: null, images: <?php echo e($galleryImages->toJson()); ?> }">
 
 
@@ -49,6 +52,49 @@
                 <i class="bi bi-geo-alt text-hb-orange"></i> <?php echo e($establishment->address); ?>, <?php echo e($establishment->locality->name); ?>
 
             </p>
+
+            
+            <?php if($establishment->latitude && $establishment->longitude): ?>
+                <div class="my-6 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+                    <div id="map" class="h-64 w-full sm:h-80"></div>
+                    <div class="flex items-center justify-between bg-white px-4 py-2.5 text-xs text-gray-500">
+                        <span class="flex items-center gap-1"><i class="bi bi-geo-alt text-hb-orange"></i> <?php echo e($establishment->address); ?>, <?php echo e($establishment->locality->name); ?></span>
+                        <div class="flex items-center gap-2">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=<?php echo e($establishment->latitude); ?>,<?php echo e($establishment->longitude); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-hb-blue/10 px-2.5 py-1 text-xs font-semibold text-hb-blue transition hover:bg-hb-blue/20">
+                                <i class="bi bi-sign-turn-right"></i> Itinéraire
+                            </a>
+                            <a href="https://wa.me/?text=Voici+la+localisation+de+<?php echo e(urlencode($establishment->name)); ?>%3A+https://maps.google.com/?q=<?php echo e($establishment->latitude); ?>,<?php echo e($establishment->longitude); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700 transition hover:bg-green-100">
+                                <i class="bi bi-share"></i> Partager
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            
+            <?php if($establishment->transfer_available): ?>
+                <div class="mb-6 rounded-xl border border-green-200 bg-green-50 p-5">
+                    <div class="flex items-start gap-3">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-700"><i class="bi bi-car-front-fill text-lg"></i></span>
+                        <div class="flex-1">
+                            <h3 class="font-display text-sm font-bold text-green-800">Service d'accueil / transfert aéroport</h3>
+                            <?php if($establishment->transfer_description): ?>
+                                <p class="mt-1 text-sm text-green-700"><?php echo e($establishment->transfer_description); ?></p>
+                            <?php endif; ?>
+                            <div class="mt-2 flex flex-wrap items-center gap-3">
+                                <?php if($establishment->transfer_fee): ?>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
+                                        <i class="bi bi-tag"></i> <?php echo e(number_format($establishment->transfer_fee, 0, ',', ' ')); ?> FCFA
+                                    </span>
+                                <?php endif; ?>
+                                <a href="https://wa.me/2290128592664?text=Bonjour,+je+souhaite+un+transfert+pour+l'établissement+<?php echo e(urlencode($establishment->name)); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-green-700">
+                                    <i class="bi bi-whatsapp"></i> Contacter via WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <div class="my-8 h-px bg-gradient-to-r from-transparent via-hb-gold/40 to-transparent"></div>
 
@@ -341,6 +387,24 @@
 
     <button @click="lightbox = (lightbox + 1) % images.length" class="absolute right-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"><i class="bi bi-chevron-right text-2xl"></i></button>
 </div>
+
+</div>
+
+<?php if($establishment->latitude && $establishment->longitude): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof L === 'undefined') return;
+    var lat = <?php echo e($establishment->latitude); ?>;
+    var lng = <?php echo e($establishment->longitude); ?>;
+    var map = L.map('map', { scrollWheelZoom: false }).setView([lat, lng], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 19
+    }).addTo(map);
+    L.marker([lat, lng]).addTo(map).bindPopup('<strong><?php echo e(addslashes($establishment->name)); ?></strong><br><?php echo e(addslashes($establishment->address)); ?>');
+});
+</script>
+<?php endif; ?>
 
 </div>
 <?php $__env->stopSection(); ?>
