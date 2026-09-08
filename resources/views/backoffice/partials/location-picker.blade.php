@@ -1,13 +1,13 @@
 {{-- Sélecteur de localisation sur carte (Bénin). Cliquer sur la carte place le marqueur et remplit latitude/longitude. --}}
-<div x-data="locationPicker({ lat: {{ (float) ($lat ?? 9.3077) }}, lng: {{ (float) ($lng ?? 2.3158) }} })">
+<div x-data="locationPicker({ lat: {{ $lat ?? 'null' }}, lng: {{ $lng ?? 'null' }} })">
     <label class="label">Localisation sur la carte</label>
     <div x-ref="map" class="h-64 w-full rounded-xl border border-gray-200 shadow-sm"></div>
-    <input type="hidden" name="latitude" x-model="lat" :value="lat">
-    <input type="hidden" name="longitude" x-model="lng" :value="lng">
+    <input type="hidden" name="latitude" :value="lat">
+    <input type="hidden" name="longitude" :value="lng">
     <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
         <p class="text-xs text-gray-500">
             <i class="bi bi-geo-alt text-hb-orange"></i>
-            Cliquez pour placer le marqueur :
+            Cliquez sur la carte pour positionner l'établissement :
             <span class="font-mono font-semibold text-hb-blue" x-text="lat.toFixed(6) + ', ' + lng.toFixed(6)"></span>
         </p>
         <span x-show="!hasPoint" class="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-semibold text-yellow-700">
@@ -17,19 +17,20 @@
 
     <script>
         function locationPicker(initial) {
+            const hasInit = initial.lat !== null && initial.lng !== null;
             return {
-                lat: initial.lat,
-                lng: initial.lng,
-                hasPoint: initial.lat !== null && initial.lng !== null && (initial.lat !== 0 && initial.lng !== 0),
+                lat: initial.lat !== null ? initial.lat : 9.3077,
+                lng: initial.lng !== null ? initial.lng : 2.3158,
+                hasPoint: hasInit,
                 _map: null,
                 _marker: null,
                 init() {
                     if (typeof L === 'undefined') return;
-                    this._map = L.map(this.$refs.map, { scrollWheelZoom: false }).setView([this.lat, this.lng], 7);
+                    this._map = L.map(this.$refs.map, { scrollWheelZoom: false }).setView([this.lat, this.lng], hasInit ? 13 : 7);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; OpenStreetMap', maxZoom: 19
                     }).addTo(this._map);
-                    if (this.hasPoint) this._setMarker(this.lat, this.lng);
+                    if (hasInit) this._setMarker(this.lat, this.lng);
                     this._map.on('click', (e) => {
                         this.lat = e.latlng.lat;
                         this.lng = e.latlng.lng;
