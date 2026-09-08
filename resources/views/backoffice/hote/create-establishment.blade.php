@@ -60,8 +60,12 @@
             </div>
             <div>
                 <label class="label">Commission plateforme (%)</label>
-                <input type="number" name="commission_pct" value="{{ old('commission_pct', 25) }}" class="input-field" min="20" max="30" step="0.5">
-                <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation (entre 20 et 30 %). Défaut : 25 %.</p>
+                <select name="commission_pct" class="input-field">
+                    @foreach([15, 20, 25, 30] as $value)
+                        <option value="{{ $value }}" @selected((float) old('commission_pct', 25) == $value)>{{ $value }}%</option>
+                    @endforeach
+                </select>
+                <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation.</p>
             </div>
             <div>
                 <label class="label">Latitude</label>
