@@ -395,10 +395,19 @@ document.addEventListener('DOMContentLoaded', function () {
     var lat = {{ $establishment->latitude }};
     var lng = {{ $establishment->longitude }};
     var map = L.map('map', { scrollWheelZoom: false }).setView([lat, lng], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap',
-        maxZoom: 19
+    var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        attribution: 'Données &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, fond &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+        maxZoom: 17, subdomains: 'abc'
     }).addTo(map);
+    var fallenBack = false;
+    map.on('tileerror', function () {
+        if (fallenBack) return;
+        fallenBack = true;
+        map.removeLayer(topo);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap', maxZoom: 19
+        }).addTo(map);
+    });
     L.marker([lat, lng]).addTo(map).bindPopup('<strong>{{ addslashes($establishment->name) }}</strong><br>{{ addslashes($establishment->address) }}');
 });
 </script>
