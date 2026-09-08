@@ -65,8 +65,12 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
             <label class="label">Commission plateforme (%)</label>
-            <input type="number" name="commission_pct" value="{{ old('commission_pct', $establishment->commission_pct) }}" class="input-field" min="20" max="30" step="0.5">
-            <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation (20-30 %).</p>
+            <select name="commission_pct" class="input-field">
+                @foreach([15, 20, 25, 30] as $value)
+                    <option value="{{ $value }}" @selected((float) old('commission_pct', $establishment->commission_pct) == $value)>{{ $value }}%</option>
+                @endforeach
+            </select>
+            <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation.</p>
         </div>
         <div>
             <label class="label">Localisation</label>

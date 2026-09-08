@@ -185,7 +185,7 @@ $driver = DB::connection()->getDriverName();
         $establishment = Establishment::findOrFail($id);
 
         $data = $request->validate([
-            'commission_pct' => ['required', 'numeric', 'min:20', 'max:30'],
+            'commission_pct' => ['required', 'numeric', 'in:15,20,25,30'],
         ], [], ['commission_pct' => 'commission']);
 
         $establishment->update(['commission_pct' => (float) $data['commission_pct']]);
