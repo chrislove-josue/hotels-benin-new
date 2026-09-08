@@ -171,6 +171,7 @@ Route::get('/etablissements', [AdminController::class, 'establishments'])->name(
     Route::get('/etablissements/{id}/modifier', [AdminController::class, 'editEstablishment'])->name('establishments.edit');
     Route::put('/etablissements/{id}', [AdminController::class, 'updateEstablishment'])->name('establishments.update');
     Route::post('/etablissements/{id}/toggle', [AdminController::class, 'toggleEstablishment'])->name('establishments.toggle');
+    Route::post('/etablissements/{id}/commission', [AdminController::class, 'updateCommission'])->name('establishments.commission');
     Route::delete('/etablissements/{id}', [AdminController::class, 'deleteEstablishment'])->name('establishments.destroy');
     Route::get('/etablissements/{id}/chambres', [AdminController::class, 'establishmentRooms'])->name('establishments.rooms');
     Route::get('/etablissements/{establishmentId}/chambres/{roomId}/modifier', [AdminController::class, 'editRoom'])->name('rooms.edit');
