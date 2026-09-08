@@ -52,6 +52,17 @@
                     <td class="px-5 py-3 text-gray-600">{{ $establishment->type->name }}</td>
                     <td class="px-5 py-3 text-gray-600">{{ $establishment->locality->name }}</td>
                     <td class="px-5 py-3 font-semibold text-hb-blue">{{ number_format($establishment->price_from, 0, ',', ' ') }} FCFA</td>
+                    <td class="px-5 py-3">
+                        <form action="{{ route('admin.establishments.commission', $establishment->id) }}" method="POST" class="flex items-center gap-1.5" onsubmit="return confirm('Appliquer la commission saisie sur {{ $establishment->name }} ?')">
+                            @csrf
+                            <div class="flex w-20 items-center gap-0.5">
+                                <input type="number" name="commission_pct" value="{{ $establishment->commission_pct }}" min="20" max="30" step="0.5"
+                                       class="input-field !px-2 !py-1 text-center text-xs w-16" required>
+                                <span class="text-xs text-gray-400">%</span>
+                            </div>
+                            <button type="submit" class="btn-outline !px-2 !py-1 text-xs" title="Enregistrer la commission"><i class="bi bi-check-lg"></i></button>
+                        </form>
+                    </td>
                     <td class="px-5 py-3 text-gray-600">{{ $establishment->owner->name ?? '—' }}</td>
                     <td class="px-5 py-3">
                         <span class="badge-pill {{ $establishment->is_available ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
@@ -79,7 +90,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-5 py-8 text-center text-gray-400">Aucun établissement.</td>
+                    <td colspan="8" class="px-5 py-8 text-center text-gray-400">Aucun établissement.</td>
                 </tr>
             @endforelse
         </tbody>
