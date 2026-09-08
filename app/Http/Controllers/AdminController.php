@@ -957,7 +957,7 @@ public function updateEstablishment(Request $request, int $id)
             'description' => ['required', 'string'],
             'price_from' => ['required', 'numeric', 'min:0'],
             'capacity' => ['required', 'integer', 'min:1'],
-            'commission_pct' => ['nullable', 'numeric', 'min:20', 'max:30'],
+            'commission_pct' => ['nullable', 'numeric', 'in:15,20,25,30'],
             'latitude' => ['nullable', 'regex:/^-?\d{1,3}(\.\d+)?$/'],
             'longitude' => ['nullable', 'regex:/^-?\d{1,3}(\.\d+)?$/'],
             'transfer_available' => ['sometimes', 'boolean'],
