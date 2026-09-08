@@ -177,6 +177,22 @@ $driver = DB::connection()->getDriverName();
         return back()->with('status', 'Statut de l\'établissement mis à jour.');
     }
 
+    /**
+     * Fixe directement la commission plateforme (20-30 %) d'un établissement.
+     */
+    public function updateCommission(Request $request, int $id)
+    {
+        $establishment = Establishment::findOrFail($id);
+
+        $data = $request->validate([
+            'commission_pct' => ['required', 'numeric', 'min:20', 'max:30'],
+        ], [], ['commission_pct' => 'commission']);
+
+        $establishment->update(['commission_pct' => (float) $data['commission_pct']]);
+
+        return back()->with('status', "Commission de « {$establishment->name} » fixée à {$data['commission_pct']} %.");
+    }
+
     public function deleteEstablishment(int $id)
     {
         $establishment = Establishment::findOrFail($id);

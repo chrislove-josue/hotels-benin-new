@@ -31,6 +31,7 @@
                 <th class="px-5 py-3">Type</th>
                 <th class="px-5 py-3">Localité</th>
                 <th class="px-5 py-3">Prix / nuit</th>
+                <th class="px-5 py-3">Commission</th>
                 <th class="px-5 py-3">Propriétaire</th>
                 <th class="px-5 py-3">Disponible</th>
                 <th class="px-5 py-3 text-right">Actions</th>
