@@ -67,14 +67,8 @@
                 </select>
                 <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation.</p>
             </div>
-            <div>
-                <label class="label">Latitude</label>
-                <input type="text" name="latitude" value="{{ old('latitude') }}" class="input-field" placeholder="ex: 6.4969">
-            </div>
-            <div>
-                <label class="label">Longitude</label>
-                <input type="text" name="longitude" value="{{ old('longitude') }}" class="input-field" placeholder="ex: 2.6289">
-                <p class="mt-1 text-xs text-gray-400">Sert à afficher la localisation sur la carte. Trouvez les coordonnées sur <a href="https://www.google.com/maps" target="_blank" class="text-hb-blue underline">Google Maps</a> (clic droit → « Les coordonnées »).</p>
+            <div class="sm:col-span-2">
+                @include('backoffice.partials.location-picker', ['lat' => old('latitude'), 'lng' => old('longitude')])
             </div>
 </div>
     </div>

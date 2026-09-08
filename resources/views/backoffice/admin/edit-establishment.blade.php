@@ -73,12 +73,7 @@
             <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation.</p>
         </div>
         <div>
-            <label class="label">Localisation</label>
-            <div class="grid grid-cols-2 gap-2">
-                <input type="text" name="latitude" value="{{ old('latitude', $establishment->latitude) }}" class="input-field" placeholder="Latitude">
-                <input type="text" name="longitude" value="{{ old('longitude', $establishment->longitude) }}" class="input-field" placeholder="Longitude">
-            </div>
-            <p class="mt-1 text-xs text-gray-400">Google Maps → clic droit → « Les coordonnées ».</p>
+            @include('backoffice.partials.location-picker', ['lat' => old('latitude', $establishment->latitude), 'lng' => old('longitude', $establishment->longitude)])
         </div>
     </div>
 <div>

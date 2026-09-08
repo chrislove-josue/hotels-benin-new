@@ -74,16 +74,8 @@
             </div>
             <div></div>
         </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="label">Latitude</label>
-                <input type="text" name="latitude" value="{{ old('latitude', $establishment->latitude) }}" class="input-field" placeholder="ex: 6.4969">
-            </div>
-            <div>
-                <label class="label">Longitude</label>
-                <input type="text" name="longitude" value="{{ old('longitude', $establishment->longitude) }}" class="input-field" placeholder="ex: 2.6289">
-                <p class="mt-1 text-xs text-gray-400">Google Maps → clic droit → « Les coordonnées ».</p>
-            </div>
+        <div>
+            @include('backoffice.partials.location-picker', ['lat' => old('latitude', $establishment->latitude), 'lng' => old('longitude', $establishment->longitude)])
         </div>
 <div>
             <label class="label">Image de couverture (fichier)</label>

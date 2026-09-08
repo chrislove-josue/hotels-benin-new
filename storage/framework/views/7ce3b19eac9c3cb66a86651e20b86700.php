@@ -1,0 +1,49 @@
+
+<div x-data="locationPicker({ lat: <?php echo e((float) ($lat ?? 9.3077)); ?>, lng: <?php echo e((float) ($lng ?? 2.3158)); ?> })">
+    <label class="label">Localisation sur la carte</label>
+    <div x-ref="map" class="h-64 w-full rounded-xl border border-gray-200 shadow-sm"></div>
+    <input type="hidden" name="latitude" x-model="lat" :value="lat">
+    <input type="hidden" name="longitude" x-model="lng" :value="lng">
+    <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <p class="text-xs text-gray-500">
+            <i class="bi bi-geo-alt text-hb-orange"></i>
+            Cliquez pour placer le marqueur :
+            <span class="font-mono font-semibold text-hb-blue" x-text="lat.toFixed(6) + ', ' + lng.toFixed(6)"></span>
+        </p>
+        <span x-show="!hasPoint" class="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-semibold text-yellow-700">
+            <i class="bi bi-exclamation-triangle"></i> Localisation non définie
+        </span>
+    </div>
+
+    <script>
+        function locationPicker(initial) {
+            return {
+                lat: initial.lat,
+                lng: initial.lng,
+                hasPoint: initial.lat !== null && initial.lng !== null && (initial.lat !== 0 && initial.lng !== 0),
+                _map: null,
+                _marker: null,
+                init() {
+                    if (typeof L === 'undefined') return;
+                    this._map = L.map(this.$refs.map, { scrollWheelZoom: false }).setView([this.lat, this.lng], 7);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap', maxZoom: 19
+                    }).addTo(this._map);
+                    if (this.hasPoint) this._setMarker(this.lat, this.lng);
+                    this._map.on('click', (e) => {
+                        this.lat = e.latlng.lat;
+                        this.lng = e.latlng.lng;
+                        this.hasPoint = true;
+                        this._setMarker(this.lat, this.lng);
+                    });
+                    this.$nextTick(() => this._map.invalidateSize());
+                },
+                _setMarker(lat, lng) {
+                    if (this._marker) this._marker.remove();
+                    this._marker = L.marker([lat, lng]).addTo(this._map);
+                }
+            };
+        }
+    </script>
+</div>
+<?php /**PATH C:\Project\hotels-benin-new\resources\views/backoffice/partials/location-picker.blade.php ENDPATH**/ ?>
