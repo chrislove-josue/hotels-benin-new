@@ -91,19 +91,18 @@
                         zoomControl: true
                     }).setView([this.lat, this.lng], hasInit ? 14 : 7);
 
-                    // Fond avec relief (ombrage + courbes de niveau), rues détaillées et localités.
-                    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                        attribution: 'Données &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, fond &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
-                        maxZoom: 17,
-                        subdomains: 'abc'
+                    // Fond détaillé type Google Maps : rues, quartiers, lieux-dits, POI (source Esri).
+                    const base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                        maxZoom: 20
                     }).addTo(this._map);
 
-                    // Repli automatique sur le fond OSM standard si les tuiles topo échouent.
+                    // Repli automatique sur OSM standard si les tuiles Esri échouent.
                     let fallenBack = false;
                     this._map.on('tileerror', () => {
                         if (fallenBack) return;
                         fallenBack = true;
-                        this._map.removeLayer(topo);
+                        this._map.removeLayer(base);
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                             maxZoom: 19

@@ -395,9 +395,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var lat = {{ $establishment->latitude }};
     var lng = {{ $establishment->longitude }};
     var map = L.map('map', { scrollWheelZoom: false }).setView([lat, lng], 15);
-    var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        attribution: 'Données &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, fond &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
-        maxZoom: 17, subdomains: 'abc'
+    var topo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 20
     }).addTo(map);
     var fallenBack = false;
     map.on('tileerror', function () {
