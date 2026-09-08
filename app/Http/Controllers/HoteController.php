@@ -103,8 +103,8 @@ public function storeEstablishment(Request $request)
             'transfer_available' => $request->boolean('transfer_available'),
             'transfer_fee' => $data['transfer_fee'] ?? null,
             'transfer_description' => $data['transfer_description'] ?? null,
-            'latitude' => $data['latitude'] ?? null,
-            'longitude' => $data['longitude'] ?? null,
+            'latitude' => filled($data['latitude'] ?? null) ? $data['latitude'] : null,
+            'longitude' => filled($data['longitude'] ?? null) ? $data['longitude'] : null,
             'capacity' => $data['capacity'],
             'cover_image' => $cover,
             'is_available' => false, // en attente de validation par l'admin
@@ -163,6 +163,8 @@ public function updateEstablishment(Request $request, int $id)
         if (isset($data['commission_pct']) && is_numeric($data['commission_pct'])) {
             $data['commission_pct'] = (float) $data['commission_pct'];
         }
+        $data['latitude'] = filled($data['latitude'] ?? null) ? $data['latitude'] : null;
+        $data['longitude'] = filled($data['longitude'] ?? null) ? $data['longitude'] : null;
 
         // Upload de la couverture (fichier prioritaire sur l'URL)
         $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null);
