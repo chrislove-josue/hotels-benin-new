@@ -91,10 +91,24 @@
                         zoomControl: true
                     }).setView([this.lat, this.lng], hasInit ? 14 : 7);
 
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                        maxZoom: 19
+                    // Fond avec relief (ombrage + courbes de niveau), rues détaillées et localités.
+                    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                        attribution: 'Données &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, fond &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+                        maxZoom: 17,
+                        subdomains: 'abc'
                     }).addTo(this._map);
+
+                    // Repli automatique sur le fond OSM standard si les tuiles topo échouent.
+                    let fallenBack = false;
+                    this._map.on('tileerror', () => {
+                        if (fallenBack) return;
+                        fallenBack = true;
+                        this._map.removeLayer(topo);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                            maxZoom: 19
+                        }).addTo(this._map);
+                    });
 
                     if (hasInit) this._setMarker(this.lat, this.lng);
 
