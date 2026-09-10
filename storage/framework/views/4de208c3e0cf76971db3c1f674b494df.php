@@ -3,6 +3,32 @@
 <?php $__env->startSection('title', $establishment->name . ' — Hôtels Bénin'); ?>
 <?php $__env->startSection('meta_description', \Illuminate\Support\Str::limit($establishment->short_description, 155)); ?>
 
+<?php
+    $shareUrl = url()->current();
+    $ogImage = \Illuminate\Support\Str::startsWith($establishment->cover_image, 'http')
+        ? $establishment->cover_image
+        : asset($establishment->cover_image);
+    $shareText = $establishment->name . ' — ' . \Illuminate\Support\Str::limit($establishment->short_description, 120);
+    $shareTextEnc = urlencode($shareText);
+    $whatsappShare = 'https://wa.me/?text=' . $shareTextEnc . '%0A' . urlencode($shareUrl);
+    $facebookShare = 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode($shareUrl);
+    $twitterShare = 'https://twitter.com/intent/tweet?text=' . $shareTextEnc . '&url=' . urlencode($shareUrl);
+?>
+
+<?php $__env->startSection('og_meta'); ?>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Hôtels Bénin">
+    <meta property="og:title" content="<?php echo e($establishment->name); ?> — Hôtels Bénin">
+    <meta property="og:description" content="<?php echo e(\Illuminate\Support\Str::limit($establishment->short_description, 155)); ?>">
+    <meta property="og:url" content="<?php echo e($shareUrl); ?>">
+    <meta property="og:image" content="<?php echo e($ogImage); ?>">
+    <meta property="og:image:alt" content="<?php echo e($establishment->name); ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?php echo e($establishment->name); ?>">
+    <meta name="twitter:description" content="<?php echo e(\Illuminate\Support\Str::limit($establishment->short_description, 155)); ?>">
+    <meta name="twitter:image" content="<?php echo e($ogImage); ?>">
+<?php $__env->stopSection(); ?>
+
 <?php $__env->startSection('content'); ?>
 <?php
     $galleryImages = collect([$establishment->cover_image])->merge($establishment->images->pluck('path'))->values();
@@ -52,6 +78,24 @@
                 <i class="bi bi-geo-alt text-hb-orange"></i> <?php echo e($establishment->address); ?>, <?php echo e($establishment->locality->name); ?>
 
             </p>
+
+            
+            <div class="mt-4 flex flex-wrap items-center gap-2" x-data="{ copied: false }">
+                <span class="mr-1 text-xs font-semibold uppercase tracking-wide text-gray-400"><i class="bi bi-share"></i> Partager</span>
+                <a href="<?php echo e($whatsappShare); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-green-700">
+                    <i class="bi bi-whatsapp"></i> WhatsApp
+                </a>
+                <a href="<?php echo e($facebookShare); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700">
+                    <i class="bi bi-facebook"></i> Facebook
+                </a>
+                <a href="<?php echo e($twitterShare); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg bg-gray-800 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-gray-900">
+                    <i class="bi bi-twitter-x"></i> X
+                </a>
+                <button type="button" @click="navigator.clipboard.writeText('<?php echo e($shareUrl); ?>'); copied = true; setTimeout(() => copied = false, 2000)" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm transition hover:border-hb-orange hover:text-hb-orange">
+                    <i class="bi" :class="copied ? 'bi-check-lg' : 'bi-link-45deg'"></i>
+                    <span x-text="copied ? 'Copié !' : 'Copier le lien'"></span>
+                </button>
+            </div>
 
             
             <?php if($establishment->latitude && $establishment->longitude): ?>
