@@ -106,7 +106,11 @@
                             <a href="https://www.google.com/maps/dir/?api=1&destination={{ $establishment->latitude }},{{ $establishment->longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-hb-blue/10 px-2.5 py-1 text-xs font-semibold text-hb-blue transition hover:bg-hb-blue/20">
                                 <i class="bi bi-sign-turn-right"></i> Itinéraire
                             </a>
-                            <a href="https://wa.me/?text=Voici+la+localisation+de+{{ urlencode($establishment->name) }}%3A+https://maps.google.com/?q={{ $establishment->latitude }},{{ $establishment->longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700 transition hover:bg-green-100">
+                            @php
+    $mapShareText = 'Voici ' . $establishment->name . ' (' . $establishment->locality->name . ').';
+    $mapShare = 'https://wa.me/?text=' . urlencode($mapShareText) . '%0A' . urlencode($shareUrl) . '%0ALocalisation%3A+https://maps.google.com/?q=' . $establishment->latitude . ',' . $establishment->longitude;
+@endphp
+                            <a href="{{ $mapShare }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700 transition hover:bg-green-100">
                                 <i class="bi bi-share"></i> Partager
                             </a>
                         </div>
