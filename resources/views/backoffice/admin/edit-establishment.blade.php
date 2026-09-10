@@ -41,11 +41,12 @@
         </div>
         <div>
             <label class="label">Localité *</label>
-            <select name="locality_id" class="input-field" required>
-                @foreach($localities as $locality)
-                    <option value="{{ $locality->id }}" @selected($establishment->locality_id == $locality->id)>{{ $locality->name }}</option>
-                @endforeach
-            </select>
+            @include('backoffice.partials.locality-picker', [
+                'localities' => $localities,
+                'selected' => old('locality_id', $establishment->locality_id),
+                'addNewInit' => old('new_locality') ? 'true' : 'false',
+                'newLocalityValue' => old('new_locality'),
+            ])
         </div>
     </div>
     <div>
