@@ -66,7 +66,8 @@ public function storeEstablishment(Request $request)
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'establishment_type_id' => ['required', 'exists:establishment_types,id'],
-            'locality_id' => ['required', 'exists:localities,id'],
+            'locality_id' => ['required_without:new_locality', 'nullable', 'exists:localities,id'],
+            'new_locality' => ['required_without:locality_id', 'nullable', 'string', 'max:100'],
             'address' => ['required', 'string', 'max:255'],
             'short_description' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
@@ -85,6 +86,15 @@ public function storeEstablishment(Request $request)
             'amenities' => ['array'],
             'amenities.*' => ['exists:amenities,id'],
         ]);
+
+        // Nouvelle localité éventuelle (créée si demandée)
+        if ($request->filled('new_locality')) {
+            $locality = Locality::firstOrCreate(
+                ['name' => trim($request->input('new_locality'))],
+                ['slug' => Str::slug(trim($request->input('new_locality'))) . '-' . Str::lower(Str::random(5))]
+            );
+            $data['locality_id'] = $locality->id;
+        }
 
         // Upload de la couverture (fichier prioritaire sur l'URL)
         $cover = $this->resolveImage($request->file('cover_image_file'), $data['cover_image'] ?? null)
@@ -139,7 +149,8 @@ public function updateEstablishment(Request $request, int $id)
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'establishment_type_id' => ['required', 'exists:establishment_types,id'],
-            'locality_id' => ['required', 'exists:localities,id'],
+            'locality_id' => ['required_without:new_locality', 'nullable', 'exists:localities,id'],
+            'new_locality' => ['required_without:locality_id', 'nullable', 'string', 'max:100'],
             'address' => ['required', 'string', 'max:255'],
             'short_description' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
@@ -158,6 +169,15 @@ public function updateEstablishment(Request $request, int $id)
             'amenities' => ['array'],
             'amenities.*' => ['exists:amenities,id'],
         ]);
+
+        // Nouvelle localité éventuelle (créée si demandée)
+        if ($request->filled('new_locality')) {
+            $locality = Locality::firstOrCreate(
+                ['name' => trim($request->input('new_locality'))],
+                ['slug' => Str::slug(trim($request->input('new_locality'))) . '-' . Str::lower(Str::random(5))]
+            );
+            $data['locality_id'] = $locality->id;
+        }
 
         $data['transfer_available'] = $request->boolean('transfer_available');
         if (isset($data['commission_pct']) && is_numeric($data['commission_pct'])) {
