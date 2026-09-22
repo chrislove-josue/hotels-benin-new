@@ -487,6 +487,28 @@ document.addEventListener('DOMContentLoaded', function () {
     L.marker([lat, lng], { icon: icon }).addTo(map)
         .bindPopup('<strong style="font-size:14px;">{{ addslashes($establishment->name) }}</strong><br><span style="color:#4b5563;">{{ addslashes($establishment->address) }}, {{ addslashes($establishment->locality->name) }}</span><br><span style="font-family:monospace;font-size:12px;color:#6b7280;">{{ $establishment->latitude }}, {{ $establishment->longitude }}</span>');
 
+    // Itinéraire façon Google Maps : départ (position GPS ou Cotonou par défaut) -> établissement.
+    var routing = L.Routing.control({
+        waypoints: [
+            L.latLng(6.3656, 2.4189, 'Cotonou'),
+            L.latLng(lat, lng, '{{ addslashes($establishment->name) }}')
+        ],
+        routeWhileDragging: true,
+        showAlternatives: true,
+        fitSelectedRoutes: false,
+        lineOptions: {
+            styles: [{ color: '#4285F4', opacity: 0.85, weight: 6 }, { color: '#A2C2FF', opacity: 1, weight: 2 }]
+        },
+        geocoder: L.Control.Geocoder.nominatim({ geocodingQueryParams: { countrycodes: 'bj', 'accept-language': 'fr' } })
+    }).addTo(map);
+
+    // Départ réel de l'utilisateur si la géolocalisation est autorisée.
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (pos) {
+            routing.spliceWaypoints(0, 1, L.latLng(pos.coords.latitude, pos.coords.longitude));
+        }, function () { /* départ par défaut conservé */ }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
+    }
+
     setTimeout(function () { map.invalidateSize(); }, 200);
 });
 </script>
