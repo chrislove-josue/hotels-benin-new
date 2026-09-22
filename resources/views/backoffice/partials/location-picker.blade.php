@@ -40,7 +40,7 @@
                             aria-label="Rechercher une ville ou un lieu au Bénin" autocomplete="off" role="combobox" aria-expanded="showSuggestions">
 
                         {{-- Suggestions --}}
-                        <ul x-show="showSuggestions && suggestions.length" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 max-h-72 overflow-auto rounded-xl border border-gray-200 bg-white shadow-xl">
+                        <ul x-ref="suggestionsList" x-show="showSuggestions && suggestions.length" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 max-h-72 overflow-auto rounded-xl border border-gray-200 bg-white shadow-xl">
                             <template x-for="(s, i) in suggestions" :key="i">
                                 <li>
                                     <button type="button" @mousedown.prevent="chooseSuggestion(s)" @mouseenter="selectedIndex = i"
@@ -126,8 +126,72 @@
                 searching: false,
                 locating: false,
                 message: '',
+                suggestions: [],
+                showSuggestions: false,
+                selectedIndex: -1,
                 _map: null,
                 _marker: null,
+                async lookupSuggestions() {
+                    this.showSuggestions = true;
+                    if (!this.query || this.query.length < 2) {
+                        this.suggestions = [];
+                        this.selectedIndex = -1;
+                        return;
+                    }
+                    this.searching = true;
+                    try {
+                        const response = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&countrycodes=bj&accept-language=fr&q=' + encodeURIComponent(this.query), {
+                            headers: { Accept: 'application/json' }
+                        });
+                        if (!response.ok) throw new Error('suggest-failed');
+                        const results = await response.json();
+                        this.suggestions = (results || []).map((r) => ({
+                            lat: r.lat,
+                            lon: r.lon,
+                            display_name: r.display_name,
+                            type: ['Ville', 'Village', 'Quartier', 'Région', 'Lieu'].includes(r.type)
+                                ? ({ city: 'Ville', town: 'Ville', village: 'Village', suburb: 'Quartier', neighbourhood: 'Quartier', state: 'Département', country: 'Pays' }[r.type] || r.type)
+                                : (r.type || 'Lieu')
+                        }));
+                        this.selectedIndex = this.suggestions.length ? 0 : -1;
+                    } catch (error) {
+                        this.suggestions = [];
+                        this.selectedIndex = -1;
+                    } finally {
+                        this.searching = false;
+                    }
+                },
+                highlightNext() {
+                    if (!this.suggestions.length) return;
+                    this.selectedIndex = (this.selectedIndex + 1) % this.suggestions.length;
+                    this.$refs.suggestionsList && this.$el.querySelectorAll('li')[this.selectedIndex]?.scrollIntoView({ block: 'nearest' });
+                },
+                highlightPrev() {
+                    if (!this.suggestions.length) return;
+                    this.selectedIndex = (this.selectedIndex - 1 + this.suggestions.length) % this.suggestions.length;
+                    this.$el.querySelectorAll('li')[this.selectedIndex]?.scrollIntoView({ block: 'nearest' });
+                },
+                chooseHighlighted() {
+                    if (this.suggestions[this.selectedIndex]) {
+                        this.chooseSuggestion(this.suggestions[this.selectedIndex]);
+                    } else {
+                        this.searchAddress();
+                    }
+                },
+                chooseSuggestion(s) {
+                    this.lat = Number(Number(s.lat).toFixed(7));
+                    this.lng = Number(Number(s.lon).toFixed(7));
+                    this.hasPoint = true;
+                    this.query = s.display_name;
+                    this.showSuggestions = false;
+                    this.suggestions = [];
+                    this.selectedIndex = -1;
+                    this.message = 'Lieu sélectionné : ' + s.display_name;
+                    if (this._map) {
+                        this._setMarker(this.lat, this.lng);
+                        this._map.setView([this.lat, this.lng], 15, { animate: true });
+                    }
+                },
                 init() {
                     if (typeof L === 'undefined') return;
                     this._map = L.map(this.$refs.map, {
