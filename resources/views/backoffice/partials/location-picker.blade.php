@@ -189,7 +189,7 @@
                     this.message = 'Lieu sélectionné : ' + s.display_name;
                     if (this._map) {
                         this._setMarker(this.lat, this.lng);
-                        this._map.setView([this.lat, this.lng], 15, { animate: true });
+                        this._map.setView([this.lat, this.lng], 11, { animate: true });
                     }
                 },
                 init() {
@@ -197,7 +197,7 @@
                     this._map = L.map(this.$refs.map, {
                         scrollWheelZoom: false,
                         zoomControl: true
-                    }).setView([this.lat, this.lng], hasInit ? 13 : 7);
+                    }).setView([this.lat, this.lng], hasInit ? 11 : 7);
 
                     // Fond Esri World Street Map : gratuit sans clé, rendu type Google Maps (rues + labels).
                     // maxNativeZoom: 18 => Leaflet étire les tuiles au-delà, sans requêter un zoom
@@ -228,7 +228,7 @@
                         this.lng = e.latlng.lng;
                         this.hasPoint = true;
                         this._setMarker(this.lat, this.lng);
-                        this._map.setView([this.lat, this.lng], 15, { animate: true });
+                        this._map.setView([this.lat, this.lng], 11, { animate: true });
                     });
 
                     this.$nextTick(() => this._map.invalidateSize());
@@ -246,7 +246,7 @@
                     this.message = '';
                     if (this._map) {
                         this._setMarker(this.lat, this.lng);
-                        this._map.setView([this.lat, this.lng], 15, { animate: true });
+                        this._map.setView([this.lat, this.lng], 11, { animate: true });
                     }
                 },
                 async searchAddress() {
@@ -268,7 +268,7 @@
                         this.hasPoint = true;
                         this.message = 'Adresse trouvée. Vérifiez le marqueur puis ajustez-le si nécessaire.';
                         this._setMarker(this.lat, this.lng);
-                        this._map.setView([this.lat, this.lng], 16, { animate: true });
+                        this._map.setView([this.lat, this.lng], 11, { animate: true });
                     } catch (error) {
                         this.message = 'La recherche est indisponible. Vous pouvez placer le marqueur manuellement.';
                     } finally {
@@ -288,7 +288,7 @@
                         this.hasPoint = true;
                         this.message = 'Position actuelle utilisée. Ajustez le marqueur si nécessaire.';
                         this._setMarker(this.lat, this.lng);
-                        this._map.setView([this.lat, this.lng], 16, { animate: true });
+                        this._map.setView([this.lat, this.lng], 11, { animate: true });
                         this.locating = false;
                     }, () => {
                         this.message = 'Position inaccessible. Autorisez la géolocalisation ou placez le marqueur manuellement.';
