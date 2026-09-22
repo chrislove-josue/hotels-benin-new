@@ -39,25 +39,9 @@
                             class="input-field w-full" placeholder="Rechercher une ville, zone, entreprise, hôtel, lieu… au Bénin"
                             aria-label="Rechercher une ville, zone, entreprise ou lieu au Bénin" autocomplete="off" role="combobox" aria-expanded="showSuggestions">
 
-                        {{-- Catégories --}}
+                        {{-- Suggestions --}}
                         <div x-show="showSuggestions && query" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 rounded-xl border border-gray-200 bg-white shadow-xl">
-                            <div class="flex flex-wrap items-center gap-1.5 border-b border-gray-100 bg-gray-50 px-3 py-2">
-                                <span class="mr-1 text-[10px] font-bold uppercase tracking-wide text-gray-400">Catégories :</span>
-                                <button type="button" @click.prevent.stop="category = ''; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-                                    :class="category === '' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Toutes</button>
-                                <button type="button" @click.prevent.stop="category = 'city'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-                                    :class="category === 'city' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Villes</button>
-                                <button type="button" @click.prevent.stop="category = 'zone'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-                                    :class="category === 'zone' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Zones / Quartiers</button>
-                                <button type="button" @click.prevent.stop="category = 'company'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-                                    :class="category === 'company' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Entreprises</button>
-                                <button type="button" @click.prevent.stop="category = 'hotel'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-                                    :class="category === 'hotel' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Hôtels</button>
-                                <button type="button" @click.prevent.stop="category = 'poi'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-                                    :class="category === 'poi' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Autres lieux</button>
-                            </div>
-                            {{-- Suggestions --}}
-                            <ul x-ref="suggestionsList" x-show="suggestions.length && !(query && !searching && !suggestions.length)" class="max-h-72 overflow-auto">
+                            <ul x-ref="suggestionsList" class="max-h-72 overflow-auto">
                                 <template x-for="(s, i) in suggestions" :key="i">
                                     <li>
                                         <button type="button" @mousedown.prevent="chooseSuggestion(s)" @mouseenter="selectedIndex = i"
@@ -74,7 +58,7 @@
                                 </template>
                             </ul>
                             <p x-show="query && !searching && !suggestions.length" class="px-3 py-2.5 text-xs text-gray-500">
-                                Aucun lieu trouvé pour cette catégorie. Appuyez sur Entrée pour rechercher sur la carte, ou placez le marqueur manuellement.
+                                Aucun lieu trouvé. Appuyez sur Entrée pour rechercher sur la carte, ou placez le marqueur manuellement.
                             </p>
                         </div>
                     </div>
