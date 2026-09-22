@@ -144,7 +144,7 @@
                 focusBenin() {
                     if (!this._map) return;
                     if (this.hasPoint) {
-                        this._map.setView([this.lat, this.lng], 18, { animate: true });
+                        this._map.setView([this.lat, this.lng], 17, { animate: true });
                     } else {
                         this._map.setView(BENIN_CENTER, 7);
                     }
