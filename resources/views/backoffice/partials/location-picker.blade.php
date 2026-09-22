@@ -164,6 +164,8 @@
                         // Les autres catégories sont filtrées côté client sur les types retournés.
                         const f = this.category;
                         const featureType = f === 'city' ? '&featuretype=city' : (f === 'zone' ? '&featuretype=settlement' : '');
+                        // Nominatim (OSM) couvre mal le Bénin : résultats locaux fusionnés par-dessus.
+                        const local = this._searchLocal(this.query, f);
                         const response = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=25&countrycodes=bj&accept-language=fr&q=' + encodeURIComponent(this.query) + featureType, {
                             headers: { Accept: 'application/json' }
                         });
@@ -176,16 +178,33 @@
                             hotel: new Set(['hotel', 'guest_house', 'hostel', 'motel', 'resort', 'apartment']),
                             poi: new Set(['amenity', 'place_of_worship', 'hospital', 'school', 'university', 'market', 'restaurant', 'cafe', 'bank', 'fuel', 'police', 'fire_station', 'toilets', 'pharmacy', 'parking']),
                         }[f] || null;
-                        this.suggestions = (results || [])
+                        const nominated = (results || [])
                             .filter((r) => !allowed || allowed.has(r.type) || allowed.has(r.category))
                             .map((r) => this._decorateSuggestion(r));
+                        const seen = new Set(nominated.map((s) => s.norm));
+                        const merged = [...local.filter((s) => !seen.has(s.norm)), ...nominated];
+                        this.suggestions = merged.slice(0, 12);
                         this.selectedIndex = this.suggestions.length ? 0 : -1;
                     } catch (error) {
-                        this.suggestions = [];
-                        this.selectedIndex = -1;
+                        this.suggestions = this._searchLocal(this.query, this.category);
+                        this.selectedIndex = this.suggestions.length ? 0 : -1;
                     } finally {
                         this.searching = false;
                     }
+                },
+                _searchLocal(query, category) {
+                    const q = this._normalize(query);
+                    const out = [];
+                    for (const site of LOCAL_SITES) {
+                        if (q && site.hints.some((h) => this._normalize(h).includes(q))) {
+                            if (category && site.tags.indexOf(category) === -1) continue;
+                            out.push(this._decorateSuggestion(site));
+                        }
+                    }
+                    return out;
+                },
+                _normalize(str) {
+                    return (str || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
                 },
                 _decorateSuggestion(r) {
                     const t = r.type || '';
@@ -227,6 +246,7 @@
                         typeLabel,
                         fullLabel: r.display_name.split(',')[0],
                         icon: '<i class="bi ' + icon + ' text-sm"></i>',
+                        norm: this._normalize(r.display_name),
                     };
                 },
                 highlightNext() {
