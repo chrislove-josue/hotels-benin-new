@@ -91,15 +91,16 @@
                         zoomControl: true
                     }).setView([this.lat, this.lng], hasInit ? 17 : 7);
 
-                    // Fond CARTO Voyager : rendu moderne et propre (type Google Maps), fiable au Bénin.
-                    const base = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                        subdomains: 'abcd',
+                    // Fond Esri World Street Map : gratuit sans clé, rendu type Google Maps (rues + labels).
+                    // maxNativeZoom: 18 => Leaflet étire les tuiles au-delà, sans requêter un zoom
+                    // qui n'existe pas (évite les tuiles « Map data not yet available »).
+                    const base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles &copy; Esri &mdash; Source: Esri and the GIS User Community',
                         maxZoom: 19,
-                        maxNativeZoom: 19
+                        maxNativeZoom: 18
                     }).addTo(this._map);
 
-                    // Repli OSM standard si les tuiles CARTO échouent.
+                    // Repli OSM standard si les tuiles Esri échouent.
                     let fallenBack = false;
                     this._map.on('tileerror', () => {
                         if (fallenBack) return;

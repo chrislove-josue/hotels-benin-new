@@ -466,12 +466,12 @@ document.addEventListener('DOMContentLoaded', function () {
     var lat = {{ $establishment->latitude }};
     var lng = {{ $establishment->longitude }};
     var map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 17);
-    var base = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 19, maxNativeZoom: 19
+    var base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri and the GIS User Community',
+        maxZoom: 19, maxNativeZoom: 18
     }).addTo(map);
-    // Repli OSM standard si les tuiles CARTO échouent.
+    L.control.scale({ imperial: false }).addTo(map);
+    // Repli OSM standard si les tuiles Esri échouent.
     var fallenBack = false;
     map.on('tileerror', function () {
         if (fallenBack) return;
