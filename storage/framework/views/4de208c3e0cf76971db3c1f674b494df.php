@@ -100,11 +100,6 @@
             
             <?php if($establishment->latitude && $establishment->longitude): ?>
                 <div class="my-6 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between bg-hb-blue px-4 py-2 text-xs text-white">
-                        <span class="flex items-center gap-1.5 font-semibold"><i class="bi bi-geo-alt"></i> Localisation précise</span>
-                        <span class="font-semibold"><i class="bi bi-bullseye"></i> Zone de 50 km</span>
-                        <span class="font-mono tabular-nums tracking-wide opacity-90"><?php echo e($establishment->latitude); ?>, <?php echo e($establishment->longitude); ?></span>
-                    </div>
                     <div id="map" class="h-72 w-full sm:h-96"></div>
                     <div class="flex flex-wrap items-center justify-between gap-2 bg-white px-4 py-2.5 text-xs text-gray-500">
                         <span class="flex items-center gap-1"><i class="bi bi-geo-alt text-hb-orange"></i> <?php echo e($establishment->address); ?>, <?php echo e($establishment->locality->name); ?></span>
