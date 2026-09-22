@@ -197,7 +197,7 @@
                     this._map = L.map(this.$refs.map, {
                         scrollWheelZoom: false,
                         zoomControl: true
-                    }).setView([this.lat, this.lng], hasInit ? 17 : 7);
+                    }).setView([this.lat, this.lng], hasInit ? 13 : 7);
 
                     // Fond Esri World Street Map : gratuit sans clé, rendu type Google Maps (rues + labels).
                     // maxNativeZoom: 18 => Leaflet étire les tuiles au-delà, sans requêter un zoom
@@ -228,7 +228,7 @@
                         this.lng = e.latlng.lng;
                         this.hasPoint = true;
                         this._setMarker(this.lat, this.lng);
-                        this._map.setView([this.lat, this.lng], 17, { animate: true });
+                        this._map.setView([this.lat, this.lng], 15, { animate: true });
                     });
 
                     this.$nextTick(() => this._map.invalidateSize());
@@ -246,7 +246,7 @@
                     this.message = '';
                     if (this._map) {
                         this._setMarker(this.lat, this.lng);
-                        this._map.setView([this.lat, this.lng], 17, { animate: true });
+                        this._map.setView([this.lat, this.lng], 15, { animate: true });
                     }
                 },
                 async searchAddress() {
