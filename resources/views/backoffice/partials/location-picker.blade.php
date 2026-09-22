@@ -74,12 +74,8 @@
 
     <style>
         .hb-marker-wrap { position: relative; width: 40px; height: 44px; }
-        .hb-marker-wrap .hb-marker-pulse {
-            position: absolute; left: 0; top: 0; width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(245, 154, 35, 0.35); animation: hbMarkerPulse 1.8s ease-out infinite; z-index: 0;
-        }
         .hb-marker-wrap .hb-marker-pin {
-            position: relative; left: 0; top: 0; width: 40px; height: 40px;
+            position: absolute; left: 0; top: 0; width: 40px; height: 40px;
             display: flex; align-items: flex-end; justify-content: center;
         }
         .hb-marker-wrap .hb-marker-pin::before {
@@ -91,10 +87,6 @@
         .hb-marker-wrap .hb-marker-pin i {
             position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
             color: #fff; font-size: 15px; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-        @keyframes hbMarkerPulse {
-            0% { transform: scale(0.6); opacity: 1; }
-            100% { transform: scale(1.6); opacity: 0; }
         }
     </style>
 
@@ -219,7 +211,7 @@
                     if (this._marker) this._marker.remove();
                     const icon = L.divIcon({
                         className: '',
-                        html: '<div class="hb-marker-wrap"><span class="hb-marker-pulse"></span><span class="hb-marker-pin"><i class="bi bi-geo-alt-fill"></i></span></div>',
+                        html: '<div class="hb-marker-wrap"><span class="hb-marker-pin"><i class="bi bi-geo-alt-fill"></i></span></div>',
                         iconSize: [40, 44],
                         iconAnchor: [20, 42],
                         popupAnchor: [0, -40]

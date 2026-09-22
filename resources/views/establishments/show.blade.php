@@ -447,10 +447,6 @@
 @if($establishment->latitude && $establishment->longitude)
 <style>
     .hb-map-marker-wrap { position: relative; width: 42px; height: 42px; }
-    .hb-map-marker-wrap .hb-map-marker-pulse {
-        position: absolute; inset: 0; border-radius: 9999px; background: rgba(245, 154, 35, 0.35);
-        animation: hbMapMarkerPulse 1.8s ease-out infinite; z-index: 0;
-    }
     .hb-map-marker-wrap .hb-map-marker-pin { position: absolute; left: 1px; top: 1px; width: 40px; height: 40px; display: flex; align-items: flex-end; justify-content: center; }
     .hb-map-marker-wrap .hb-map-marker-pin::before {
         content: ''; position: absolute; bottom: 2px; left: 50%; width: 26px; height: 26px;
@@ -459,7 +455,6 @@
         box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
     }
     .hb-map-marker-wrap .hb-map-marker-pin i { position: absolute; bottom: 9px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 15px; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-    @keyframes hbMapMarkerPulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -485,7 +480,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     var icon = L.divIcon({
         className: '',
-        html: '<div class="hb-map-marker-wrap"><span class="hb-map-marker-pulse"></span><span class="hb-map-marker-pin"><i class="bi bi-geo-alt-fill"></i></span></div>',
+        html: '<div class="hb-map-marker-wrap"><span class="hb-map-marker-pin"><i class="bi bi-geo-alt-fill"></i></span></div>',
         iconSize: [42, 42], iconAnchor: [21, 40], popupAnchor: [0, -36]
     });
     L.marker([lat, lng], { icon: icon }).addTo(map)
