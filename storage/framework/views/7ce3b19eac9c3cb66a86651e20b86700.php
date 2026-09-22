@@ -36,28 +36,47 @@
                 <div class="flex flex-col gap-2 sm:flex-row">
                     <div class="relative flex-1">
                         <input type="search" x-model.trim="query" @input.debounce.300ms="lookupSuggestions()" @focus="if (query) lookupSuggestions()" @keydown.down.prevent="highlightNext()" @keydown.up.prevent="highlightPrev()" @keydown.enter.prevent="chooseHighlighted()" @focusout="setTimeout(() => showSuggestions = false, 200)"
-                            class="input-field w-full" placeholder="Tapez une ville, un quartier ou un lieu au Bénin (ex : Cotonou, Abomey, Ouidah)"
-                            aria-label="Rechercher une ville ou un lieu au Bénin" autocomplete="off" role="combobox" aria-expanded="showSuggestions">
+                            class="input-field w-full" placeholder="Rechercher une ville, zone, entreprise, hôtel, lieu… au Bénin"
+                            aria-label="Rechercher une ville, zone, entreprise ou lieu au Bénin" autocomplete="off" role="combobox" aria-expanded="showSuggestions">
 
                         
-                        <ul x-ref="suggestionsList" x-show="showSuggestions && suggestions.length" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 max-h-72 overflow-auto rounded-xl border border-gray-200 bg-white shadow-xl">
-                            <template x-for="(s, i) in suggestions" :key="i">
-                                <li>
-                                    <button type="button" @mousedown.prevent="chooseSuggestion(s)" @mouseenter="selectedIndex = i"
-                                        class="flex w-full items-start gap-2.5 px-3 py-2.5 text-left transition hover:bg-hb-cream"
-                                        :class="selectedIndex === i ? 'bg-hb-cream' : ''">
-                                        <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-hb-blue/10 text-hb-blue"><i class="bi bi-geo-alt text-sm"></i></span>
-                                        <span class="min-w-0">
-                                            <span class="block truncate text-sm font-semibold text-hb-blue-deeper" x-text="s.display_name"></span>
-                                            <span class="block text-[11px] text-gray-500" x-text="s.type"></span>
-                                        </span>
-                                    </button>
-                                </li>
-                            </template>
-                        </ul>
-                        <p x-show="showSuggestions && query && !searching && !suggestions.length" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-500 shadow-xl">
-                            Aucun lieu trouvé. Appuyez sur Entrée pour rechercher sur la carte, ou placez le marqueur manuellement.
-                        </p>
+                        <div x-show="showSuggestions && query" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 rounded-xl border border-gray-200 bg-white shadow-xl">
+                            <div class="flex flex-wrap items-center gap-1.5 border-b border-gray-100 bg-gray-50 px-3 py-2">
+                                <span class="mr-1 text-[10px] font-bold uppercase tracking-wide text-gray-400">Catégories :</span>
+                                <button type="button" @click.prevent.stop="category = ''; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                    :class="category === '' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Toutes</button>
+                                <button type="button" @click.prevent.stop="category = 'city'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                    :class="category === 'city' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Villes</button>
+                                <button type="button" @click.prevent.stop="category = 'zone'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                    :class="category === 'zone' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Zones / Quartiers</button>
+                                <button type="button" @click.prevent.stop="category = 'company'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                    :class="category === 'company' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Entreprises</button>
+                                <button type="button" @click.prevent.stop="category = 'hotel'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                    :class="category === 'hotel' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Hôtels</button>
+                                <button type="button" @click.prevent.stop="category = 'poi'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                    :class="category === 'poi' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Autres lieux</button>
+                            </div>
+                            
+                            <ul x-ref="suggestionsList" x-show="suggestions.length && !(query && !searching && !suggestions.length)" class="max-h-72 overflow-auto">
+                                <template x-for="(s, i) in suggestions" :key="i">
+                                    <li>
+                                        <button type="button" @mousedown.prevent="chooseSuggestion(s)" @mouseenter="selectedIndex = i"
+                                            class="flex w-full items-start gap-2.5 px-3 py-2.5 text-left transition hover:bg-hb-cream"
+                                            :class="selectedIndex === i ? 'bg-hb-cream' : ''">
+                                            <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-hb-blue/10 text-hb-blue" x-html="s.icon"></span>
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block truncate text-sm font-semibold text-hb-blue-deeper" x-text="s.display_name"></span>
+                                                <span class="block text-[11px] text-gray-500" x-text="s.fullLabel"></span>
+                                            </span>
+                                            <span class="mt-1 shrink-0 rounded-full bg-hb-gold/10 px-2 py-0.5 text-[10px] font-semibold text-hb-blue" x-text="s.typeLabel"></span>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
+                            <p x-show="query && !searching && !suggestions.length" class="px-3 py-2.5 text-xs text-gray-500">
+                                Aucun lieu trouvé pour cette catégorie. Appuyez sur Entrée pour rechercher sur la carte, ou placez le marqueur manuellement.
+                            </p>
+                        </div>
                     </div>
                     <button type="button" @click="searchAddress()" :disabled="searching || !query"
                         class="inline-flex items-center justify-center gap-2 rounded-xl bg-hb-blue px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-hb-blue-dark disabled:cursor-not-allowed disabled:opacity-50">
@@ -129,6 +148,7 @@
                 suggestions: [],
                 showSuggestions: false,
                 selectedIndex: -1,
+                category: '',
                 _map: null,
                 _marker: null,
                 async lookupSuggestions() {
@@ -140,19 +160,25 @@
                     }
                     this.searching = true;
                     try {
-                        const response = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&countrycodes=bj&accept-language=fr&q=' + encodeURIComponent(this.query), {
+                        // featuretype est le seul filtre serveur valide sur Nominatim (city/settlement).
+                        // Les autres catégories sont filtrées côté client sur les types retournés.
+                        const f = this.category;
+                        const featureType = f === 'city' ? '&featuretype=city' : (f === 'zone' ? '&featuretype=settlement' : '');
+                        const response = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=25&countrycodes=bj&accept-language=fr&q=' + encodeURIComponent(this.query) + featureType, {
                             headers: { Accept: 'application/json' }
                         });
                         if (!response.ok) throw new Error('suggest-failed');
                         const results = await response.json();
-                        this.suggestions = (results || []).map((r) => ({
-                            lat: r.lat,
-                            lon: r.lon,
-                            display_name: r.display_name,
-                            type: ['Ville', 'Village', 'Quartier', 'Région', 'Lieu'].includes(r.type)
-                                ? ({ city: 'Ville', town: 'Ville', village: 'Village', suburb: 'Quartier', neighbourhood: 'Quartier', state: 'Département', country: 'Pays' }[r.type] || r.type)
-                                : (r.type || 'Lieu')
-                        }));
+                        const allowed = {
+                            city: new Set(['city', 'town', 'village', 'county', 'municipality']),
+                            zone: new Set(['suburb', 'municipality', 'neighbourhood', 'borough', 'quarter', 'residential', 'industrial', 'commercial', 'hamlet', 'locality']),
+                            company: new Set(['office', 'bureau', 'shop', 'mall', 'factory', 'craft', 'works', 'company']),
+                            hotel: new Set(['hotel', 'guest_house', 'hostel', 'motel', 'resort', 'apartment']),
+                            poi: new Set(['amenity', 'place_of_worship', 'hospital', 'school', 'university', 'market', 'restaurant', 'cafe', 'bank', 'fuel', 'police', 'fire_station', 'toilets', 'pharmacy', 'parking']),
+                        }[f] || null;
+                        this.suggestions = (results || [])
+                            .filter((r) => !allowed || allowed.has(r.type) || allowed.has(r.category))
+                            .map((r) => this._decorateSuggestion(r));
                         this.selectedIndex = this.suggestions.length ? 0 : -1;
                     } catch (error) {
                         this.suggestions = [];
@@ -160,6 +186,48 @@
                     } finally {
                         this.searching = false;
                     }
+                },
+                _decorateSuggestion(r) {
+                    const t = r.type || '';
+                    const cat = r.category || '';
+                    const labels = {
+                        city: 'Ville', town: 'Ville', village: 'Village', county: 'Zone',
+                        suburb: 'Quartier', municipality: 'Zone', neighbourhood: 'Quartier',
+                        borough: 'Arrondissement', quarter: 'Quartier', residential: 'Zone résidentielle',
+                        industrial: 'Zone industrielle', commercial: 'Zone commerciale',
+                        state: 'Département', country: 'Pays', road: 'Rue', amenity: 'Lieu',
+                        shop: 'Commerce', office: 'Entreprise', bureau: 'Entreprise',
+                        tourism: 'Tourisme', building: 'Bâtiment', hotel: 'Hôtel', guest_house: 'Auberge',
+                        hostel: 'Auberge', motel: 'Motel', factory: 'Usine', restaurant: 'Restaurant',
+                        cafe: 'Café', hospital: 'Hôpital', school: 'École', university: 'Université',
+                        market: 'Marché', bank: 'Banque', fuel: 'Station-service', police: 'Police',
+                        place_of_worship: 'Lieu de culte', fire_station: 'Caserne de pompiers',
+                        station: 'Gare', aerodrome: 'Aéroport', boundary: 'Limite administratif',
+                    };
+                    const typeLabel = labels[t] || labels[cat] || 'Lieu';
+                    const icons = {
+                        city: 'bi-buildings', town: 'bi-buildings', village: 'bi-house-gear',
+                        county: 'bi-map', suburb: 'bi-cast', municipality: 'bi-map',
+                        neighbourhood: 'bi-cast', borough: 'bi-diagram-3', quarter: 'bi-cast',
+                        residential: 'bi-house', industrial: 'bi-gear', commercial: 'bi-bag',
+                        state: 'bi-pin-map', country: 'bi-globe', road: 'bi-signpost',
+                        amenity: 'bi-geo-alt', shop: 'bi-bag', office: 'bi-briefcase', bureau: 'bi-briefcase',
+                        tourism: 'bi-camera', building: 'bi-buildings', hotel: 'bi-building', guest_house: 'bi-house',
+                        hostel: 'bi-house', motel: 'bi-car-front', factory: 'bi-gear-wide-connected',
+                        restaurant: 'bi-shop', cafe: 'bi-cup-hot', hospital: 'bi-hospital', school: 'bi-mortarboard',
+                        university: 'bi-mortarboard', market: 'bi-basket', bank: 'bi-bank', fuel: 'bi-fuel-pump',
+                        police: 'bi-shield-lock', place_of_worship: 'bi-brightness-alt-high', fire_station: 'bi-fire',
+                        station: 'bi-train', aerodrome: 'bi-airplane', boundary: 'bi-bounding-box',
+                    };
+                    const icon = icons[t] || icons[cat] || 'bi-geo-alt-fill';
+                    return {
+                        lat: r.lat,
+                        lon: r.lon,
+                        display_name: r.display_name,
+                        typeLabel,
+                        fullLabel: r.display_name.split(',')[0],
+                        icon: '<i class="bi ' + icon + ' text-sm"></i>',
+                    };
                 },
                 highlightNext() {
                     if (!this.suggestions.length) return;

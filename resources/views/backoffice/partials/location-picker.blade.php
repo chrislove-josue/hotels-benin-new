@@ -39,9 +39,9 @@
                             class="input-field w-full" placeholder="Rechercher une ville, zone, entreprise, hôtel, lieu… au Bénin"
                             aria-label="Rechercher une ville, zone, entreprise ou lieu au Bénin" autocomplete="off" role="combobox" aria-expanded="showSuggestions">
 
-                        {{-- Suggestions --}}
-                        <ul x-ref="suggestionsList" x-show="showSuggestions && suggestions.length" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 max-h-72 overflow-auto rounded-xl border border-gray-200 bg-white shadow-xl">
-                            <li class="flex flex-wrap items-center gap-1.5 border-b border-gray-100 bg-gray-50 px-3 py-2">
+                        {{-- Catégories --}}
+                        <div x-show="showSuggestions && query" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 rounded-xl border border-gray-200 bg-white shadow-xl">
+                            <div class="flex flex-wrap items-center gap-1.5 border-b border-gray-100 bg-gray-50 px-3 py-2">
                                 <span class="mr-1 text-[10px] font-bold uppercase tracking-wide text-gray-400">Catégories :</span>
                                 <button type="button" @click.prevent.stop="category = ''; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
                                     :class="category === '' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Toutes</button>
@@ -55,25 +55,28 @@
                                     :class="category === 'hotel' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Hôtels</button>
                                 <button type="button" @click.prevent.stop="category = 'poi'; lookupSuggestions()" class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
                                     :class="category === 'poi' ? 'bg-hb-blue text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'">Autres lieux</button>
-                            </li>
-                            <template x-for="(s, i) in suggestions" :key="i">
-                                <li>
-                                    <button type="button" @mousedown.prevent="chooseSuggestion(s)" @mouseenter="selectedIndex = i"
-                                        class="flex w-full items-start gap-2.5 px-3 py-2.5 text-left transition hover:bg-hb-cream"
-                                        :class="selectedIndex === i ? 'bg-hb-cream' : ''">
-                                        <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-hb-blue/10 text-hb-blue" x-html="s.icon"></span>
-                                        <span class="min-w-0 flex-1">
-                                            <span class="block truncate text-sm font-semibold text-hb-blue-deeper" x-text="s.display_name"></span>
-                                            <span class="block text-[11px] text-gray-500" x-text="s.fullLabel"></span>
-                                        </span>
-                                        <span class="mt-1 shrink-0 rounded-full bg-hb-gold/10 px-2 py-0.5 text-[10px] font-semibold text-hb-blue" x-text="s.typeLabel"></span>
-                                    </button>
-                                </li>
-                            </template>
-                        </ul>
-                        <p x-show="showSuggestions && query && !searching && !suggestions.length" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-500 shadow-xl">
-                            Aucun lieu trouvé. Appuyez sur Entrée pour rechercher sur la carte, ou placez le marqueur manuellement.
-                        </p>
+                            </div>
+                            {{-- Suggestions --}}
+                            <ul x-ref="suggestionsList" x-show="suggestions.length && !(query && !searching && !suggestions.length)" class="max-h-72 overflow-auto">
+                                <template x-for="(s, i) in suggestions" :key="i">
+                                    <li>
+                                        <button type="button" @mousedown.prevent="chooseSuggestion(s)" @mouseenter="selectedIndex = i"
+                                            class="flex w-full items-start gap-2.5 px-3 py-2.5 text-left transition hover:bg-hb-cream"
+                                            :class="selectedIndex === i ? 'bg-hb-cream' : ''">
+                                            <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-hb-blue/10 text-hb-blue" x-html="s.icon"></span>
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block truncate text-sm font-semibold text-hb-blue-deeper" x-text="s.display_name"></span>
+                                                <span class="block text-[11px] text-gray-500" x-text="s.fullLabel"></span>
+                                            </span>
+                                            <span class="mt-1 shrink-0 rounded-full bg-hb-gold/10 px-2 py-0.5 text-[10px] font-semibold text-hb-blue" x-text="s.typeLabel"></span>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
+                            <p x-show="query && !searching && !suggestions.length" class="px-3 py-2.5 text-xs text-gray-500">
+                                Aucun lieu trouvé pour cette catégorie. Appuyez sur Entrée pour rechercher sur la carte, ou placez le marqueur manuellement.
+                            </p>
+                        </div>
                     </div>
                     <button type="button" @click="searchAddress()" :disabled="searching || !query"
                         class="inline-flex items-center justify-center gap-2 rounded-xl bg-hb-blue px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-hb-blue-dark disabled:cursor-not-allowed disabled:opacity-50">
