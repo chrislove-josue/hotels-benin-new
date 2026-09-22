@@ -466,7 +466,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof L === 'undefined') return;
     var lat = {{ $establishment->latitude }};
     var lng = {{ $establishment->longitude }};
-    var map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 17);
+    // Zoom 11 : vue locale d'environ 50 km, adaptée à la zone de recherche.
+    var map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 11);
     var base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri and the GIS User Community',
         maxZoom: 19, maxNativeZoom: 18
@@ -494,7 +495,6 @@ document.addEventListener('DOMContentLoaded', function () {
         fillColor: '#1A3A6B',
         fillOpacity: 0.08
     }).addTo(map);
-    map.fitBounds(radius.getBounds(), { padding: [20, 20] });
     L.marker([lat, lng], { icon: icon }).addTo(map)
         .bindPopup('<strong style="font-size:14px;">{{ addslashes($establishment->name) }}</strong><br><span style="color:#4b5563;">{{ addslashes($establishment->address) }}, {{ addslashes($establishment->locality->name) }}</span><br><span style="font-family:monospace;font-size:12px;color:#6b7280;">{{ $establishment->latitude }}, {{ $establishment->longitude }}</span>');
 

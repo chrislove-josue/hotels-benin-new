@@ -246,7 +246,7 @@
                 focusBenin() {
                     if (!this._map) return;
                     if (this.hasPoint) {
-                        this._map.fitBounds(this._radius.getBounds(), { padding: [20, 20], animate: true });
+                        this._map.setView([this.lat, this.lng], 11, { animate: true });
                     } else {
                         this._map.setView(BENIN_CENTER, 7);
                     }
