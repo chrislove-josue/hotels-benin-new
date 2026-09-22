@@ -268,7 +268,7 @@
                         this.hasPoint = true;
                         this.message = 'Adresse trouvée. Vérifiez le marqueur puis ajustez-le si nécessaire.';
                         this._setMarker(this.lat, this.lng);
-                        this._map.setView([this.lat, this.lng], 18, { animate: true });
+                        this._map.setView([this.lat, this.lng], 16, { animate: true });
                     } catch (error) {
                         this.message = 'La recherche est indisponible. Vous pouvez placer le marqueur manuellement.';
                     } finally {
@@ -288,7 +288,7 @@
                         this.hasPoint = true;
                         this.message = 'Position actuelle utilisée. Ajustez le marqueur si nécessaire.';
                         this._setMarker(this.lat, this.lng);
-                        this._map.setView([this.lat, this.lng], 18, { animate: true });
+                        this._map.setView([this.lat, this.lng], 16, { animate: true });
                         this.locating = false;
                     }, () => {
                         this.message = 'Position inaccessible. Autorisez la géolocalisation ou placez le marqueur manuellement.';
