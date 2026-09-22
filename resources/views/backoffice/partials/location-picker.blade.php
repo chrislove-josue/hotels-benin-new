@@ -112,7 +112,6 @@
                 message: '',
                 _map: null,
                 _marker: null,
-                _radius: null,
                 init() {
                     if (typeof L === 'undefined') return;
                     this._map = L.map(this.$refs.map, {
@@ -226,18 +225,9 @@
                         popupAnchor: [0, -40]
                     });
                     this._marker = L.marker([lat, lng], { icon }).addTo(this._map);
-                    if (this._radius) this._radius.remove();
-                    this._radius = L.circle([lat, lng], {
-                        radius: 50000,
-                        color: '#1A3A6B',
-                        weight: 2,
-                        fillColor: '#1A3A6B',
-                        fillOpacity: 0.08
-                    }).addTo(this._map);
                 },
                 clearPoint() {
                     if (this._marker) { this._marker.remove(); this._marker = null; }
-                    if (this._radius) { this._radius.remove(); this._radius = null; }
                     this.hasPoint = false;
                     this.lat = BENIN_CENTER[0];
                     this.lng = BENIN_CENTER[1];
