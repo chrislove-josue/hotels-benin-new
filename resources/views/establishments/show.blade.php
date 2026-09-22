@@ -458,19 +458,21 @@ document.addEventListener('DOMContentLoaded', function () {
     var lng = {{ $establishment->longitude }};
     // Zoom 11 : vue locale d'environ 50 km, adaptée à la zone de recherche.
     var map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 11);
-    var base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri and the GIS User Community',
+    // Fond Esri World Topo Map : relief, routes et noms de lieux/zones — rendu « relief » Google Maps.
+    var base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom',
         maxZoom: 19, maxNativeZoom: 18
     }).addTo(map);
     L.control.scale({ imperial: false }).addTo(map);
-    // Repli OSM standard si les tuiles Esri échouent.
+    // Repli Esri World Street Map si les tuiles topo échouent.
     var fallenBack = false;
     map.on('tileerror', function () {
         if (fallenBack) return;
         fallenBack = true;
         map.removeLayer(base);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap', maxZoom: 19, maxNativeZoom: 19
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri and the GIS User Community',
+            maxZoom: 19, maxNativeZoom: 18
         }).addTo(map);
     });
     var icon = L.divIcon({
