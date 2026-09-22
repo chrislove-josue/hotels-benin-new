@@ -180,7 +180,6 @@
                 suggestions: [],
                 showSuggestions: false,
                 selectedIndex: -1,
-                category: '',
                 _map: null,
                 _marker: null,
                 async lookupSuggestions() {
@@ -192,44 +191,30 @@
                     }
                     this.searching = true;
                     try {
-                        // featuretype est le seul filtre serveur valide sur Nominatim (city/settlement).
-                        // Les autres catégories sont filtrées côté client sur les types retournés.
-                        const f = this.category;
-                        const featureType = f === 'city' ? '&featuretype=city' : (f === 'zone' ? '&featuretype=settlement' : '');
                         // Nominatim (OSM) couvre mal le Bénin : résultats locaux fusionnés par-dessus.
-                        const local = this._searchLocal(this.query, f);
-                        const response = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=25&countrycodes=bj&accept-language=fr&q=' + encodeURIComponent(this.query) + featureType, {
+                        const local = this._searchLocal(this.query);
+                        const response = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=25&countrycodes=bj&accept-language=fr&q=' + encodeURIComponent(this.query), {
                             headers: { Accept: 'application/json' }
                         });
                         if (!response.ok) throw new Error('suggest-failed');
                         const results = await response.json();
-                        const allowed = {
-                            city: new Set(['city', 'town', 'village', 'county', 'municipality']),
-                            zone: new Set(['suburb', 'municipality', 'neighbourhood', 'borough', 'quarter', 'residential', 'industrial', 'commercial', 'hamlet', 'locality']),
-                            company: new Set(['office', 'bureau', 'shop', 'mall', 'factory', 'craft', 'works', 'company']),
-                            hotel: new Set(['hotel', 'guest_house', 'hostel', 'motel', 'resort', 'apartment']),
-                            poi: new Set(['amenity', 'place_of_worship', 'hospital', 'school', 'university', 'market', 'restaurant', 'cafe', 'bank', 'fuel', 'police', 'fire_station', 'toilets', 'pharmacy', 'parking']),
-                        }[f] || null;
-                        const nominated = (results || [])
-                            .filter((r) => !allowed || allowed.has(r.type) || allowed.has(r.category))
-                            .map((r) => this._decorateSuggestion(r));
+                        const nominated = (results || []).map((r) => this._decorateSuggestion(r));
                         const seen = new Set(nominated.map((s) => s.norm));
                         const merged = [...local.filter((s) => !seen.has(s.norm)), ...nominated];
                         this.suggestions = merged.slice(0, 12);
                         this.selectedIndex = this.suggestions.length ? 0 : -1;
                     } catch (error) {
-                        this.suggestions = this._searchLocal(this.query, this.category);
+                        this.suggestions = this._searchLocal(this.query);
                         this.selectedIndex = this.suggestions.length ? 0 : -1;
                     } finally {
                         this.searching = false;
                     }
                 },
-                _searchLocal(query, category) {
+                _searchLocal(query) {
                     const q = this._normalize(query);
                     const out = [];
                     for (const site of LOCAL_SITES) {
                         if (q && site.hints.some((h) => this._normalize(h).includes(q))) {
-                            if (category && site.tags.indexOf(category) === -1) continue;
                             out.push(this._decorateSuggestion(site));
                         }
                     }
