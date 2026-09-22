@@ -99,12 +99,19 @@
             {{-- Carte de localisation --}}
             @if($establishment->latitude && $establishment->longitude)
                 <div class="my-6 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
-                    <div id="map" class="h-64 w-full sm:h-80"></div>
-                    <div class="flex items-center justify-between bg-white px-4 py-2.5 text-xs text-gray-500">
+                    <div class="flex items-center justify-between bg-hb-blue px-4 py-2 text-xs text-white">
+                        <span class="flex items-center gap-1.5 font-semibold"><i class="bi bi-geo-alt"></i> Localisation précise</span>
+                        <span class="font-mono tabular-nums tracking-wide opacity-90">{{ $establishment->latitude }}, {{ $establishment->longitude }}</span>
+                    </div>
+                    <div id="map" class="h-72 w-full sm:h-96"></div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 bg-white px-4 py-2.5 text-xs text-gray-500">
                         <span class="flex items-center gap-1"><i class="bi bi-geo-alt text-hb-orange"></i> {{ $establishment->address }}, {{ $establishment->locality->name }}</span>
                         <div class="flex items-center gap-2">
                             <a href="https://www.google.com/maps/dir/?api=1&destination={{ $establishment->latitude }},{{ $establishment->longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-hb-blue/10 px-2.5 py-1 text-xs font-semibold text-hb-blue transition hover:bg-hb-blue/20">
                                 <i class="bi bi-sign-turn-right"></i> Itinéraire
+                            </a>
+                            <a href="https://www.google.com/maps?q={{ $establishment->latitude }},{{ $establishment->longitude }}\&z=17" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-hb-blue/10 px-2.5 py-1 text-xs font-semibold text-hb-blue transition hover:bg-hb-blue/20">
+                                <i class="bi bi-arrows-expand"></i> Plein écran
                             </a>
                             @php
     $mapShareText = 'Voici ' . $establishment->name . ' (' . $establishment->locality->name . ').';
@@ -437,12 +444,28 @@
 </div>
 
 @if($establishment->latitude && $establishment->longitude)
+<style>
+    .hb-map-marker-wrap { position: relative; width: 42px; height: 42px; }
+    .hb-map-marker-wrap .hb-map-marker-pulse {
+        position: absolute; inset: 0; border-radius: 9999px; background: rgba(245, 154, 35, 0.35);
+        animation: hbMapMarkerPulse 1.8s ease-out infinite; z-index: 0;
+    }
+    .hb-map-marker-wrap .hb-map-marker-pin { position: absolute; left: 1px; top: 1px; width: 40px; height: 40px; display: flex; align-items: flex-end; justify-content: center; }
+    .hb-map-marker-wrap .hb-map-marker-pin::before {
+        content: ''; position: absolute; bottom: 2px; left: 50%; width: 26px; height: 26px;
+        transform: translateX(-50%) rotate(45deg); border-radius: 50% 50% 50% 0;
+        background: linear-gradient(135deg, #F59A23, #D9820F); border: 3px solid #fff;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+    }
+    .hb-map-marker-wrap .hb-map-marker-pin i { position: absolute; bottom: 9px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 15px; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    @keyframes hbMapMarkerPulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     if (typeof L === 'undefined') return;
     var lat = {{ $establishment->latitude }};
     var lng = {{ $establishment->longitude }};
-    var map = L.map('map', { scrollWheelZoom: false }).setView([lat, lng], 15);
+    var map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 18);
     var topo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
         maxZoom: 20
@@ -456,7 +479,15 @@ document.addEventListener('DOMContentLoaded', function () {
             attribution: '&copy; OpenStreetMap', maxZoom: 19
         }).addTo(map);
     });
-    L.marker([lat, lng]).addTo(map).bindPopup('<strong>{{ addslashes($establishment->name) }}</strong><br>{{ addslashes($establishment->address) }}');
+    var icon = L.divIcon({
+        className: '',
+        html: '<div class="hb-map-marker-wrap"><span class="hb-map-marker-pulse"></span><span class="hb-map-marker-pin"><i class="bi bi-geo-alt-fill"></i></span></div>',
+        iconSize: [42, 42], iconAnchor: [21, 40], popupAnchor: [0, -36]
+    });
+    L.marker([lat, lng], { icon: icon }).addTo(map)
+        .bindPopup('<strong style="font-size:14px;">{{ addslashes($establishment->name) }}</strong><br><span style="color:#4b5563;">{{ addslashes($establishment->address) }}, {{ addslashes($establishment->locality->name) }}</span><br><span style="font-family:monospace;font-size:12px;color:#6b7280;">{{ $establishment->latitude }}, {{ $establishment->longitude }}</span>');
+
+    setTimeout(function () { map.invalidateSize(); }, 200);
 });
 </script>
 @endif

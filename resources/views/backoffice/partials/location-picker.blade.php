@@ -89,7 +89,7 @@
                     this._map = L.map(this.$refs.map, {
                         scrollWheelZoom: false,
                         zoomControl: true
-                    }).setView([this.lat, this.lng], hasInit ? 14 : 7);
+                    }).setView([this.lat, this.lng], hasInit ? 18 : 7);
 
                     // Fond détaillé type Google Maps : rues, quartiers, lieux-dits, POI (source Esri).
                     const base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
