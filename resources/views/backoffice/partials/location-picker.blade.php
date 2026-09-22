@@ -137,6 +137,54 @@
         function locationPicker(initial) {
             const hasInit = initial.lat !== null && initial.lng !== null;
             const BENIN_CENTER = [9.3077, 2.3158];
+            // Villes/quartiers/zones du Bénin avec coordonnées — complète Nominatim (OSM) qui
+            // couvre mal le pays. tags = catégories ('city','zone','company','hotel','poi').
+            const LOCAL_SITES = [
+                { name: 'Cotonou', lat: 6.3703, lng: 2.3912, tags: ['city'], type: 'city', hints: ['cotonou'] },
+                { name: 'Porto-Novo', lat: 6.4969, lng: 2.6289, tags: ['city'], type: 'city', hints: ['porto-novo', 'portonovo', 'adjara'] },
+                { name: 'Abomey-Calavi', lat: 6.4550, lng: 2.3400, tags: ['city'], type: 'city', hints: ['abomey-calavi', 'calavi'] },
+                { name: 'Parakou', lat: 9.3371, lng: 2.6303, tags: ['city'], type: 'city', hints: ['parakou'] },
+                { name: 'Djougou', lat: 9.7069, lng: 1.6666, tags: ['city'], type: 'city', hints: ['djougou'] },
+                { name: 'Bohicon', lat: 7.1817, lng: 2.0667, tags: ['city'], type: 'city', hints: ['bohicon'] },
+                { name: 'Abomey', lat: 7.1856, lng: 1.9914, tags: ['city'], type: 'city', hints: ['abomey'] },
+                { name: 'Natitingou', lat: 10.3056, lng: 1.3786, tags: ['city'], type: 'city', hints: ['natitingou'] },
+                { name: 'Ouidah', lat: 6.3631, lng: 2.0849, tags: ['city'], type: 'city', hints: ['ouidah'] },
+                { name: 'Lokossa', lat: 6.6344, lng: 1.7183, tags: ['city'], type: 'city', hints: ['lokossa'] },
+                { name: 'Comè', lat: 6.4056, lng: 2.0867, tags: ['city'], type: 'city', hints: ['come', 'comè'] },
+                { name: 'Sèmè-Podji', lat: 6.3686, lng: 2.6078, tags: ['city'], type: 'city', hints: ['seme-podji', 'seme podji', 'podji'] },
+                { name: 'Grand-Popo', lat: 6.2776, lng: 1.8286, tags: ['city'], type: 'city', hints: ['grand-popo'] },
+                { name: 'Allada', lat: 6.6667, lng: 2.1500, tags: ['city'], type: 'city', hints: ['allada'] },
+                { name: 'Savalou', lat: 6.9333, lng: 1.8167, tags: ['city'], type: 'city', hints: ['savalou'] },
+                { name: 'Savè', lat: 8.0333, lng: 2.4833, tags: ['city'], type: 'city', hints: ['save', 'savè'] },
+                { name: 'Tchaourou', lat: 8.9167, lng: 2.6500, tags: ['city'], type: 'city', hints: ['tchaourou'] },
+                { name: 'Kandi', lat: 11.1333, lng: 2.9333, tags: ['city'], type: 'city', hints: ['kandi'] },
+                { name: 'Dogbo', lat: 6.8167, lng: 1.7833, tags: ['city'], type: 'city', hints: ['dogbo'] },
+                { name: 'Sô-Ava', lat: 6.5000, lng: 2.3667, tags: ['city'], type: 'city', hints: ['so-ava', 'so ava'] },
+                // Quartiers / zones principales
+                { name: 'Cotonou — Quartier Fidjrossè', lat: 6.3486, lng: 2.3711, tags: ['zone'], type: 'suburb', hints: ['fidjrossè', 'fidjresse', 'fidj'] },
+                { name: 'Cotonou — Quartier Akpakpa', lat: 6.3772, lng: 2.4178, tags: ['zone'], type: 'suburb', hints: ['akpakpa'] },
+                { name: 'Cotonou — Quartier Ganhi', lat: 6.3686, lng: 2.3997, tags: ['zone'], type: 'suburb', hints: ['ganhi'] },
+                { name: 'Cotonou — Quartier Vèdoko', lat: 6.3603, lng: 2.4083, tags: ['zone'], type: 'suburb', hints: ['vedoko', 'vèdoko'] },
+                { name: 'Cotonou — Quartier Sainte-Rita', lat: 6.3639, lng: 2.4347, tags: ['zone'], type: 'suburb', hints: ['sainte-rita', 'sainte rita'] },
+                { name: 'Cotonou — Quartier Agla', lat: 6.3439, lng: 2.3997, tags: ['zone'], type: 'suburb', hints: ['agla'] },
+                { name: 'Cotonou — Quartier Gbégamey', lat: 6.3769, lng: 2.3989, tags: ['zone'], type: 'suburb', hints: ['gbegamey', 'gbègamey'] },
+                { name: 'Cotonou — Quartier Zogbo', lat: 6.3836, lng: 2.3961, tags: ['zone'], type: 'suburb', hints: ['zogbo'] },
+                { name: 'Cotonou — Quartier Mènontin', lat: 6.3544, lng: 2.3839, tags: ['zone'], type: 'suburb', hints: ['menontin', 'mènontin'] },
+                { name: 'Cotonou — Quartier Plage', lat: 6.3567, lng: 2.3617, tags: ['zone'], type: 'suburb', hints: ['plage', 'cotonou plage'] },
+                { name: 'Abomey-Calavi — Quartier Godomey', lat: 6.3694, lng: 2.3364, tags: ['zone'], type: 'suburb', hints: ['godomey'] },
+                { name: 'Abomey-Calavi — Quartier Zinvié', lat: 6.4611, lng: 2.3467, tags: ['zone'], type: 'suburb', hints: ['zinvié', 'zinvie'] },
+                { name: 'Abomey-Calavi — Quartier Ogoudou', lat: 6.4344, lng: 2.3428, tags: ['zone'], type: 'suburb', hints: ['ogoudou'] },
+                { name: 'Porto-Novo — Quartier Dowa', lat: 6.5028, lng: 2.6353, tags: ['zone'], type: 'suburb', hints: ['dowa'] },
+                { name: 'Porto-Novo — Quartier Adjarra', lat: 6.5411, lng: 2.6178, tags: ['zone'], type: 'suburb', hints: ['adjarra'] },
+                // Repères / POI
+                { name: 'Aéroport international Cadjèhoun', lat: 6.3571, lng: 2.3847, tags: ['poi'], type: 'aerodrome', hints: ['aeroport', 'cadjèhoun', 'cadjeahun'] },
+                { name: 'Pont du Mono', lat: 6.2417, lng: 1.8250, tags: ['poi'], type: 'amenity', hints: ['pont du mono'] },
+                { name: 'Route des Pêches (Ouidah)', lat: 6.3400, lng: 2.2300, tags: ['poi'], type: 'road', hints: ['route des peches', 'route des pêches'] },
+                { name: 'Marché Dantokpa (Cotonou)', lat: 6.3619, lng: 2.3839, tags: ['poi', 'company'], type: 'market', hints: ['dantokpa', 'marche dantokpa', 'marché dantokpa'] },
+                { name: 'Haie Vive (Cotonou)', lat: 6.3603, lng: 2.3986, tags: ['zone'], type: 'suburb', hints: ['haie vive'] },
+                { name: 'Togba (Abomey-Calavi)', lat: 6.4142, lng: 2.3439, tags: ['zone'], type: 'suburb', hints: ['togba'] },
+                { name: 'Somekpo (Sèmè-Podji)', lat: 6.3731, lng: 2.6489, tags: ['zone'], type: 'suburb', hints: ['somekpo'] },
+            ];
             return {
                 lat: hasInit ? initial.lat : BENIN_CENTER[0],
                 lng: hasInit ? initial.lng : BENIN_CENTER[1],
@@ -239,14 +287,15 @@
                         station: 'bi-train', aerodrome: 'bi-airplane', boundary: 'bi-bounding-box',
                     };
                     const icon = icons[t] || icons[cat] || 'bi-geo-alt-fill';
+                    const name = r.display_name || r.name || '';
                     return {
                         lat: r.lat,
                         lon: r.lon,
-                        display_name: r.display_name,
+                        display_name: name,
                         typeLabel,
-                        fullLabel: r.display_name.split(',')[0],
+                        fullLabel: name.split(',')[0],
                         icon: '<i class="bi ' + icon + ' text-sm"></i>',
-                        norm: this._normalize(r.display_name),
+                        norm: this._normalize(name),
                     };
                 },
                 highlightNext() {
