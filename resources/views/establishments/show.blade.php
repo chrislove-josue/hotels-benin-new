@@ -101,6 +101,7 @@
                 <div class="my-6 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between bg-hb-blue px-4 py-2 text-xs text-white">
                         <span class="flex items-center gap-1.5 font-semibold"><i class="bi bi-geo-alt"></i> Localisation précise</span>
+                        <span class="font-semibold"><i class="bi bi-bullseye"></i> Zone de 50 km</span>
                         <span class="font-mono tabular-nums tracking-wide opacity-90">{{ $establishment->latitude }}, {{ $establishment->longitude }}</span>
                     </div>
                     <div id="map" class="h-72 w-full sm:h-96"></div>
@@ -486,6 +487,14 @@ document.addEventListener('DOMContentLoaded', function () {
         html: '<div class="hb-map-marker-wrap"><span class="hb-map-marker-pulse"></span><span class="hb-map-marker-pin"><i class="bi bi-geo-alt-fill"></i></span></div>',
         iconSize: [42, 42], iconAnchor: [21, 40], popupAnchor: [0, -36]
     });
+    var radius = L.circle([lat, lng], {
+        radius: 50000,
+        color: '#1A3A6B',
+        weight: 2,
+        fillColor: '#1A3A6B',
+        fillOpacity: 0.08
+    }).addTo(map);
+    map.fitBounds(radius.getBounds(), { padding: [20, 20] });
     L.marker([lat, lng], { icon: icon }).addTo(map)
         .bindPopup('<strong style="font-size:14px;">{{ addslashes($establishment->name) }}</strong><br><span style="color:#4b5563;">{{ addslashes($establishment->address) }}, {{ addslashes($establishment->locality->name) }}</span><br><span style="font-family:monospace;font-size:12px;color:#6b7280;">{{ $establishment->latitude }}, {{ $establishment->longitude }}</span>');
 

@@ -31,6 +31,24 @@
             </div>
         </div>
 
+        <div class="border-b border-gray-100 bg-white p-4">
+            <div class="flex flex-col gap-2 sm:flex-row">
+                <input type="search" x-model.trim="query" @keydown.enter.prevent="searchAddress()"
+                    class="input-field flex-1" placeholder="Rechercher une adresse, un quartier ou un lieu au Bénin"
+                    aria-label="Rechercher une adresse au Bénin">
+                <button type="button" @click="searchAddress()" :disabled="searching || !query"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-hb-blue px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-hb-blue-dark disabled:cursor-not-allowed disabled:opacity-50">
+                    <i class="bi" :class="searching ? 'bi-arrow-repeat animate-spin' : 'bi-search'"></i>
+                    Rechercher
+                </button>
+                <button type="button" @click="useCurrentPosition()" :disabled="locating"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl border border-hb-blue/20 px-4 py-2.5 text-sm font-semibold text-hb-blue transition hover:bg-hb-blue/5 disabled:cursor-not-allowed disabled:opacity-50">
+                    <i class="bi bi-crosshair"></i> Ma position
+                </button>
+            </div>
+            <p x-show="message" x-text="message" class="mt-2 text-xs text-gray-500" role="status"></p>
+        </div>
+
         <div x-ref="map" class="h-[20rem] w-full bg-gray-100 md:h-[24rem]"></div>
 
         <div class="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 bg-white px-4 py-2.5">
@@ -42,9 +60,15 @@
                 </span>
                 <span x-show="!hasPoint" x-cloak>Cliquez sur la carte pour positionner l'établissement au Bénin.</span>
             </p>
-            <button type="button" @click="focusBenin()" class="inline-flex items-center gap-1.5 rounded-lg bg-hb-blue/5 px-2.5 py-1.5 text-[11px] font-semibold text-hb-blue transition hover:bg-hb-blue/10">
-                <i class="bi bi-zoom-in"></i> Voir le Bénin
-            </button>
+            <div class="flex items-center gap-2">
+                <input type="number" x-model.number="lat" @change="syncCoordinates()" step="0.0000001" min="-90" max="90"
+                    class="w-32 rounded-lg border border-gray-200 px-2 py-1.5 font-mono text-xs text-hb-blue" aria-label="Latitude">
+                <input type="number" x-model.number="lng" @change="syncCoordinates()" step="0.0000001" min="-180" max="180"
+                    class="w-32 rounded-lg border border-gray-200 px-2 py-1.5 font-mono text-xs text-hb-blue" aria-label="Longitude">
+                <button type="button" @click="focusBenin()" class="inline-flex items-center gap-1.5 rounded-lg bg-hb-blue/5 px-2.5 py-1.5 text-[11px] font-semibold text-hb-blue transition hover:bg-hb-blue/10">
+                    <i class="bi bi-zoom-in"></i> Voir
+                </button>
+            </div>
         </div>
     </div>
 
@@ -82,8 +106,13 @@
                 lat: hasInit ? initial.lat : BENIN_CENTER[0],
                 lng: hasInit ? initial.lng : BENIN_CENTER[1],
                 hasPoint: hasInit,
+                query: '',
+                searching: false,
+                locating: false,
+                message: '',
                 _map: null,
                 _marker: null,
+                _radius: null,
                 init() {
                     if (typeof L === 'undefined') return;
                     this._map = L.map(this.$refs.map, {
@@ -125,6 +154,68 @@
 
                     this.$nextTick(() => this._map.invalidateSize());
                 },
+                syncCoordinates() {
+                    const lat = Number(this.lat);
+                    const lng = Number(this.lng);
+                    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                        this.message = 'Veuillez saisir des coordonnées valides.';
+                        return;
+                    }
+                    this.lat = Number(lat.toFixed(7));
+                    this.lng = Number(lng.toFixed(7));
+                    this.hasPoint = true;
+                    this.message = '';
+                    if (this._map) {
+                        this._setMarker(this.lat, this.lng);
+                        this._map.setView([this.lat, this.lng], 17, { animate: true });
+                    }
+                },
+                async searchAddress() {
+                    if (!this.query || this.searching) return;
+                    this.searching = true;
+                    this.message = 'Recherche en cours…';
+                    try {
+                        const response = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=bj&q=' + encodeURIComponent(this.query), {
+                            headers: { Accept: 'application/json' }
+                        });
+                        if (!response.ok) throw new Error('search-failed');
+                        const results = await response.json();
+                        if (!results.length) {
+                            this.message = 'Aucun résultat trouvé au Bénin.';
+                            return;
+                        }
+                        this.lat = Number(Number(results[0].lat).toFixed(7));
+                        this.lng = Number(Number(results[0].lon).toFixed(7));
+                        this.hasPoint = true;
+                        this.message = 'Adresse trouvée. Vérifiez le marqueur puis ajustez-le si nécessaire.';
+                        this._setMarker(this.lat, this.lng);
+                        this._map.setView([this.lat, this.lng], 18, { animate: true });
+                    } catch (error) {
+                        this.message = 'La recherche est indisponible. Vous pouvez placer le marqueur manuellement.';
+                    } finally {
+                        this.searching = false;
+                    }
+                },
+                useCurrentPosition() {
+                    if (!navigator.geolocation) {
+                        this.message = 'La géolocalisation n’est pas disponible sur cet appareil.';
+                        return;
+                    }
+                    this.locating = true;
+                    this.message = 'Obtention de votre position…';
+                    navigator.geolocation.getCurrentPosition((position) => {
+                        this.lat = Number(position.coords.latitude.toFixed(7));
+                        this.lng = Number(position.coords.longitude.toFixed(7));
+                        this.hasPoint = true;
+                        this.message = 'Position actuelle utilisée. Ajustez le marqueur si nécessaire.';
+                        this._setMarker(this.lat, this.lng);
+                        this._map.setView([this.lat, this.lng], 18, { animate: true });
+                        this.locating = false;
+                    }, () => {
+                        this.message = 'Position inaccessible. Autorisez la géolocalisation ou placez le marqueur manuellement.';
+                        this.locating = false;
+                    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+                },
                 _setMarker(lat, lng) {
                     if (this._marker) this._marker.remove();
                     const icon = L.divIcon({
@@ -135,9 +226,18 @@
                         popupAnchor: [0, -40]
                     });
                     this._marker = L.marker([lat, lng], { icon }).addTo(this._map);
+                    if (this._radius) this._radius.remove();
+                    this._radius = L.circle([lat, lng], {
+                        radius: 50000,
+                        color: '#1A3A6B',
+                        weight: 2,
+                        fillColor: '#1A3A6B',
+                        fillOpacity: 0.08
+                    }).addTo(this._map);
                 },
                 clearPoint() {
                     if (this._marker) { this._marker.remove(); this._marker = null; }
+                    if (this._radius) { this._radius.remove(); this._radius = null; }
                     this.hasPoint = false;
                     this.lat = BENIN_CENTER[0];
                     this.lng = BENIN_CENTER[1];
@@ -146,7 +246,7 @@
                 focusBenin() {
                     if (!this._map) return;
                     if (this.hasPoint) {
-                        this._map.setView([this.lat, this.lng], 17, { animate: true });
+                        this._map.fitBounds(this._radius.getBounds(), { padding: [20, 20], animate: true });
                     } else {
                         this._map.setView(BENIN_CENTER, 7);
                     }
