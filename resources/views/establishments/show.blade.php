@@ -488,13 +488,6 @@ document.addEventListener('DOMContentLoaded', function () {
         html: '<div class="hb-map-marker-wrap"><span class="hb-map-marker-pulse"></span><span class="hb-map-marker-pin"><i class="bi bi-geo-alt-fill"></i></span></div>',
         iconSize: [42, 42], iconAnchor: [21, 40], popupAnchor: [0, -36]
     });
-    var radius = L.circle([lat, lng], {
-        radius: 50000,
-        color: '#1A3A6B',
-        weight: 2,
-        fillColor: '#1A3A6B',
-        fillOpacity: 0.08
-    }).addTo(map);
     L.marker([lat, lng], { icon: icon }).addTo(map)
         .bindPopup('<strong style="font-size:14px;">{{ addslashes($establishment->name) }}</strong><br><span style="color:#4b5563;">{{ addslashes($establishment->address) }}, {{ addslashes($establishment->locality->name) }}</span><br><span style="font-family:monospace;font-size:12px;color:#6b7280;">{{ $establishment->latitude }}, {{ $establishment->longitude }}</span>');
 
