@@ -18,7 +18,7 @@
     </div>
 @endif
 
-<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+<div class="grid grid-cols-1 gap-6">
     {{-- Formulaire d'édition --}}
 <form action="{{ route('hote.establishments.update', $establishment->id) }}" method="POST" enctype="multipart/form-data" class="card p-6 space-y-4">
         @csrf
