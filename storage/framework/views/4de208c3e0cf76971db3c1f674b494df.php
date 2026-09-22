@@ -102,6 +102,7 @@
                 <div class="my-6 overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between bg-hb-blue px-4 py-2 text-xs text-white">
                         <span class="flex items-center gap-1.5 font-semibold"><i class="bi bi-geo-alt"></i> Localisation précise</span>
+                        <span class="font-semibold"><i class="bi bi-bullseye"></i> Zone de 50 km</span>
                         <span class="font-mono tabular-nums tracking-wide opacity-90"><?php echo e($establishment->latitude); ?>, <?php echo e($establishment->longitude); ?></span>
                     </div>
                     <div id="map" class="h-72 w-full sm:h-96"></div>
@@ -467,7 +468,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof L === 'undefined') return;
     var lat = <?php echo e($establishment->latitude); ?>;
     var lng = <?php echo e($establishment->longitude); ?>;
-    var map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 17);
+    // Zoom 11 : vue locale d'environ 50 km, adaptée à la zone de recherche.
+    var map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 11);
     var base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri and the GIS User Community',
         maxZoom: 19, maxNativeZoom: 18
@@ -488,6 +490,13 @@ document.addEventListener('DOMContentLoaded', function () {
         html: '<div class="hb-map-marker-wrap"><span class="hb-map-marker-pulse"></span><span class="hb-map-marker-pin"><i class="bi bi-geo-alt-fill"></i></span></div>',
         iconSize: [42, 42], iconAnchor: [21, 40], popupAnchor: [0, -36]
     });
+    var radius = L.circle([lat, lng], {
+        radius: 50000,
+        color: '#1A3A6B',
+        weight: 2,
+        fillColor: '#1A3A6B',
+        fillOpacity: 0.08
+    }).addTo(map);
     L.marker([lat, lng], { icon: icon }).addTo(map)
         .bindPopup('<strong style="font-size:14px;"><?php echo e(addslashes($establishment->name)); ?></strong><br><span style="color:#4b5563;"><?php echo e(addslashes($establishment->address)); ?>, <?php echo e(addslashes($establishment->locality->name)); ?></span><br><span style="font-family:monospace;font-size:12px;color:#6b7280;"><?php echo e($establishment->latitude); ?>, <?php echo e($establishment->longitude); ?></span>');
 
