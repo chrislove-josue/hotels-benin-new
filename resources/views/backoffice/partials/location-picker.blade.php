@@ -89,23 +89,25 @@
                     this._map = L.map(this.$refs.map, {
                         scrollWheelZoom: false,
                         zoomControl: true
-                    }).setView([this.lat, this.lng], hasInit ? 18 : 7);
+                    }).setView([this.lat, this.lng], hasInit ? 17 : 7);
 
-                    // Fond détaillé type Google Maps : rues, quartiers, lieux-dits, POI (source Esri).
-                    const base = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-                        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-                        maxZoom: 20
+                    // Fond OSM standard : couverture fiable, jamais de tuile d'erreur.
+                    const base = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                        maxZoom: 19,
+                        maxNativeZoom: 19
                     }).addTo(this._map);
 
-                    // Repli automatique sur OSM standard si les tuiles Esri échouent.
+                    // Repli Esri (rues détaillées) si les tuiles OSM échouent.
                     let fallenBack = false;
                     this._map.on('tileerror', () => {
                         if (fallenBack) return;
                         fallenBack = true;
                         this._map.removeLayer(base);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                            maxZoom: 19
+                        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                            attribution: 'Tiles &copy; Esri &mdash; Source: Esri and the GIS User Community',
+                            maxZoom: 19,
+                            maxNativeZoom: 19
                         }).addTo(this._map);
                     });
 

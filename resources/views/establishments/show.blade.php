@@ -110,7 +110,7 @@
                             <a href="https://www.google.com/maps/dir/?api=1&destination={{ $establishment->latitude }},{{ $establishment->longitude }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-hb-blue/10 px-2.5 py-1 text-xs font-semibold text-hb-blue transition hover:bg-hb-blue/20">
                                 <i class="bi bi-sign-turn-right"></i> Itinéraire
                             </a>
-                            <a href="https://www.google.com/maps?q={{ $establishment->latitude }},{{ $establishment->longitude }}\&z=17" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-hb-blue/10 px-2.5 py-1 text-xs font-semibold text-hb-blue transition hover:bg-hb-blue/20">
+                            <a href="https://www.google.com/maps?q={{ $establishment->latitude }},{{ $establishment->longitude }}\&z=16" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg bg-hb-blue/10 px-2.5 py-1 text-xs font-semibold text-hb-blue transition hover:bg-hb-blue/20">
                                 <i class="bi bi-arrows-expand"></i> Plein écran
                             </a>
                             @php
@@ -465,18 +465,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof L === 'undefined') return;
     var lat = {{ $establishment->latitude }};
     var lng = {{ $establishment->longitude }};
-    var map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 18);
-    var topo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-        maxZoom: 20
+    var map = L.map('map', { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 17);
+    var base = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19, maxNativeZoom: 19
     }).addTo(map);
+    // Repli Esri (rue détaillée) si OSM échoue.
     var fallenBack = false;
     map.on('tileerror', function () {
         if (fallenBack) return;
         fallenBack = true;
-        map.removeLayer(topo);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap', maxZoom: 19
+        map.removeLayer(base);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri and the GIS User Community',
+            maxZoom: 19, maxNativeZoom: 19
         }).addTo(map);
     });
     var icon = L.divIcon({
