@@ -91,21 +91,22 @@
                         zoomControl: true
                     }).setView([this.lat, this.lng], hasInit ? 17 : 7);
 
-                    // Fond OSM standard : couverture fiable, jamais de tuile d'erreur.
-                    const base = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    // Fond CARTO Voyager : rendu moderne et propre (type Google Maps), fiable au Bénin.
+                    const base = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                        subdomains: 'abcd',
                         maxZoom: 19,
                         maxNativeZoom: 19
                     }).addTo(this._map);
 
-                    // Repli Esri (rues détaillées) si les tuiles OSM échouent.
+                    // Repli OSM standard si les tuiles CARTO échouent.
                     let fallenBack = false;
                     this._map.on('tileerror', () => {
                         if (fallenBack) return;
                         fallenBack = true;
                         this._map.removeLayer(base);
-                        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-                            attribution: 'Tiles &copy; Esri &mdash; Source: Esri and the GIS User Community',
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                             maxZoom: 19,
                             maxNativeZoom: 19
                         }).addTo(this._map);
