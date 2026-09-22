@@ -116,6 +116,7 @@
                         this.lng = e.latlng.lng;
                         this.hasPoint = true;
                         this._setMarker(this.lat, this.lng);
+                        this._map.setView([this.lat, this.lng], 17, { animate: true });
                     });
 
                     this.$nextTick(() => this._map.invalidateSize());
