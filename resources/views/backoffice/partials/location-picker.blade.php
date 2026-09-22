@@ -32,19 +32,43 @@
         </div>
 
         <div class="border-b border-gray-100 bg-white p-4">
-            <div class="flex flex-col gap-2 sm:flex-row">
-                <input type="search" x-model.trim="query" @keydown.enter.prevent="searchAddress()"
-                    class="input-field flex-1" placeholder="Rechercher une adresse, un quartier ou un lieu au Bénin"
-                    aria-label="Rechercher une adresse au Bénin">
-                <button type="button" @click="searchAddress()" :disabled="searching || !query"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-hb-blue px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-hb-blue-dark disabled:cursor-not-allowed disabled:opacity-50">
-                    <i class="bi" :class="searching ? 'bi-arrow-repeat animate-spin' : 'bi-search'"></i>
-                    Rechercher
-                </button>
-                <button type="button" @click="useCurrentPosition()" :disabled="locating"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl border border-hb-blue/20 px-4 py-2.5 text-sm font-semibold text-hb-blue transition hover:bg-hb-blue/5 disabled:cursor-not-allowed disabled:opacity-50">
-                    <i class="bi bi-crosshair"></i> Ma position
-                </button>
+            <div class="relative">
+                <div class="flex flex-col gap-2 sm:flex-row">
+                    <div class="relative flex-1">
+                        <input type="search" x-model.trim="query" @input.debounce.300ms="lookupSuggestions()" @focus="if (query) lookupSuggestions()" @keydown.down.prevent="highlightNext()" @keydown.up.prevent="highlightPrev()" @keydown.enter.prevent="chooseHighlighted()" @focusout="setTimeout(() => showSuggestions = false, 200)"
+                            class="input-field w-full" placeholder="Tapez une ville, un quartier ou un lieu au Bénin (ex : Cotonou, Abomey, Ouidah)"
+                            aria-label="Rechercher une ville ou un lieu au Bénin" autocomplete="off" role="combobox" aria-expanded="showSuggestions">
+
+                        {{-- Suggestions --}}
+                        <ul x-show="showSuggestions && suggestions.length" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 max-h-72 overflow-auto rounded-xl border border-gray-200 bg-white shadow-xl">
+                            <template x-for="(s, i) in suggestions" :key="i">
+                                <li>
+                                    <button type="button" @mousedown.prevent="chooseSuggestion(s)" @mouseenter="selectedIndex = i"
+                                        class="flex w-full items-start gap-2.5 px-3 py-2.5 text-left transition hover:bg-hb-cream"
+                                        :class="selectedIndex === i ? 'bg-hb-cream' : ''">
+                                        <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-hb-blue/10 text-hb-blue"><i class="bi bi-geo-alt text-sm"></i></span>
+                                        <span class="min-w-0">
+                                            <span class="block truncate text-sm font-semibold text-hb-blue-deeper" x-text="s.display_name"></span>
+                                            <span class="block text-[11px] text-gray-500" x-text="s.type"></span>
+                                        </span>
+                                    </button>
+                                </li>
+                            </template>
+                        </ul>
+                        <p x-show="showSuggestions && query && !searching && !suggestions.length" x-cloak class="absolute inset-x-0 top-full z-[1000] mt-1 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-500 shadow-xl">
+                            Aucun lieu trouvé. Appuyez sur Entrée pour rechercher sur la carte, ou placez le marqueur manuellement.
+                        </p>
+                    </div>
+                    <button type="button" @click="searchAddress()" :disabled="searching || !query"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-hb-blue px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-hb-blue-dark disabled:cursor-not-allowed disabled:opacity-50">
+                        <i class="bi" :class="searching ? 'bi-arrow-repeat animate-spin' : 'bi-search'"></i>
+                        Rechercher
+                    </button>
+                    <button type="button" @click="useCurrentPosition()" :disabled="locating"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl border border-hb-blue/20 px-4 py-2.5 text-sm font-semibold text-hb-blue transition hover:bg-hb-blue/5 disabled:cursor-not-allowed disabled:opacity-50">
+                        <i class="bi bi-crosshair"></i> Ma position
+                    </button>
+                </div>
             </div>
             <p x-show="message" x-text="message" class="mt-2 text-xs text-gray-500" role="status"></p>
         </div>
