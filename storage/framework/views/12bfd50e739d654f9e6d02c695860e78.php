@@ -48,4 +48,4 @@ $message = $__bag->first($__errorArgs[0]); ?>
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-</div><?php /**PATH C:\Project\hotels-benin-new\resources\views/backoffice/partials/locality-picker.blade.php ENDPATH**/ ?>
+</div><?php /**PATH C:\Project\hotels-benin-new\resources\views\backoffice\partials\locality-picker.blade.php ENDPATH**/ ?>

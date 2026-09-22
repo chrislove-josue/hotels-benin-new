@@ -72,4 +72,4 @@
     </a>
 </span>.    </div>
 </footer>
-<?php /**PATH C:\Project\hotels-benin-new\resources\views/partials/footer.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Project\hotels-benin-new\resources\views\partials\footer.blade.php ENDPATH**/ ?>

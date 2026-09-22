@@ -196,4 +196,4 @@
     </script>
 </body>
 </html>
-<?php /**PATH C:\Project\hotels-benin-new\resources\views/layouts/app.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Project\hotels-benin-new\resources\views\layouts\app.blade.php ENDPATH**/ ?>

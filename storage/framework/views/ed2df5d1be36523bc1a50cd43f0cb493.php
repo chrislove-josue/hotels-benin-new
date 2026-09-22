@@ -190,4 +190,4 @@
 
 </body>
 </html>
-<?php /**PATH C:\Project\hotels-benin-new\resources\views/layouts/backoffice.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Project\hotels-benin-new\resources\views\layouts\backoffice.blade.php ENDPATH**/ ?>

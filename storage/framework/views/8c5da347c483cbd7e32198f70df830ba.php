@@ -73,9 +73,9 @@
             </select>
             <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation.</p>
         </div>
-        <div>
-            <?php echo $__env->make('backoffice.partials.location-picker', ['lat' => old('latitude', $establishment->latitude), 'lng' => old('longitude', $establishment->longitude)], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-        </div>
+    </div>
+    <div class="sm:col-span-2">
+        <?php echo $__env->make('backoffice.partials.location-picker', ['lat' => old('latitude', $establishment->latitude), 'lng' => old('longitude', $establishment->longitude)], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     </div>
 <div>
         <label class="label">Image de couverture (fichier)</label>
@@ -162,4 +162,4 @@
 </form>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.backoffice', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Project\hotels-benin-new\resources\views/backoffice/admin/edit-establishment.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.backoffice', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Project\hotels-benin-new\resources\views\backoffice\admin\edit-establishment.blade.php ENDPATH**/ ?>

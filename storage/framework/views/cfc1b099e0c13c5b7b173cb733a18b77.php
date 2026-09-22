@@ -412,4 +412,4 @@
 
     </div>
 
-</header><?php /**PATH C:\Project\hotels-benin-new\resources\views/partials/header.blade.php ENDPATH**/ ?>
+</header><?php /**PATH C:\Project\hotels-benin-new\resources\views\partials\header.blade.php ENDPATH**/ ?>

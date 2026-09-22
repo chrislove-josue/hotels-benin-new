@@ -391,4 +391,4 @@
             };
         }
     </script>
-</div><?php /**PATH C:\Project\hotels-benin-new\resources\views/backoffice/partials/location-picker.blade.php ENDPATH**/ ?>
+</div><?php /**PATH C:\Project\hotels-benin-new\resources\views\backoffice\partials\location-picker.blade.php ENDPATH**/ ?>

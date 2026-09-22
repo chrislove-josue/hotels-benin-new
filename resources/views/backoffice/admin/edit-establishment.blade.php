@@ -73,9 +73,9 @@
             </select>
             <p class="mt-1 text-xs text-gray-400">Part prélevée sur chaque réservation.</p>
         </div>
-        <div>
-            @include('backoffice.partials.location-picker', ['lat' => old('latitude', $establishment->latitude), 'lng' => old('longitude', $establishment->longitude)])
-        </div>
+    </div>
+    <div class="sm:col-span-2">
+        @include('backoffice.partials.location-picker', ['lat' => old('latitude', $establishment->latitude), 'lng' => old('longitude', $establishment->longitude)])
     </div>
 <div>
         <label class="label">Image de couverture (fichier)</label>
